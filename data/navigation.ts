@@ -8,6 +8,7 @@
 //   components/layout/navigation/icon-registry.ts
 // ============================================
 
+import { ShoppingBag, CalendarDays } from "lucide-react";
 import type { NavigationConfig } from "@/types";
 
 export const navigationConfig: NavigationConfig = {
@@ -36,12 +37,14 @@ export const navigationConfig: NavigationConfig = {
       label:   "Shop",
       variant: "secondary",
       path:    "/shop",
+      Icon:    ShoppingBag,
     },
     {
       label:   "Book a Call",
       variant: "primary",
       // href: "https://cal.com/yourname",  // ← uncomment for Calendly / Cal.com
       path:    "/book",
+      Icon:    CalendarDays,
     },
   ],
 };

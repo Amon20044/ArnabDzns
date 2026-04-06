@@ -36,6 +36,8 @@ export interface CTAConfig {
   path?: string;
   /** External URL — opens in new tab */
   href?: string;
+  /** Lucide icon rendered when icon-only (unhovered) */
+  Icon?: LucideIcon;
 }
 
 export interface NavigationConfig {

@@ -50,6 +50,35 @@ export const Navigation = () => {
   };
 
   return (
+    <>
+      {/* Hidden SVG displacement filter — referenced by backdrop-filter: url(#lg-distort)
+          in .glass-capsule / .glass-capsule-primary (Chrome/Edge only; degrades gracefully). */}
+      <svg
+        aria-hidden
+        focusable="false"
+        xmlns="http://www.w3.org/2000/svg"
+        style={{ position: "absolute", width: 0, height: 0, overflow: "hidden" }}
+      >
+        <defs>
+          <filter id="lg-distort">
+            <feTurbulence
+              type="turbulence"
+              baseFrequency="0.015 0.02"
+              numOctaves="2"
+              seed="3"
+              result="turbulence"
+            />
+            <feDisplacementMap
+              in="SourceGraphic"
+              in2="turbulence"
+              scale="8"
+              xChannelSelector="R"
+              yChannelSelector="G"
+            />
+          </filter>
+        </defs>
+      </svg>
+
     <motion.nav
       ref={navbarRef}
       role="navigation"
@@ -105,7 +134,9 @@ export const Navigation = () => {
         {ctas.map((cta) => (
           <CTAButton key={cta.label} config={cta} />
         ))}
+        
       </div>
     </motion.nav>
+    </>
   );
 };
