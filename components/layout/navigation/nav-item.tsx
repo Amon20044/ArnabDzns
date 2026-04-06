@@ -1,53 +1,79 @@
 "use client";
 
-import Link from "next/link";
-import { motion, useSpring } from "framer-motion";
-import { useEffect, useState } from "react";
 import type { LucideIcon } from "lucide-react";
+import { motion, useSpring } from "framer-motion";
+import Link from "next/link";
+import { useEffect, useRef, useState } from "react";
 import { cn } from "@/lib/utils";
 
 interface NavItemProps {
+  id: string;
   to: string;
   label: string;
   Icon: LucideIcon;
   isActive: boolean;
-  /** Dock magnification size in px (driven by mouse proximity) */
   iconSize: number;
+  isNew?: boolean;
 }
 
-export const NavItem = ({ to, label, Icon, isActive, iconSize }: NavItemProps) => {
+export const NavItem = ({
+  id,
+  to,
+  label,
+  Icon,
+  isActive,
+  iconSize,
+  isNew = false,
+}: NavItemProps) => {
   const [hovered, setHovered] = useState(false);
+  const [labelWidth, setLabelWidth] = useState(0);
   const sizeSpring = useSpring(iconSize, { stiffness: 380, damping: 18 });
+  const labelInnerRef = useRef<HTMLSpanElement>(null);
 
   useEffect(() => {
     sizeSpring.set(iconSize);
   }, [iconSize, sizeSpring]);
 
+  useEffect(() => {
+    const labelInner = labelInnerRef.current;
+
+    if (!labelInner) {
+      return;
+    }
+
+    const measure = () => setLabelWidth(labelInner.scrollWidth);
+
+    measure();
+
+    const resizeObserver = new ResizeObserver(measure);
+    resizeObserver.observe(labelInner);
+
+    return () => resizeObserver.disconnect();
+  }, [isNew, label]);
+
   return (
     <Link
       href={to}
+      data-nav-item={id}
       className={cn(
-        "group relative flex items-center rounded-full select-none",
+        "group relative flex shrink-0 items-center rounded-full select-none",
         "transition-colors duration-150",
-        isActive ? "text-accent" : "text-[#71717a] hover:text-[#18181b]"
+        isActive ? "text-accent" : "text-text-secondary hover:text-text-primary"
       )}
-      aria-label={label}
+      aria-label={isNew ? `${label}, new` : label}
       aria-current={isActive ? "page" : undefined}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
     >
-      {/* Liquid glass capsule — Framer Motion handles isActive dim */}
       <motion.div
         aria-hidden
-        className="absolute inset-0 rounded-full glass-capsule pointer-events-none"
+        className="glass-capsule pointer-events-none absolute inset-0 rounded-full"
         initial={false}
         animate={{ opacity: hovered ? 1 : isActive ? 0.45 : 0 }}
         transition={{ duration: 0.22, ease: "easeOut" }}
       />
 
-      {/* Content row */}
       <div className="relative z-10 flex items-center py-[7px] pl-[11px] pr-[11px]">
-        {/* Icon + active dot */}
         <div className="relative shrink-0">
           <motion.div
             className="flex items-center justify-center"
@@ -59,29 +85,43 @@ export const NavItem = ({ to, label, Icon, isActive, iconSize }: NavItemProps) =
             />
           </motion.div>
 
-          {isActive && (
+          {isActive ? (
             <motion.div
               layoutId="navDot"
-              className="absolute left-1/2 -translate-x-1/2 -bottom-[9px] w-[4px] h-[4px] rounded-full bg-accent"
+              className="absolute -bottom-[9px] left-1/2 h-[4px] w-[4px] -translate-x-1/2 rounded-full bg-accent"
               animate={{ opacity: hovered ? 0 : 1 }}
               transition={{ duration: 0.15 }}
             />
-          )}
+          ) : null}
         </div>
 
-        {/* Label — CSS group-hover reveal (reliable: fires on native :hover, no JS needed) */}
-        <span
+        <motion.span
           aria-hidden
-          className={cn(
-            "block whitespace-nowrap overflow-hidden leading-none",
-            "text-[12px] font-medium tracking-wide",
-            "transition-all duration-[260ms] ease-[cubic-bezier(0.4,0,0.2,1)]",
-            "max-w-0 opacity-0 ml-0",
-            "group-hover:max-w-[96px] group-hover:opacity-100 group-hover:ml-[7px]"
-          )}
+          className="block overflow-hidden leading-none"
+          initial={false}
+          animate={{
+            marginLeft: hovered ? 7 : 0,
+            maxWidth: hovered ? labelWidth : 0,
+            opacity: hovered ? 1 : 0,
+          }}
+          transition={{ duration: 0.26, ease: [0.4, 0, 0.2, 1] }}
         >
-          {label}
-        </span>
+          <span
+            ref={labelInnerRef}
+            className="inline-flex items-center gap-2 whitespace-nowrap"
+          >
+            <span className="text-[12px] font-medium tracking-wide">{label}</span>
+
+            {isNew ? (
+              <span
+                className="rounded-full border border-accent/20 bg-accent/10
+                           px-1.5 py-0.5 text-[9px] font-semibold uppercase tracking-[0.18em] text-accent"
+              >
+                New
+              </span>
+            ) : null}
+          </span>
+        </motion.span>
       </div>
     </Link>
   );

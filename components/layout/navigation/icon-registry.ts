@@ -1,28 +1,20 @@
-// ============================================
-// ICON REGISTRY
-// Maps nav item IDs → Lucide icon components.
-//
-// To add a new nav item:
-//  1. Add the entry in data/navigation.ts
-//  2. Import the icon here and add the mapping.
-// ============================================
-
 import {
+  FolderKanban,
   Home,
   Layers,
-  Sparkles,
-  ShoppingBag,
-  User,
   Mail,
+  ShoppingBag,
+  Sparkles,
+  User,
 } from "lucide-react";
-
 import type { NavIconRegistry } from "@/types";
 
 export const iconRegistry: NavIconRegistry = {
-  home:      Home,
+  home: Home,
   portfolio: Layers,
-  services:  Sparkles,
-  shop:      ShoppingBag,
-  about:     User,
-  contact:   Mail,
+  projects: FolderKanban,
+  services: Sparkles,
+  shop: ShoppingBag,
+  about: User,
+  contact: Mail,
 };
