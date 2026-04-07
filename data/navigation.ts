@@ -1,4 +1,4 @@
-import { CalendarDays, ShoppingBag } from "lucide-react";
+import { CalendarDays } from "lucide-react";
 import type { HeaderConfig, NavigationConfig } from "@/types";
 
 export const headerConfig: HeaderConfig = {

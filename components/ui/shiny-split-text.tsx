@@ -2,7 +2,13 @@
 
 import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
-import { animate, motion, useMotionValue } from "motion/react";
+import {
+  animate,
+  motion,
+  useMotionValue,
+  type MotionStyle,
+  type MotionValue,
+} from "motion/react";
 import {
   type CSSProperties,
   useEffect,
@@ -23,7 +29,13 @@ type TextPart = {
   whitespace?: boolean;
 };
 
-type CSSVariableStyle = CSSProperties & Record<`--${string}`, string | number>;
+type MotionCSSVariableStyle = MotionStyle &
+  CSSProperties &
+  Record<`--${string}`, string | number | MotionValue<number>>;
+
+type StaticCSSVariableStyle = MotionStyle &
+  CSSProperties &
+  Record<`--${string}`, string | number>;
 
 export interface ShinySplitTextProps {
   text: string;
@@ -121,6 +133,7 @@ export function ShinySplitText({
   const [isVisible, setIsVisible] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
   const shinePosition = useMotionValue(direction === "left" ? 145 : -145);
+  const shouldAnimateIn = disabled || isVisible;
 
   const parts = useMemo(() => splitText(text, splitType), [text, splitType]);
   const animationKey = useMemo(
@@ -139,8 +152,16 @@ export function ShinySplitText({
   );
 
   const shineBand = Math.max(10, Math.min(spread / 8, 24));
+  const rootStyle = useMemo<MotionCSSVariableStyle>(
+    () => ({
+      ...style,
+      textAlign,
+      "--shine-position": shinePosition,
+    }),
+    [shinePosition, style, textAlign],
+  );
 
-  const shinyGlyphStyle = useMemo<CSSVariableStyle>(
+  const shinyGlyphStyle = useMemo<StaticCSSVariableStyle>(
     () => ({
       "--shiny-band": `${shineBand}%`,
       "--shiny-color": color,
@@ -150,10 +171,7 @@ export function ShinySplitText({
   );
 
   useEffect(() => {
-    if (disabled) {
-      setIsVisible(true);
-      return;
-    }
+    if (disabled) return;
 
     const node = containerRef.current;
 
@@ -217,7 +235,7 @@ export function ShinySplitText({
 
       gsap.set(targets, from);
 
-      if (!isVisible) {
+      if (!shouldAnimateIn) {
         return;
       }
 
@@ -242,7 +260,7 @@ export function ShinySplitText({
     {
       dependencies: [
         animationKey,
-        isVisible,
+        shouldAnimateIn,
         onLetterAnimationComplete,
         showCallback,
       ],
@@ -251,8 +269,6 @@ export function ShinySplitText({
     },
   );
 
-  glyphRefs.current = [];
-
   return (
     <motion.span
       ref={containerRef}
@@ -260,7 +276,7 @@ export function ShinySplitText({
         "inline-block text-balance text-4xl font-semibold leading-[0.95] tracking-tight text-text-primary md:text-6xl",
         className,
       )}
-      style={{ ...style, textAlign, ["--shine-position" as "--shine-position"]: shinePosition } as any}
+      style={rootStyle}
       onHoverStart={() => setIsHovered(true)}
       onHoverEnd={() => setIsHovered(false)}
       onMouseEnter={() => setIsHovered(true)}
@@ -268,7 +284,7 @@ export function ShinySplitText({
       aria-label={text}
     >
       <span aria-hidden="true" className="inline whitespace-pre-wrap">
-        {parts.map((part) => {
+        {parts.map((part, index) => {
           if (part.value === "\n") {
             return <br key={part.id} />;
           }
@@ -286,8 +302,11 @@ export function ShinySplitText({
               key={part.id}
               ref={(node) => {
                 if (node) {
-                  glyphRefs.current.push(node);
+                  glyphRefs.current[index] = node;
+                  return;
                 }
+
+                delete glyphRefs.current[index];
               }}
               className="inline-block will-change-transform"
             >
