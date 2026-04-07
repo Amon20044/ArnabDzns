@@ -3,7 +3,8 @@
     "allow": [
       "Bash(curl -s \"https://api.github.com/repos/polidario/Frontend-Projects/contents/liquid-glass-vue/src/components\")",
       "Bash(curl -s \"https://api.github.com/repos/polidario/Frontend-Projects/contents/liquid-glass-vue/src/assets\")",
-      "WebFetch(domain:raw.githubusercontent.com)"
+      "WebFetch(domain:raw.githubusercontent.com)",
+      "Bash(git checkout:*)"
     ]
   }
 }

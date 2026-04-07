@@ -1,8 +1,9 @@
 "use client";
 
-import Link from "next/link";
 import { motion } from "framer-motion";
+import Link from "next/link";
 import { useState } from "react";
+import { PrimaryButton } from "@/components/ui/primary-button";
 import { cn } from "@/lib/utils";
 import type { CTAConfig } from "@/types";
 
@@ -11,34 +12,52 @@ interface CTAButtonProps {
 }
 
 export const CTAButton = ({ config }: CTAButtonProps) => {
-  const { label, variant, path, href, Icon } = config;
+  if (config.variant === "primary") {
+    const primaryTarget = config.href ?? config.path;
+
+    if (!primaryTarget) {
+      return null;
+    }
+
+    return (
+      <PrimaryButton
+        label={config.label}
+        href={primaryTarget}
+        Icon={config.Icon}
+        external={!!config.href}
+        mode="hero"
+      />
+    );
+  }
+
+  return <SecondaryCTAButton config={config} />;
+};
+
+const SecondaryCTAButton = ({ config }: CTAButtonProps) => {
+  const { label, path, href, Icon } = config;
   const [hovered, setHovered] = useState(false);
   const isExternal = !!href;
-  const target = isExternal ? href! : path!;
-  const isPrimary = variant === "primary";
+  const target = href ?? path;
+
+  if (!target) {
+    return null;
+  }
 
   const inner = (
     <div className="relative flex items-center py-[8px] pl-[11px] pr-[11px]">
-      {/* Glass background — fades in on hover for both variants */}
       <motion.div
         aria-hidden
-        className={cn(
-          "absolute inset-0 rounded-full pointer-events-none",
-          isPrimary ? "glass-capsule-primary" : "glass-capsule"
-        )}
+        className={cn("absolute inset-0 rounded-full pointer-events-none", "glass-capsule")}
         initial={false}
         animate={{ opacity: hovered ? 1 : 0 }}
         transition={{ duration: 0.22, ease: "easeOut" }}
       />
 
-      {/* Icon */}
       {Icon && (
         <div
           className={cn(
             "relative z-10 flex items-center justify-center shrink-0 transition-colors duration-150",
-            hovered
-              ? isPrimary ? "text-white" : "text-accent"
-              : "text-[#71717a]"
+            hovered ? "text-accent" : "text-[#71717a]"
           )}
           style={{ width: 18, height: 18 }}
         >
@@ -46,19 +65,16 @@ export const CTAButton = ({ config }: CTAButtonProps) => {
         </div>
       )}
 
-      {/* Label — clips open to the right on hover */}
       <motion.span
         aria-hidden
         className={cn(
           "relative z-10 text-[13px] font-semibold whitespace-nowrap leading-none transition-colors duration-150",
-          hovered
-            ? isPrimary ? "text-white" : "text-accent"
-            : "text-[#71717a]"
+          hovered ? "text-accent" : "text-[#71717a]"
         )}
         animate={{
-          maxWidth:   hovered ? 110 : 0,
-          opacity:    hovered ? 1   : 0,
-          marginLeft: hovered ? 7   : 0,
+          maxWidth: hovered ? 110 : 0,
+          opacity: hovered ? 1 : 0,
+          marginLeft: hovered ? 7 : 0,
         }}
         transition={{ duration: 0.28, ease: [0.4, 0, 0.2, 1] }}
         style={{ overflow: "hidden", display: "block" }}

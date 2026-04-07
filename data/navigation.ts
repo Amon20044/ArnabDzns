@@ -34,17 +34,17 @@ export const navigationConfig: NavigationConfig = {
   items: [
     { id: "portfolio", label: "Portfolio", path: "/portfolio" },
     { id: "projects", label: "Projects", path: "/projects", isNew: true },
-    { id: "about", label: "About", path: "/about" },
     { id: "services", label: "Services", path: "/services" },
+    { id: "about", label: "About", path: "/about" },
     { id: "contact", label: "Contact", path: "/contact" },
   ],
   ctas: [
-    {
-      label: "Shop",
-      variant: "secondary",
-      path: "/shop",
-      Icon: ShoppingBag,
-    },
+    // {
+    //   label: "Shop",
+    //   variant: "secondary",
+    //   path: "/shop",
+    //   Icon: ShoppingBag,
+    // },
     {
       label: "Book a Call",
       variant: "primary",
