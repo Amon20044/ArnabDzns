@@ -307,41 +307,115 @@ body > :is(div, main) {
 }
 
 /* =====================================================
-   LIQUID GLASS CAPSULE
-   Technique: backdrop-filter + SVG displacement filter
-   Reference: github.com/polidario/Frontend-Projects
+   LIQUID GLASS SYSTEM
+   Inspired by the refracted glass treatment from:
+   github.com/polidario/Frontend-Projects/liquid-glass-vue
    ===================================================== */
 
-/* Light glass — nav items + secondary CTA */
+:is(
+  .liquid-glass,
+  .liquid-glass-header,
+  .liquid-glass-shell,
+  .glass-capsule,
+  .glass-capsule-primary
+) {
+  isolation: isolate;
+  overflow: hidden;
+  border: 1px solid var(--lg-border, rgba(255, 255, 255, 0.38));
+  background:
+    var(
+      --lg-background,
+      linear-gradient(180deg, rgba(255, 255, 255, 0.42) 0%, rgba(255, 255, 255, 0.16) 18%, transparent 58%),
+      radial-gradient(circle at 12% 12%, rgba(255, 255, 255, 0.4) 0%, transparent 36%),
+      radial-gradient(circle at 88% 88%, rgba(168, 85, 247, 0.12) 0%, transparent 42%),
+      linear-gradient(135deg, rgba(255, 255, 255, 0.32) 0%, rgba(245, 240, 255, 0.22) 56%, rgba(255, 255, 255, 0.12) 100%)
+    );
+  background-color: var(--lg-background-color, rgba(255, 255, 255, 0.16));
+  box-shadow:
+    var(
+      --lg-shadow,
+      inset 1px 1px 0 rgba(255, 255, 255, 0.82),
+      inset -1px -1px 0 rgba(255, 255, 255, 0.18),
+      inset 0 0 0 1px rgba(255, 255, 255, 0.12),
+      0 14px 34px rgba(88, 28, 135, 0.12),
+      0 3px 10px rgba(9, 9, 11, 0.06)
+    );
+  backdrop-filter: var(--lg-backdrop, brightness(1.06) saturate(1.42) blur(16px) url(#lg-distort));
+  -webkit-backdrop-filter: var(--lg-backdrop-webkit, brightness(1.06) saturate(1.42) blur(16px));
+}
+
+.liquid-glass {
+  --lg-border: var(--liquid-glass-surface-border);
+  --lg-background: var(--liquid-glass-surface-background);
+  --lg-background-color: var(--liquid-glass-surface-background-color);
+  --lg-shadow: var(--liquid-glass-surface-shadow);
+  --lg-backdrop: var(--liquid-glass-surface-backdrop);
+  --lg-backdrop-webkit: var(--liquid-glass-surface-backdrop-webkit);
+}
+
+.liquid-glass-header {
+  --lg-border: var(--liquid-glass-header-border);
+  --lg-background: var(--liquid-glass-header-background);
+  --lg-background-color: var(--liquid-glass-header-background-color);
+  --lg-shadow: var(--liquid-glass-header-shadow);
+  --lg-backdrop: var(--liquid-glass-header-backdrop);
+  --lg-backdrop-webkit: var(--liquid-glass-header-backdrop-webkit);
+}
+
+.liquid-glass-header::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(circle at 12% 0%, rgba(255, 255, 255, 0.72) 0%, transparent 34%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.28) 0%, transparent 34%);
+  opacity: 0.9;
+}
+
+.liquid-glass-header::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.38) 0%, rgba(255, 255, 255, 0.12) 28%, transparent 65%),
+    linear-gradient(90deg, transparent 0%, rgba(255, 255, 255, 0.2) 35%, transparent 68%);
+  mix-blend-mode: screen;
+  opacity: 0.75;
+}
+
+.liquid-glass-shell {
+  --lg-border: var(--liquid-glass-shell-border);
+  --lg-background: var(--liquid-glass-shell-background);
+  --lg-background-color: var(--liquid-glass-shell-background-color);
+  --lg-shadow: var(--liquid-glass-shell-shadow);
+  --lg-backdrop: var(--liquid-glass-shell-backdrop);
+  --lg-backdrop-webkit: var(--liquid-glass-shell-backdrop-webkit);
+}
+
 .glass-capsule {
   background: linear-gradient(
     135deg,
-    rgba(168, 85, 247, 0.10)  0%,
+    rgba(168, 85, 247, 0.10) 0%,
     rgba(244, 240, 255, 0.52) 60%,
     rgba(255, 255, 255, 0.20) 100%
   );
-  /* Chrome/Edge: SVG turbulence distortion gives the "liquid" quality */
   backdrop-filter: brightness(1.06) blur(14px) saturate(1.4) url(#lg-distort);
-  /* Safari / fallback without SVG filter */
   -webkit-backdrop-filter: brightness(1.06) blur(14px) saturate(1.4);
   border: 1px solid rgba(168, 85, 247, 0.22);
   box-shadow:
-    /* top-left specular rim (liquid glass edge) */
     inset 1.5px 1.5px 0 rgba(255, 255, 255, 0.82),
-    /* bottom-right counter-highlight */
     inset -0.5px -0.5px 0 rgba(255, 255, 255, 0.30),
-    /* diffuse inner glow */
     inset 0 0 12px rgba(255, 255, 255, 0.28),
-    /* outer purple halo */
     0 2px 16px rgba(168, 85, 247, 0.14),
-    0 1px  4px rgba(0, 0, 0, 0.06);
+    0 1px 4px rgba(0, 0, 0, 0.06);
 }
 
-/* Dark glass — primary CTA (Book a Call) */
 .glass-capsule-primary {
   background: linear-gradient(
     135deg,
-    rgba(9,  9,  11, 0.90) 0%,
+    rgba(9, 9, 11, 0.90) 0%,
     rgba(50, 20, 80, 0.86) 100%
   );
   backdrop-filter: brightness(0.88) blur(12px) saturate(1.5) url(#lg-distort);
@@ -351,7 +425,7 @@ body > :is(div, main) {
     inset 1px 1px 0 rgba(255, 255, 255, 0.18),
     inset 0 0 14px rgba(168, 85, 247, 0.22),
     0 4px 20px rgba(0, 0, 0, 0.25),
-    0 1px  3px rgba(0, 0, 0, 0.15);
+    0 1px 3px rgba(0, 0, 0, 0.15);
 }
 
 /* Smooth scrollbar */
@@ -445,5 +519,10 @@ body > :is(div, main) {
   .form-select,
   .form-textarea {
     transition: none;
+  }
+
+  .liquid-glass-header::before,
+  .liquid-glass-header::after {
+    display: none;
   }
 }

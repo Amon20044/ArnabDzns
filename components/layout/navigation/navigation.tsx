@@ -4,6 +4,7 @@ import { motion } from "framer-motion";
 import { usePathname } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { navigationConfig } from "@/data/navigation";
+import { LiquidGlassBackdrop } from "@/components/ui/liquid-glass-backdrop";
 import { CTAButton } from "./cta-button";
 import { iconRegistry } from "./icon-registry";
 import { NavItem } from "./nav-item";
@@ -123,93 +124,67 @@ export const Navigation = () => {
   };
 
   return (
-    <>
-      <svg
+    <motion.nav
+      ref={navbarRef}
+      role="navigation"
+      aria-label="Main navigation"
+      className="fixed bottom-4 left-[50vw] z-50 flex w-[min(calc(100vw-1.25rem),31rem)] -translate-x-1/2 items-center justify-between gap-2 rounded-[1.75rem] border border-transparent bg-transparent px-2 py-2 shadow-none sm:bottom-5 sm:w-auto sm:justify-start sm:gap-1 sm:rounded-full"
+      initial={{ y: 24, opacity: 0 }}
+      animate={{ y: 0, opacity: 1 }}
+      transition={{ type: "spring", stiffness: 320, damping: 26, delay: 0.1 }}
+      onHoverStart={() => {
+        setHovered(true);
+        syncItemCenters();
+      }}
+      onHoverEnd={() => {
+        setHovered(false);
+        setMouseX(null);
+        syncItemCenters();
+      }}
+    >
+      <LiquidGlassBackdrop
+        variant="shell"
+        className="rounded-[inherit]"
+      />
+
+      <motion.div
         aria-hidden
-        focusable="false"
-        xmlns="http://www.w3.org/2000/svg"
-        style={{ position: "absolute", width: 0, height: 0, overflow: "hidden" }}
-      >
-        <defs>
-          <filter id="lg-distort">
-            <feTurbulence
-              type="turbulence"
-              baseFrequency="0.015 0.02"
-              numOctaves="2"
-              seed="3"
-              result="turbulence"
+        className="pointer-events-none absolute -top-px left-1/2 z-[1] h-px -translate-x-1/2 rounded-full
+                   bg-gradient-to-r from-transparent via-accent to-transparent"
+        animate={{ opacity: hovered ? 0.7 : 0.3, width: hovered ? "55%" : "25%" }}
+        transition={{ duration: 0.35 }}
+      />
+
+      <div className="relative z-[1] flex min-w-0 flex-1 items-center justify-between gap-0.5 sm:flex-none sm:gap-1">
+        {items.map((item) => {
+          const Icon = iconRegistry[item.id];
+
+          if (!Icon) {
+            return null;
+          }
+
+          return (
+            <NavItem
+              key={item.id}
+              id={item.id}
+              to={item.path}
+              label={item.label}
+              Icon={Icon}
+              isActive={isActive(item.path)}
+              iconSize={getIconSize(item.id)}
+              isNew={item.isNew}
             />
-            <feDisplacementMap
-              in="SourceGraphic"
-              in2="turbulence"
-              scale="8"
-              xChannelSelector="R"
-              yChannelSelector="G"
-            />
-          </filter>
-        </defs>
-      </svg>
+          );
+        })}
+      </div>
 
-      <motion.nav
-        ref={navbarRef}
-        role="navigation"
-        aria-label="Main navigation"
-        className="fixed bottom-4 left-1/2 z-50 flex w-[min(calc(100vw-1.25rem),31rem)] -translate-x-1/2 items-center justify-between gap-2
-                   rounded-[1.75rem] border border-border bg-white/90 px-2 py-2
-                   shadow-[0_4px_24px_rgba(0,0,0,0.08),0_1px_2px_rgba(0,0,0,0.04)]
-                   backdrop-blur-xl sm:bottom-5 sm:w-auto sm:justify-start sm:gap-1 sm:rounded-full"
-        initial={{ y: 24, opacity: 0 }}
-        animate={{ y: 0, opacity: 1 }}
-        transition={{ type: "spring", stiffness: 320, damping: 26, delay: 0.1 }}
-        onHoverStart={() => {
-          setHovered(true);
-          syncItemCenters();
-        }}
-        onHoverEnd={() => {
-          setHovered(false);
-          setMouseX(null);
-          syncItemCenters();
-        }}
-      >
-        <motion.div
-          aria-hidden
-          className="pointer-events-none absolute -top-px left-1/2 h-px -translate-x-1/2 rounded-full
-                     bg-gradient-to-r from-transparent via-accent to-transparent"
-          animate={{ opacity: hovered ? 0.7 : 0.3, width: hovered ? "55%" : "25%" }}
-          transition={{ duration: 0.35 }}
-        />
+      <div aria-hidden className="relative z-[1] mx-1 hidden h-6 w-px shrink-0 bg-border sm:block" />
 
-        <div className="flex min-w-0 flex-1 items-center justify-between gap-0.5 sm:flex-none sm:gap-1">
-          {items.map((item) => {
-            const Icon = iconRegistry[item.id];
-
-            if (!Icon) {
-              return null;
-            }
-
-            return (
-              <NavItem
-                key={item.id}
-                id={item.id}
-                to={item.path}
-                label={item.label}
-                Icon={Icon}
-                isActive={isActive(item.path)}
-                iconSize={getIconSize(item.id)}
-                isNew={item.isNew}
-              />
-            );
-          })}
-        </div>
-
-        <div aria-hidden className="mx-1 hidden h-6 w-px shrink-0 bg-border sm:block" />
-
-        <div className="flex shrink-0 items-center gap-1 pl-1 sm:gap-1.5 sm:pr-1">
-          {ctas.map((cta) => (
-            <CTAButton key={cta.label} config={cta} />
-          ))}
-        </div>
-      </motion.nav>
-    </>
+      <div className="relative z-[1] flex shrink-0 items-center gap-1 pl-1 sm:gap-1.5 sm:pr-1">
+        {ctas.map((cta) => (
+          <CTAButton key={cta.label} config={cta} />
+        ))}
+      </div>
+    </motion.nav>
   );
 };

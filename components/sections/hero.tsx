@@ -4,6 +4,8 @@ import { motion, type Variants } from "framer-motion";
 import { ArrowRight, Building2, Star } from "lucide-react";
 import { PrimaryButton } from "@/components/ui/primary-button";
 import { StatusBadge } from "@/components/ui/status-badge";
+import { typography } from "@/lib/style";
+import { cn } from "@/lib/utils";
 
 const ease = [0.22, 1, 0.36, 1] as const;
 
@@ -23,7 +25,7 @@ const blurUp: Variants = {
 
 export const Hero = () => {
   return (
-    <section className="relative flex min-h-[82vh] w-full flex-col items-center justify-center px-6 py-16 text-center">
+    <section className="relative flex min-h-[60vh] w-full flex-col items-center justify-center py-16 text-center sm:py-20">
       {/* ---- Stat pills row ---- */}
       <div className="flex flex-wrap items-center justify-center gap-3">
         <motion.div
@@ -77,8 +79,7 @@ export const Hero = () => {
         initial="hidden"
         animate="visible"
         variants={blurUp}
-        className="mt-9 text-balance text-[44px] font-bold leading-[0.95] tracking-[-0.035em] text-text-primary
-                   sm:text-[64px] md:text-[84px] lg:text-[96px]"
+        className={cn(typography.heading.h1, "mt-9 text-text-primary")}
       >
         Your Vision
         <br />
@@ -91,7 +92,7 @@ export const Hero = () => {
         initial="hidden"
         animate="visible"
         variants={blurUp}
-        className="mt-7 max-w-md text-[15px] leading-7 text-text-secondary md:text-[17px]"
+        className={cn(typography.text.p1, "mt-7 max-w-md text-text-secondary")}
       >
         Let&apos;s turn ideas into stunning designs.
       </motion.p>
@@ -104,7 +105,12 @@ export const Hero = () => {
         variants={blurUp}
         className="mt-10"
       >
-        <PrimaryButton label="Get in Touch" href="/contact" Icon={ArrowRight} />
+        <PrimaryButton
+          label="Get in Touch"
+          href="/contact"
+          Icon={ArrowRight}
+          iconVisibility="hover"
+        />
       </motion.div>
 
       {/* ---- Soft accent halos behind the content ---- */}

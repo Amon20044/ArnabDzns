@@ -7,6 +7,7 @@ import { useState } from "react";
 import { cn } from "@/lib/utils";
 
 type PrimaryButtonSize = "default" | "compact";
+type PrimaryButtonIconVisibility = "always" | "hover";
 
 interface PrimaryButtonProps {
   label: string;
@@ -15,6 +16,7 @@ interface PrimaryButtonProps {
   external?: boolean;
   className?: string;
   size?: PrimaryButtonSize;
+  iconVisibility?: PrimaryButtonIconVisibility;
 }
 
 const ease = [0.22, 1, 0.36, 1] as const;
@@ -37,12 +39,14 @@ export const PrimaryButton = ({
   external = false,
   className,
   size = "default",
+  iconVisibility,
 }: PrimaryButtonProps) => {
   const [hovered, setHovered] = useState(false);
   const isCompact = size === "compact";
-  const showLeadingIcon = !isCompact || hovered;
+  const resolvedIconVisibility = iconVisibility ?? (isCompact ? "hover" : "always");
+  const showLeadingIcon = !!Icon && (resolvedIconVisibility === "always" || hovered);
   const showLabel = true;
-  const showBalanceSlot = !!Icon && hovered;
+  const showBalanceSlot = !!Icon && resolvedIconVisibility === "hover" && hovered;
   const iconSlotWidth = isCompact ? 18 : 22;
   const iconGap = isCompact ? 7 : 10;
   const iconStrokeWidth = isCompact ? 2.1 : 2.25;
@@ -59,7 +63,7 @@ export const PrimaryButton = ({
       animate={{
         maxWidth: showLeadingIcon ? iconSlotWidth : 0,
         opacity: showLeadingIcon ? 1 : 0,
-        marginRight: showLabel ? iconGap : 0,
+        marginRight: showLeadingIcon && showLabel ? iconGap : 0,
         x: showLeadingIcon ? 0 : -6,
       }}
       transition={{ duration: 0.38, ease }}

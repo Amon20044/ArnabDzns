@@ -1,5 +1,8 @@
 import { Layers3, MessageSquareQuote, Sparkles } from "lucide-react";
 import { Hero } from "@/components/sections/hero";
+import { Toolkit } from "@/components/sections/toolkit";
+import { ImageMarquee } from "@/components/ui/image-marquee";
+import { demoImageMarquee } from "@/data/demo-image-marquee";
 
 const focusAreas = [
   {
@@ -30,9 +33,29 @@ const processSteps = [
 
 export default function Home() {
   return (
-    <div className="flex flex-1">
-      <main className="mx-auto flex w-full max-w-6xl flex-1 flex-col gap-12 px-6 pb-32 pt-4 md:px-10 md:pb-40">
+    <div className="flex">
+      <div className="mx-auto flex w-[100vw] max-w-6xl flex-1 flex-col gap-12 px-6 pb-32 pt-4 md:px-10 md:pb-40">
         <Hero />
+
+        <section className="page-reveal">
+          <div className="page-stack mb-6">
+            <span className="eyebrow-chip">Scrolling Gallery</span>
+            <h2 className="max-w-3xl text-3xl font-semibold tracking-tight text-text-primary md:text-4xl">
+              A full-bleed image strip you can drive from rows of JSON data.
+            </h2>
+            <p className="max-w-2xl text-sm leading-7 text-text-secondary md:text-base">
+              Each row alternates direction automatically, keeps moving forever, and eases
+              down when you hover any image card.
+            </p>
+          </div>
+
+          <ImageMarquee
+            rows={demoImageMarquee}
+            height="clamp(8.5rem, 18vw, 13rem)"
+            rowGap="1.25rem"
+            itemGap="1rem"
+          />
+        </section>
 
         <section className="grid gap-4 md:grid-cols-3">
           {focusAreas.map(({ title, description, Icon }) => (
@@ -53,6 +76,8 @@ export default function Home() {
             </article>
           ))}
         </section>
+
+        <Toolkit />
 
         <section className="page-surface page-reveal p-8 md:p-10">
           <div className="grid gap-8 lg:grid-cols-[1.2fr_0.8fr]">
@@ -82,7 +107,7 @@ export default function Home() {
             </div>
           </div>
         </section>
-      </main>
+      </div>
     </div>
   );
 }

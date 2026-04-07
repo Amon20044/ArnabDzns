@@ -47,8 +47,13 @@ void main() {
   );
 
   vec3 prism = cos(wave * cos(vec3(d, a, 2.5)) * 0.5 + 0.5) * uColor;
-  vec3 col = mix(vec3(1.0), prism, 0.34);
-  col += vec3(0.06, 0.04, 0.08);
+  // Mix the iridescent prism over a pure-white base — kept very subtle
+  // so the background stays bright and soft.
+  vec3 col = mix(vec3(1.0), prism, 0.18);
+  // Pull everything an extra 28 % toward white for a luminous, airy feel
+  col = mix(col, vec3(1.0), 0.28);
+  // Tiny cool tint so it doesn't read as flat white
+  col += vec3(0.012, 0.010, 0.018);
   col = clamp(col, 0.0, 1.0);
   gl_FragColor = vec4(col, 1.0);
 }

@@ -68,3 +68,26 @@ export interface SiteConfig {
   url: string;
   social: SocialLink[];
 }
+
+export type ToolkitIconId =
+  | "figma"
+  | "framer"
+  | "nextjs"
+  | "react"
+  | "tailwindcss"
+  | "gsap";
+
+export interface ToolkitItem {
+  id: string;
+  icon: ToolkitIconId;
+  title: string;
+  description: string;
+  percentage: number;
+}
+
+export interface ToolkitSectionConfig {
+  eyebrow: string;
+  title: string;
+  description: string;
+  items: ToolkitItem[];
+}

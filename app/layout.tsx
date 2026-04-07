@@ -1,8 +1,11 @@
 import type { Metadata } from "next";
+import type { CSSProperties } from "react";
 import "locomotive-scroll/locomotive-scroll.css";
 import { IridescenceBackground } from "@/components/background/iridescence";
 import { Header, Navigation } from "@/components/layout/navigation";
 import { LocomotiveScrollProvider } from "@/components/providers/locomotive-scroll-provider";
+import { LiquidGlassDefs } from "@/components/ui/liquid-glass-defs";
+import { liquidGlassCssVariables } from "@/lib/liquid-glass";
 import { siteConfig } from "@/data/site";
 import "./globals.css";
 
@@ -21,7 +24,11 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className="h-full antialiased">
-      <body className="min-h-full flex flex-col overflow-x-hidden bg-transparent text-foreground">
+      <body
+        className="min-h-full flex flex-col overflow-x-hidden bg-transparent text-foreground"
+        style={liquidGlassCssVariables as CSSProperties}
+      >
+        <LiquidGlassDefs />
         <IridescenceBackground color={[0.93, 0.88, 0.99]} mouseReact amplitude={0.08} speed={0.9} />
         <LocomotiveScrollProvider>
           <Header />

@@ -1,0 +1,104 @@
+[
+  {
+    "id": "showcase-row-1",
+    "speed": 56,
+    "images": [
+      {
+        "id": "row-1-image-1",
+        "src": "/demo/marquee-01.jpg",
+        "alt": "Mountain lake with warm sunlight",
+        "width": 1600,
+        "height": 900
+      },
+      {
+        "id": "row-1-image-2",
+        "src": "/demo/marquee-02.jpg",
+        "alt": "Modern city skyline at blue hour",
+        "width": 1600,
+        "height": 900
+      },
+      {
+        "id": "row-1-image-3",
+        "src": "/demo/marquee-03.jpg",
+        "alt": "Palm trees against a soft sunset sky",
+        "width": 1600,
+        "height": 900
+      },
+      {
+        "id": "row-1-image-4",
+        "src": "/demo/marquee-04.jpg",
+        "alt": "Minimal interior with sculptural shadows",
+        "width": 1600,
+        "height": 900
+      }
+    ]
+  },
+  {
+    "id": "showcase-row-2",
+    "speed": 64,
+    "images": [
+      {
+        "id": "row-2-image-1",
+        "src": "/demo/marquee-05.jpg",
+        "alt": "Aerial beach shoreline with turquoise water",
+        "width": 1600,
+        "height": 900
+      },
+      {
+        "id": "row-2-image-2",
+        "src": "/demo/marquee-06.jpg",
+        "alt": "Street scene with glowing neon signs",
+        "width": 1600,
+        "height": 900
+      },
+      {
+        "id": "row-2-image-3",
+        "src": "/demo/marquee-07.jpg",
+        "alt": "Abstract close-up with iridescent colors",
+        "width": 1600,
+        "height": 900
+      },
+      {
+        "id": "row-2-image-4",
+        "src": "/demo/marquee-08.jpg",
+        "alt": "Desert road stretching toward distant hills",
+        "width": 1600,
+        "height": 900
+      }
+    ]
+  },
+  {
+    "id": "showcase-row-3",
+    "speed": 60,
+    "images": [
+      {
+        "id": "row-3-image-1",
+        "src": "/demo/marquee-09.jpg",
+        "alt": "Night sky above a quiet forest",
+        "width": 1600,
+        "height": 900
+      },
+      {
+        "id": "row-3-image-2",
+        "src": "/demo/marquee-10.jpg",
+        "alt": "Architectural detail with curved concrete lines",
+        "width": 1600,
+        "height": 900
+      },
+      {
+        "id": "row-3-image-3",
+        "src": "/demo/marquee-11.jpg",
+        "alt": "Soft floral close-up with pastel tones",
+        "width": 1600,
+        "height": 900
+      },
+      {
+        "id": "row-3-image-4",
+        "src": "/demo/marquee-12.jpg",
+        "alt": "Fog drifting through layered mountain ridges",
+        "width": 1600,
+        "height": 900
+      }
+    ]
+  }
+]

@@ -11,6 +11,7 @@ import {
   useState,
 } from "react";
 import { headerConfig } from "@/data/navigation";
+import { LiquidGlassBackdrop } from "@/components/ui/liquid-glass-backdrop";
 import { StatusBadge } from "@/components/ui/status-badge";
 import { socialIconRegistry } from "./social-icons";
 
@@ -45,9 +46,7 @@ export const Header = () => {
 
   return (
     <motion.header
-      className="fixed inset-x-0 top-0 z-40
-                 border-b border-black/[0.06]
-                 bg-white/75 backdrop-blur-xl backdrop-saturate-150"
+      className="fixed inset-x-0 top-0 z-40 overflow-hidden border-b border-white/35 bg-transparent"
       initial={{ opacity: 0, y: -16 }}
       animate={{
         opacity: isVisible ? 1 : 0,
@@ -58,7 +57,9 @@ export const Header = () => {
         y: { type: "spring", stiffness: 280, damping: 30 },
       }}
     >
-      <div className="mx-auto flex h-[72px] w-full max-w-7xl items-center justify-between gap-4 px-5 sm:px-8">
+      <LiquidGlassBackdrop />
+
+      <div className="relative z-10 mx-auto flex h-[72px] w-full max-w-7xl items-center justify-between gap-4 px-5 sm:px-8">
         {/* Brand */}
         <Link
           href={brand.path}
@@ -149,9 +150,8 @@ export const Header = () => {
                   target="_blank"
                   rel="noopener noreferrer"
                   aria-label={social.label}
-                  className="flex size-9 items-center justify-center rounded-[11px]
-                             border border-black/[0.07] bg-white text-text-primary
-                             shadow-[0_1px_2px_rgba(9,9,11,0.05),0_4px_12px_rgba(9,9,11,0.04)]
+                  className="liquid-glass flex size-9 items-center justify-center rounded-[11px]
+                             text-text-primary
                              transition-colors duration-150
                              hover:text-accent hover:border-accent/30"
                   initial={{ opacity: 0, y: -6 }}
