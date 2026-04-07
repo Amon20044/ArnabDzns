@@ -25,7 +25,8 @@ export const CTAButton = ({ config }: CTAButtonProps) => {
         href={primaryTarget}
         Icon={config.Icon}
         external={!!config.href}
-        mode="hero"
+        size="compact"
+        className="shrink-0"
       />
     );
   }

@@ -154,10 +154,10 @@ export const Navigation = () => {
         ref={navbarRef}
         role="navigation"
         aria-label="Main navigation"
-        className="fixed bottom-5 left-1/2 z-50 flex -translate-x-1/2 items-center gap-1
-                   rounded-full border border-border bg-white/90 px-2 py-2
+        className="fixed bottom-4 left-1/2 z-50 flex w-[min(calc(100vw-1.25rem),31rem)] -translate-x-1/2 items-center justify-between gap-2
+                   rounded-[1.75rem] border border-border bg-white/90 px-2 py-2
                    shadow-[0_4px_24px_rgba(0,0,0,0.08),0_1px_2px_rgba(0,0,0,0.04)]
-                   backdrop-blur-xl"
+                   backdrop-blur-xl sm:bottom-5 sm:w-auto sm:justify-start sm:gap-1 sm:rounded-full"
         initial={{ y: 24, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ type: "spring", stiffness: 320, damping: 26, delay: 0.1 }}
@@ -179,30 +179,32 @@ export const Navigation = () => {
           transition={{ duration: 0.35 }}
         />
 
-        {items.map((item) => {
-          const Icon = iconRegistry[item.id];
+        <div className="flex min-w-0 flex-1 items-center justify-between gap-0.5 sm:flex-none sm:gap-1">
+          {items.map((item) => {
+            const Icon = iconRegistry[item.id];
 
-          if (!Icon) {
-            return null;
-          }
+            if (!Icon) {
+              return null;
+            }
 
-          return (
-            <NavItem
-              key={item.id}
-              id={item.id}
-              to={item.path}
-              label={item.label}
-              Icon={Icon}
-              isActive={isActive(item.path)}
-              iconSize={getIconSize(item.id)}
-              isNew={item.isNew}
-            />
-          );
-        })}
+            return (
+              <NavItem
+                key={item.id}
+                id={item.id}
+                to={item.path}
+                label={item.label}
+                Icon={Icon}
+                isActive={isActive(item.path)}
+                iconSize={getIconSize(item.id)}
+                isNew={item.isNew}
+              />
+            );
+          })}
+        </div>
 
-        <div aria-hidden className="mx-1 h-6 w-px shrink-0 bg-border" />
+        <div aria-hidden className="mx-1 hidden h-6 w-px shrink-0 bg-border sm:block" />
 
-        <div className="flex items-center gap-1.5 pr-1">
+        <div className="flex shrink-0 items-center gap-1 pl-1 sm:gap-1.5 sm:pr-1">
           {ctas.map((cta) => (
             <CTAButton key={cta.label} config={cta} />
           ))}

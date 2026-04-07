@@ -1,4 +1,4 @@
-import { CalendarDays } from "lucide-react";
+import { PhoneCall } from "lucide-react";
 import type { HeaderConfig, NavigationConfig } from "@/types";
 
 export const headerConfig: HeaderConfig = {
@@ -49,7 +49,7 @@ export const navigationConfig: NavigationConfig = {
       label: "Book a Call",
       variant: "primary",
       path: "/book",
-      Icon: CalendarDays,
+      Icon: PhoneCall,
     },
   ],
 };

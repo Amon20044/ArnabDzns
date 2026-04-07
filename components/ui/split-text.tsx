@@ -93,7 +93,8 @@ export default function SplitText({
 }: SplitTextProps) {
   const containerRef = useRef<HTMLSpanElement>(null);
   const glyphRefs = useRef<HTMLSpanElement[]>([]);
-  const [isVisible, setIsVisible] = useState(disabled);
+  const [isVisible, setIsVisible] = useState(false);
+  const shouldAnimateIn = disabled || isVisible;
 
   const parts = useMemo(() => splitText(text, splitType), [text, splitType]);
 
@@ -103,7 +104,6 @@ export default function SplitText({
 
   useEffect(() => {
     if (disabled) {
-      setIsVisible(true);
       return;
     }
 
@@ -148,7 +148,7 @@ export default function SplitText({
 
       gsap.set(targets, from);
 
-      if (!isVisible) {
+      if (!shouldAnimateIn) {
         return;
       }
 
@@ -176,7 +176,7 @@ export default function SplitText({
         duration,
         ease,
         from,
-        isVisible,
+        shouldAnimateIn,
         onLetterAnimationComplete,
         showCallback,
         text,

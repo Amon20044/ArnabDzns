@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import "locomotive-scroll/locomotive-scroll.css";
-import { ShaderBackground } from "@/components/background/shader-background";
+import { IridescenceBackground } from "@/components/background/iridescence";
 import { Header, Navigation } from "@/components/layout/navigation";
 import { LocomotiveScrollProvider } from "@/components/providers/locomotive-scroll-provider";
 import { siteConfig } from "@/data/site";
@@ -22,7 +22,7 @@ export default function RootLayout({
   return (
     <html lang="en" className="h-full antialiased">
       <body className="min-h-full flex flex-col overflow-x-hidden bg-transparent text-foreground">
-        <ShaderBackground />
+        <IridescenceBackground color={[0.93, 0.88, 0.99]} mouseReact amplitude={0.08} speed={0.9} />
         <LocomotiveScrollProvider>
           <Header />
           <div className="flex flex-1 flex-col pt-24">{children}</div>

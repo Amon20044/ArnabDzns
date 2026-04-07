@@ -6,7 +6,7 @@ import Link from "next/link";
 import { useState } from "react";
 import { cn } from "@/lib/utils";
 
-type PrimaryButtonMode = "hero" | "navbar";
+type PrimaryButtonSize = "default" | "compact";
 
 interface PrimaryButtonProps {
   label: string;
@@ -14,7 +14,7 @@ interface PrimaryButtonProps {
   Icon?: LucideIcon;
   external?: boolean;
   className?: string;
-  mode?: PrimaryButtonMode;
+  size?: PrimaryButtonSize;
 }
 
 const ease = [0.22, 1, 0.36, 1] as const;
@@ -36,19 +36,17 @@ export const PrimaryButton = ({
   Icon,
   external = false,
   className,
-  mode = "hero",
+  size = "default",
 }: PrimaryButtonProps) => {
   const [hovered, setHovered] = useState(false);
-  const isNavbar = mode === "navbar";
-  const iconSlotWidth = isNavbar ? 18 : 22;
-  const iconGap = isNavbar ? 7 : 10;
-  const iconStrokeWidth = isNavbar ? 2.1 : 2.25;
-
-  const labelColorClass = isNavbar
-    ? hovered
-      ? "text-white"
-      : "text-white"
-    : "text-white";
+  const isCompact = size === "compact";
+  const showLeadingIcon = !isCompact || hovered;
+  const showLabel = true;
+  const showBalanceSlot = !!Icon && hovered;
+  const iconSlotWidth = isCompact ? 18 : 22;
+  const iconGap = isCompact ? 7 : 10;
+  const iconStrokeWidth = isCompact ? 2.1 : 2.25;
+  const labelColorClass = "text-white";
 
   const leadingIcon = Icon ? (
     <motion.span
@@ -59,15 +57,15 @@ export const PrimaryButton = ({
       )}
       initial={false}
       animate={{
-        maxWidth: hovered ? iconSlotWidth : 0,
-        opacity: hovered ? 1 : 0,
-        marginRight: hovered ? iconGap : 0,
-        x: hovered ? 0 : -6,
+        maxWidth: showLeadingIcon ? iconSlotWidth : 0,
+        opacity: showLeadingIcon ? 1 : 0,
+        marginRight: showLabel ? iconGap : 0,
+        x: showLeadingIcon ? 0 : -6,
       }}
       transition={{ duration: 0.38, ease }}
     >
       <Icon
-        className={cn("shrink-0", isNavbar ? "size-4" : "size-[17px]")}
+        className={cn("shrink-0", isCompact ? "size-4" : "size-[17px]")}
         strokeWidth={iconStrokeWidth}
       />
     </motion.span>
@@ -79,25 +77,25 @@ export const PrimaryButton = ({
       className="pointer-events-none inline-flex overflow-hidden opacity-0"
       initial={false}
       animate={{
-        maxWidth: hovered ? iconSlotWidth : 0,
-        marginLeft: hovered ? iconGap : 0,
+        maxWidth: showBalanceSlot ? iconSlotWidth : 0,
+        marginLeft: showBalanceSlot ? iconGap : 0,
       }}
       transition={{ duration: 0.38, ease }}
     >
-      <span className={cn("block shrink-0", isNavbar ? "size-4" : "size-[17px]")} />
+      <span className={cn("block shrink-0", isCompact ? "size-4" : "size-[17px]")} />
     </motion.span>
   ) : null;
 
   const linkClassName = cn(
     "primary-button group relative inline-flex items-center justify-center overflow-hidden rounded-full select-none",
     "will-change-transform",
-    isNavbar
+    isCompact
       ? "px-[18px] py-[8px] text-[13px] font-semibold leading-none"
       : "px-8 py-[18px] text-[15px] font-semibold text-white",
   );
 
-  const surfaceOpacity = isNavbar ? (hovered ? 1 : 0) : 1;
-  const glowOpacity = isNavbar ? (hovered ? 0.82 : 0) : hovered ? 0.86 : 0.46;
+  const surfaceOpacity = 1;
+  const glowOpacity = hovered ? 0.86 : 0.46;
 
   const content = (
     <>
@@ -133,9 +131,20 @@ export const PrimaryButton = ({
         transition={{ duration: 1.05, ease }}
       />
       {leadingIcon}
-      <span className={cn("relative z-10 whitespace-nowrap transition-colors duration-200", labelColorClass)}>
+      <motion.span
+        className={cn(
+          "relative z-10 inline-block overflow-hidden whitespace-nowrap transition-colors duration-200",
+          labelColorClass,
+        )}
+        initial={false}
+        animate={{
+          maxWidth: showLabel ? 180 : 0,
+          opacity: showLabel ? 1 : 0,
+        }}
+        transition={{ duration: 0.32, ease }}
+      >
         {label}
-      </span>
+      </motion.span>
       {balanceSlot}
     </>
   );

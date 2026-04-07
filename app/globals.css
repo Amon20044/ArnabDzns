@@ -95,9 +95,17 @@ html {
 
 body {
   min-height: 100vh;
+  min-width: 100vw;
+  display: flex;
+  flex-direction: column;
   background: transparent;
   color: var(--foreground);
   font-family: var(--font-sans-stack);
+  align-items: center;
+}
+
+body > :is(div, main) {
+  width: 100%;
 }
 
 ::selection {

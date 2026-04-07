@@ -56,7 +56,7 @@ export const NavItem = ({
       href={to}
       data-nav-item={id}
       className={cn(
-        "group relative flex shrink-0 items-center rounded-full select-none",
+        "group relative flex min-w-0 flex-1 items-center justify-center rounded-full select-none sm:flex-none",
         "transition-colors duration-150",
         isActive ? "text-accent" : "text-text-secondary hover:text-text-primary"
       )}
@@ -73,7 +73,7 @@ export const NavItem = ({
         transition={{ duration: 0.22, ease: "easeOut" }}
       />
 
-      <div className="relative z-10 flex items-center py-[7px] pl-[11px] pr-[11px]">
+      <div className="relative z-10 flex items-center justify-center px-[9px] py-[9px] sm:py-[7px] sm:pl-[11px] sm:pr-[11px]">
         <div className="relative shrink-0">
           <motion.div
             className="flex items-center justify-center"
@@ -110,7 +110,7 @@ export const NavItem = ({
             ref={labelInnerRef}
             className="inline-flex items-center gap-2 whitespace-nowrap"
           >
-            <span className="text-[12px] font-medium tracking-wide">{label}</span>
+            <span className="text-[11px] font-medium tracking-wide sm:text-[12px]">{label}</span>
 
             {isNew ? (
               <span
