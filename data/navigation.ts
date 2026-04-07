@@ -10,7 +10,7 @@ export const headerConfig: HeaderConfig = {
     logoSrc: "/image.png",
     logoAlt: "Arnab brand portrait",
   },
-  availabilityLabel: "Available for select freelance work",
+  availabilityLabel: "Available",
   socials: [
     {
       id: "discord",
