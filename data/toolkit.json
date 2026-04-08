@@ -1,0 +1,158 @@
+{
+  "hero": {
+    "badges": [
+      {
+        "id": "toolkit",
+        "label": "Toolkit",
+        "icon": "none",
+        "tone": "#a855f7",
+        "iconColor": "#f5e1ff"
+      }
+    ],
+    "title": "Skills and services",
+    "description": "A category-driven view of the tools, systems, and delivery strengths behind graphic design, live tournament production, and software work.",
+    "cta": false
+  },
+  "defaultCategoryId": "software-design-development",
+  "categories": [
+    {
+      "id": "graphic-design",
+      "label": "Graphic Design",
+      "shortLabel": "Design",
+      "icon": "palette",
+      "description": "Brand visuals, social creatives, thumbnail systems, and polished marketing assets that feel sharp across desktop and mobile surfaces.",
+      "items": [
+        {
+          "id": "toolkit-figma",
+          "icon": "figma",
+          "title": "Figma",
+          "description": "Layout direction, design systems, and fast visual exploration before production starts.",
+          "percentage": 97
+        },
+        {
+          "id": "toolkit-photoshop",
+          "icon": "photoshop",
+          "title": "Photoshop",
+          "description": "High-impact social graphics, retouching, and thumbnail work tuned for stronger click-through.",
+          "percentage": 95
+        },
+        {
+          "id": "toolkit-illustrator",
+          "icon": "illustrator",
+          "title": "Illustrator",
+          "description": "Vector marks, logo systems, and scalable graphic assets that stay crisp everywhere.",
+          "percentage": 90
+        },
+        {
+          "id": "toolkit-framer-design",
+          "icon": "framer",
+          "title": "Framer",
+          "description": "Quick campaign pages and presentation-ready visual prototypes for client sign-off.",
+          "percentage": 88
+        },
+        {
+          "id": "toolkit-tailwindcss-design",
+          "icon": "tailwindcss",
+          "title": "Tailwind CSS",
+          "description": "Turning visual systems into reusable UI primitives once the design moves into code.",
+          "percentage": 92
+        }
+      ]
+    },
+    {
+      "id": "tournament-organising",
+      "label": "Tournament Organising (LiveStreaming)",
+      "shortLabel": "Live",
+      "icon": "broadcast",
+      "description": "Live-stream-ready assets, production coordination, and broadcast support for competitive events that need to feel composed under pressure.",
+      "items": [
+        {
+          "id": "toolkit-obsstudio",
+          "icon": "obsstudio",
+          "title": "OBS Studio",
+          "description": "Scene orchestration, live switching, overlays, and stream-ready production setup.",
+          "percentage": 89
+        },
+        {
+          "id": "toolkit-discord",
+          "icon": "discord",
+          "title": "Discord",
+          "description": "Team coordination, player communication, and tournament flow management behind the scenes.",
+          "percentage": 93
+        },
+        {
+          "id": "toolkit-youtube",
+          "icon": "youtube",
+          "title": "YouTube Live",
+          "description": "Publishing, live distribution, and audience-facing stream presentation for event coverage.",
+          "percentage": 86
+        },
+        {
+          "id": "toolkit-figma-broadcast",
+          "icon": "figma",
+          "title": "Figma",
+          "description": "Broadcast graphics, bracket visuals, and sponsor-ready overlays before stream day.",
+          "percentage": 91
+        },
+        {
+          "id": "toolkit-gsap-broadcast",
+          "icon": "gsap",
+          "title": "GSAP",
+          "description": "Motion timing and animated stream graphics that make live broadcasts feel more premium.",
+          "percentage": 84
+        }
+      ]
+    },
+    {
+      "id": "software-design-development",
+      "label": "Software Design and Development",
+      "shortLabel": "Software",
+      "icon": "code",
+      "description": "Product thinking, interface design, and production-ready implementation for websites and app experiences that need both clarity and polish.",
+      "items": [
+        {
+          "id": "toolkit-nextjs",
+          "icon": "nextjs",
+          "title": "Next.js",
+          "description": "App Router builds with clean structure, strong performance, and flexible UI composition.",
+          "percentage": 94
+        },
+        {
+          "id": "toolkit-react",
+          "icon": "react",
+          "title": "React",
+          "description": "Reusable component systems that stay maintainable as the product surface expands.",
+          "percentage": 96
+        },
+        {
+          "id": "toolkit-typescript",
+          "icon": "typescript",
+          "title": "TypeScript",
+          "description": "Safer interfaces, cleaner refactors, and stronger data contracts across the whole app.",
+          "percentage": 91
+        },
+        {
+          "id": "toolkit-tailwindcss",
+          "icon": "tailwindcss",
+          "title": "Tailwind CSS",
+          "description": "A fast visual system for shipping polished layouts with consistency and control.",
+          "percentage": 93
+        },
+        {
+          "id": "toolkit-nodejs",
+          "icon": "nodejs",
+          "title": "Node.js",
+          "description": "Practical backend flows, APIs, and integrations that support the frontend cleanly.",
+          "percentage": 87
+        },
+        {
+          "id": "toolkit-vercel",
+          "icon": "vercel",
+          "title": "Vercel",
+          "description": "Preview workflows, deployment loops, and faster iteration once the product is moving.",
+          "percentage": 89
+        }
+      ]
+    }
+  ]
+}

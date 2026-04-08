@@ -59,11 +59,11 @@ export const Header = () => {
     >
       <LiquidGlassBackdrop />
 
-      <div className="relative z-10 mx-auto flex h-[72px] w-full max-w-7xl items-center justify-between gap-4 px-5 sm:px-8">
+      <div className="relative z-10 mx-auto flex h-[72px] w-full max-w-7xl items-center justify-between gap-3 px-4 sm:gap-4 sm:px-8">
         {/* Brand */}
         <Link
           href={brand.path}
-          className="group flex min-w-0 items-center gap-3.5 rounded-full py-1 pr-3"
+          className="group flex min-w-0 flex-1 items-center gap-2.5 rounded-full py-1 pr-1 sm:gap-3.5 sm:pr-3"
           onMouseEnter={() => setBrandHovered(true)}
           onMouseLeave={() => setBrandHovered(false)}
           onFocus={() => setBrandHovered(true)}
@@ -109,7 +109,7 @@ export const Header = () => {
         </Link>
 
         {/* Right cluster */}
-        <div className="flex items-center gap-3 sm:gap-4">
+        <div className="flex shrink-0 items-center gap-2 sm:gap-4">
           {/* Availability — minimalist dot + text */}
           <motion.div
             className="hidden sm:block"
@@ -135,7 +135,7 @@ export const Header = () => {
           />
 
           {/* Social tiles */}
-          <div className="flex items-center gap-2">
+          <div className="flex shrink-0 items-center gap-1.5 sm:gap-2">
             {socials.map((social, index) => {
               const Icon = socialIconRegistry[social.id];
 
@@ -150,10 +150,10 @@ export const Header = () => {
                   target="_blank"
                   rel="noopener noreferrer"
                   aria-label={social.label}
-                  className="liquid-glass flex size-9 items-center justify-center rounded-[11px]
+                  className="liquid-glass flex size-[2.125rem] items-center justify-center rounded-[11px]
                              text-text-primary
                              transition-colors duration-150
-                             hover:text-accent hover:border-accent/30"
+                             hover:text-accent hover:border-accent/30 sm:size-9"
                   initial={{ opacity: 0, y: -6 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{

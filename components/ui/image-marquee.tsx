@@ -113,6 +113,7 @@ function MarqueeRow({
   const direction = row.direction ?? (rowIndex % 2 === 0 ? "left" : "right");
   const speed = row.speed ?? DEFAULT_SPEED + rowIndex * 8;
   const height = toCssValue(row.height, defaultHeight);
+  const edgePadding = `calc(${itemGap} / 2)`;
   const images = useMemo(
     () => expandImages(row.images, minItemsPerRow),
     [minItemsPerRow, row.images],
@@ -221,7 +222,7 @@ function MarqueeRow({
             ref={segmentIndex === 0 ? segmentRef : undefined}
             aria-hidden={segmentIndex === 1}
             className="flex shrink-0"
-            style={{ gap: itemGap }}
+            style={{ gap: itemGap, paddingInline: edgePadding }}
           >
             {images.map((image, imageIndex) => {
               const aspectRatio = resolveAspectRatio(image);
@@ -239,7 +240,7 @@ function MarqueeRow({
                 >
                   <div
                     className={cn(
-                      "relative overflow-hidden rounded-[1.5rem] transition-transform duration-300 ease-out group-hover:-translate-y-1",
+                      "relative overflow-hidden rounded-[0.5rem] transition-transform duration-300 ease-out group-hover:-translate-y-1",
                       itemClassName,
                     )}
                     style={{ aspectRatio, height }}

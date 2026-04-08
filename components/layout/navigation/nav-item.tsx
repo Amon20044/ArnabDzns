@@ -80,7 +80,7 @@ export const NavItem = ({
             style={{ width: sizeSpring, height: sizeSpring }}
           >
             <Icon
-              className={isActive ? "stroke-[1.8px]" : "stroke-[1.5px]"}
+              className={isActive ? "stroke-[2px]" : "stroke-[1.8px]"}
               style={{ width: "100%", height: "100%" }}
             />
           </motion.div>

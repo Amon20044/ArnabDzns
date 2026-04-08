@@ -151,7 +151,7 @@ export const Navigation = () => {
         aria-hidden
         className="pointer-events-none absolute -top-px left-1/2 z-[1] h-px -translate-x-1/2 rounded-full
                    bg-gradient-to-r from-transparent via-accent to-transparent"
-        animate={{ opacity: hovered ? 0.7 : 0.3, width: hovered ? "55%" : "25%" }}
+        animate={{ opacity: hovered ? 0.95 : 0.8, width: hovered ? "55%" : "25%" }}
         transition={{ duration: 0.35 }}
       />
 
