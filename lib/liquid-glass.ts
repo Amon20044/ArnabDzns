@@ -54,8 +54,8 @@ export const liquidGlassConfig = {
     header: {
       bezel: 22,
       cornerRadius: 18,
-      displacement: 16,
-      blur: 0.9,
+      displacement: 32,
+      blur: 2.0,
       brightness: 1.06,
       saturate: 1.12,
       contrast: 1.04,
@@ -63,8 +63,8 @@ export const liquidGlassConfig = {
     shell: {
       bezel: 18,
       cornerRadius: 28,
-      displacement: 14,
-      blur: 0.9,
+      displacement: 28,
+      blur: 2.0,
       brightness: 1.06,
       saturate: 1.12,
       contrast: 1.04,
