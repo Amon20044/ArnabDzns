@@ -94,6 +94,8 @@ html {
   max-width: 100%;
   overflow-x: hidden;
   background-color: var(--background);
+  scroll-behavior: smooth;
+  scroll-padding-top: calc(72px + 1.25rem);
 }
 
 body {
@@ -120,6 +122,10 @@ body > :is(div, main) {
 
 .page-stage {
   isolation: isolate;
+}
+
+.scroll-target {
+  scroll-margin-top: calc(72px + 1.25rem);
 }
 
 .page-surface {
@@ -291,6 +297,15 @@ body > :is(div, main) {
   box-shadow: 0 22px 48px rgba(24, 24, 27, 0.26);
 }
 
+.primary-button--white {
+  background: transparent;
+  box-shadow: 0 12px 28px rgba(168, 85, 247, 0.08);
+}
+
+.primary-button--white:hover:not(:disabled) {
+  box-shadow: 0 16px 34px rgba(168, 85, 247, 0.12);
+}
+
 .primary-button:disabled {
   cursor: wait;
   opacity: 0.75;
@@ -397,6 +412,23 @@ body > :is(div, main) {
   --lg-shadow: var(--liquid-glass-shell-shadow);
   --lg-backdrop: var(--liquid-glass-shell-backdrop);
   --lg-backdrop-webkit: var(--liquid-glass-shell-backdrop-webkit);
+}
+
+.nav-shell-backdrop {
+  --lg-border: rgba(255, 255, 255, 0.58);
+  --lg-background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.54) 0%, rgba(255, 255, 255, 0.18) 20%, transparent 58%),
+    radial-gradient(circle at 14% 16%, rgba(255, 255, 255, 0.48) 0%, transparent 34%),
+    linear-gradient(135deg, rgba(255, 255, 255, 0.34) 0%, rgba(250, 250, 250, 0.2) 58%, rgba(255, 255, 255, 0.12) 100%);
+  --lg-background-color: rgba(255, 255, 255, 0.22);
+  --lg-shadow:
+    inset 1.5px 1.5px 0 rgba(255, 255, 255, 0.88),
+    inset -1px -1px 0 rgba(255, 255, 255, 0.24),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.14),
+    0 22px 60px rgba(9, 9, 11, 0.1),
+    0 6px 18px rgba(9, 9, 11, 0.06);
+  --lg-backdrop: brightness(1.08) saturate(1.1) blur(18px) url(#lg-distort);
+  --lg-backdrop-webkit: brightness(1.08) saturate(1.1) blur(18px);
 }
 
 .glass-capsule {
@@ -508,6 +540,10 @@ body > :is(div, main) {
 }
 
 @media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
   .page-reveal,
   ::view-transition-old(.route-transition),
   ::view-transition-new(.route-transition) {

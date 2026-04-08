@@ -1,20 +1,16 @@
 import {
-  FolderKanban,
+  CircleHelp,
   Home,
   Layers,
-  Mail,
-  ShoppingBag,
+  MessageSquareQuote,
   Sparkles,
-  User,
 } from "lucide-react";
 import type { NavIconRegistry } from "@/types";
 
 export const iconRegistry: NavIconRegistry = {
   home: Home,
   portfolio: Layers,
-  projects: FolderKanban,
   services: Sparkles,
-  shop: ShoppingBag,
-  about: User,
-  contact: Mail,
+  testimonials: MessageSquareQuote,
+  faq: CircleHelp,
 };

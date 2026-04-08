@@ -1,13 +1,5 @@
 import type { FAQSectionConfig } from "@/types";
 
-/**
- * FAQ section content.
- *
- * Static today, but the shape mirrors a backend payload — `items` is an
- * array of `{ id, question, answer }` so this can be swapped for a fetch
- * without touching the component. The CTA reuses `HeroCTAConfig` so the
- * shared `PrimaryButton` renders it as-is.
- */
 export const faqSection = {
   eyebrow: "FAQ",
   title: ["Frequently Asked", "Questions"],
@@ -25,37 +17,37 @@ export const faqSection = {
       id: "faq-getting-started",
       question: "What do you need from me to get started?",
       answer:
-        "To begin, please provide the following: a brief description of your video content or channel, any branding guidelines (colors, fonts, logo), example thumbnails you like or want to emulate, any text or specific imagery you'd like included in the thumbnail, and the video title (if relevant).",
+        "A short brief, your goals, the audience you want to reach, and any references or brand materials you already trust are enough to start. If the direction still feels messy, that is fine too.",
     },
     {
       id: "faq-revisions",
       question: "What if I need more revisions?",
       answer:
-        "Every project includes two rounds of focused revisions so we can dial in exactly what you want. If you need more iterations beyond that, we can absolutely keep going — additional rounds are billed at a small flat rate so you always know what to expect.",
+        "Every project includes focused revision rounds so we can refine the direction without losing momentum. If the scope grows beyond the original plan, we can keep iterating with a clear add-on structure instead of letting things get vague.",
     },
     {
       id: "faq-timeline",
-      question: "How long will it take to complete my video project?",
+      question: "How long does a typical project take?",
       answer:
-        "Most thumbnail and short-form projects turn around in 2–4 business days from kickoff. Longer-form work (full landing pages, brand systems) typically takes 1–3 weeks depending on scope. You'll always get a clear timeline before we start.",
+        "Smaller updates and focused design passes can move quickly, while full portfolio sites, launch pages, and broader brand systems usually take one to three weeks depending on scope. You will always get a clear timeline before work begins.",
     },
     {
-      id: "faq-subtitles",
-      question: "Do you provide subtitles or captions for videos?",
+      id: "faq-stack",
+      question: "Do you only design, or do you also build the site?",
       answer:
-        "Yes — for video deliverables I can include burned-in captions, soft subtitle tracks (.srt / .vtt), or styled lower-thirds. Just let me know which format you need during kickoff and it'll be folded into the timeline.",
+        "Both. Projects can stay at the design and direction stage, or move through full frontend implementation in Next.js so the final experience matches the intended polish more closely.",
     },
     {
-      id: "faq-bulk",
-      question: "Do you offer a bulk discount for multiple thumbnails?",
+      id: "faq-fit",
+      question: "What kind of projects are the best fit?",
       answer:
-        "Yes. Packs of 5+ thumbnails get a tiered discount, and ongoing creators on a monthly retainer get the best rate. Reach out with your channel and rough volume and I'll send back a tailored quote.",
+        "The strongest fit is usually portfolio websites, launch pages, personal brand sites, and premium marketing experiences that need better hierarchy, presentation, and frontend polish.",
     },
     {
-      id: "faq-not-happy",
-      question: "What if I don't like the thumbnail?",
+      id: "faq-content",
+      question: "Can you help if the copy or direction still feels rough?",
       answer:
-        "Then we keep iterating until you do. The first revision round is the biggest one — we'll change direction completely if needed. I'd rather spend extra time getting it right than ship something you're not excited to publish.",
+        "Yes. You do not need a polished brief to get useful help. Rough notes, references, and half-formed ideas are enough to start shaping a clearer direction together.",
     },
   ],
 } satisfies FAQSectionConfig;

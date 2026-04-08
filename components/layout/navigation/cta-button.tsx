@@ -26,6 +26,7 @@ export const CTAButton = ({ config }: CTAButtonProps) => {
         Icon={config.Icon}
         external={!!config.href}
         size="compact"
+        iconVisibility="hover"
         className="shrink-0"
       />
     );
@@ -48,9 +49,9 @@ const SecondaryCTAButton = ({ config }: CTAButtonProps) => {
     <div className="relative flex items-center py-[8px] pl-[11px] pr-[11px]">
       <motion.div
         aria-hidden
-        className={cn("absolute inset-0 rounded-full pointer-events-none", "glass-capsule")}
+        className="pointer-events-none absolute inset-0 rounded-full border border-black/12 bg-transparent"
         initial={false}
-        animate={{ opacity: hovered ? 1 : 0 }}
+        animate={{ opacity: hovered ? 1 : 0, scale: hovered ? 1 : 0.96 }}
         transition={{ duration: 0.22, ease: "easeOut" }}
       />
 
@@ -58,11 +59,11 @@ const SecondaryCTAButton = ({ config }: CTAButtonProps) => {
         <div
           className={cn(
             "relative z-10 flex items-center justify-center shrink-0 transition-colors duration-150",
-            hovered ? "text-accent" : "text-[#71717a]"
+            hovered ? "text-text-primary" : "text-[#71717a]"
           )}
-          style={{ width: 18, height: 18 }}
+          style={{ width: 20, height: 20 }}
         >
-          <Icon className="w-full h-full stroke-[1.6px]" />
+          <Icon className="h-full w-full stroke-[1.95px]" />
         </div>
       )}
 
@@ -70,7 +71,7 @@ const SecondaryCTAButton = ({ config }: CTAButtonProps) => {
         aria-hidden
         className={cn(
           "relative z-10 text-[13px] font-semibold whitespace-nowrap leading-none transition-colors duration-150",
-          hovered ? "text-accent" : "text-[#71717a]"
+          hovered ? "text-text-primary" : "text-[#71717a]"
         )}
         animate={{
           maxWidth: hovered ? 110 : 0,

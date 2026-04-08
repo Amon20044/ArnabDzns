@@ -1,54 +1,66 @@
 import { PhoneCall } from "lucide-react";
 import type { HeaderConfig, NavigationConfig } from "@/types";
+import { siteConfig } from "@/data/site";
 
 export const headerConfig: HeaderConfig = {
   brand: {
-    name: "Arnab",
-    role: "Designer and Developer",
-    bio: "Crafting tactile digital experiences that still feel human.",
+    name: siteConfig.name,
+    role: siteConfig.brand.role,
+    bio: siteConfig.brand.bio,
     path: "/",
-    logoSrc: "/image.png",
-    logoAlt: "Arnab brand portrait",
+    logoSrc: siteConfig.brand.logoSrc,
+    logoAlt: siteConfig.brand.logoAlt,
   },
   availabilityLabel: "Available",
-  socials: [
-    {
-      id: "discord",
-      label: "Discord",
-      href: "https://discord.com/users/your-id",
-    },
-    {
-      id: "instagram",
-      label: "Instagram",
-      href: "https://instagram.com/yourhandle",
-    },
-    {
-      id: "linkedin",
-      label: "LinkedIn",
-      href: "https://linkedin.com/in/yourprofile",
-    },
-  ],
+  socials: siteConfig.social
+    .filter((social) =>
+      ["discord", "instagram", "linkedin"].includes(social.platform),
+    )
+    .map((social) => ({
+      id: social.platform,
+      label: social.label,
+      href: social.url,
+    })),
 };
 
 export const navigationConfig: NavigationConfig = {
   items: [
-    { id: "portfolio", label: "Portfolio", path: "/portfolio" },
-    { id: "projects", label: "Projects", path: "/projects", isNew: true },
-    { id: "services", label: "Services", path: "/services" },
-    { id: "about", label: "About", path: "/about" },
-    { id: "contact", label: "Contact", path: "/contact" },
+    {
+      id: "home",
+      label: "Home",
+      path: "/",
+      sectionId: "home",
+    },
+    {
+      id: "portfolio",
+      label: "Portfolio",
+      path: "/#portfolio",
+      sectionId: "portfolio",
+    },
+    {
+      id: "services",
+      label: "Services",
+      path: "/#services",
+      sectionId: "services",
+    },
+    {
+      id: "testimonials",
+      label: "Testimonials",
+      path: "/#testimonials",
+      sectionId: "testimonials",
+    },
+    {
+      id: "faq",
+      label: "FAQ",
+      path: "/#faq",
+      sectionId: "faq",
+    },
   ],
   ctas: [
-    // {
-    //   label: "Shop",
-    //   variant: "secondary",
-    //   path: "/shop",
-    //   Icon: ShoppingBag,
-    // },
     {
       label: "Book a Call",
       variant: "primary",
-      path: "/book",
+      path: siteConfig.contact.inquiryPath,
       Icon: PhoneCall,
     },
   ],

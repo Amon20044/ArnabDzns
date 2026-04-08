@@ -3,17 +3,16 @@ import type { LucideIcon } from "lucide-react";
 export type NavIconId =
   | "home"
   | "portfolio"
-  | "projects"
   | "services"
-  | "shop"
-  | "about"
-  | "contact"
+  | "testimonials"
+  | "faq"
   | string;
 
 export interface NavItemConfig {
   id: NavIconId;
   label: string;
   path: string;
+  sectionId?: string;
   isNew?: boolean;
 }
 
@@ -59,6 +58,59 @@ export interface SocialLink {
   platform: string;
   url: string;
   label: string;
+  seo?: boolean;
+}
+
+export interface SiteBrandConfig {
+  role: string;
+  bio: string;
+  logoSrc: string;
+  logoAlt: string;
+}
+
+export interface SiteContactConfig {
+  inquiryPath: string;
+  bookingPath: string;
+  bookingUrl: string;
+  bookingDisplay: string;
+  primaryCtaLabel: string;
+  emailAddress: string;
+  callLabel: string;
+  callUrl: string;
+  callDisplay: string;
+  whatsappLabel: string;
+  whatsappUrl: string;
+  whatsappDisplay: string;
+}
+
+export interface SiteAgendaConfig {
+  summary: string;
+  audiences: string[];
+  services: string[];
+  differentiators: string[];
+  keywords: string[];
+}
+
+export type SitemapChangeFrequency =
+  | "always"
+  | "hourly"
+  | "daily"
+  | "weekly"
+  | "monthly"
+  | "yearly"
+  | "never";
+
+export interface SiteSeoConfig {
+  locale: string;
+  language: string;
+  category: string;
+  defaultTitle: string;
+  titleTemplate: string;
+  defaultDescription: string;
+  keywords: string[];
+  author: string;
+  updatedAt: string;
+  ogImageAlt: string;
 }
 
 export interface SiteConfig {
@@ -66,8 +118,49 @@ export interface SiteConfig {
   tagline: string;
   description: string;
   url: string;
+  category: string;
+  brand: SiteBrandConfig;
+  contact: SiteContactConfig;
+  agenda: SiteAgendaConfig;
+  seo: SiteSeoConfig;
   social: SocialLink[];
 }
+
+export type SitePageKey =
+  | "home"
+  | "about"
+  | "services"
+  | "portfolio"
+  | "projects"
+  | "contact"
+  | "book"
+  | "shop";
+
+export interface PageSeoConfig {
+  title: string;
+  description: string;
+  keywords: string[];
+  pageType?:
+    | "WebPage"
+    | "AboutPage"
+    | "CollectionPage"
+    | "ContactPage";
+  openGraphType?: "website" | "article";
+  noIndex?: boolean;
+}
+
+export interface SitePageConfig {
+  path: string;
+  navLabel?: string;
+  seo: PageSeoConfig;
+  sitemap: {
+    changeFrequency: SitemapChangeFrequency;
+    priority: number;
+  };
+}
+
+export type SitePagesConfig = Record<"home" | "contact", SitePageConfig> &
+  Partial<Record<Exclude<SitePageKey, "home" | "contact">, SitePageConfig>>;
 
 export type ToolkitIconId =
   | "figma"

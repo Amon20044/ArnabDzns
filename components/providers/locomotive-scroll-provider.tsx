@@ -4,6 +4,12 @@ import { usePathname } from "next/navigation";
 import { useEffect, useRef } from "react";
 import type LocomotiveScroll from "locomotive-scroll";
 
+type ModalScrollLockDetail = {
+  locked: boolean;
+};
+
+const MODAL_SCROLL_LOCK_EVENT = "app:modal-scroll-lock";
+
 export function LocomotiveScrollProvider({
   children,
 }: Readonly<{
@@ -38,6 +44,34 @@ export function LocomotiveScrollProvider({
       isMounted = false;
       scrollRef.current?.destroy();
       scrollRef.current = null;
+    };
+  }, []);
+
+  useEffect(() => {
+    const handleModalScrollLock = (event: Event) => {
+      const { locked } = (event as CustomEvent<ModalScrollLockDetail>).detail;
+
+      if (locked) {
+        scrollRef.current?.stop();
+        return;
+      }
+
+      scrollRef.current?.start();
+      window.requestAnimationFrame(() => {
+        scrollRef.current?.resize();
+      });
+    };
+
+    window.addEventListener(
+      MODAL_SCROLL_LOCK_EVENT,
+      handleModalScrollLock as EventListener,
+    );
+
+    return () => {
+      window.removeEventListener(
+        MODAL_SCROLL_LOCK_EVENT,
+        handleModalScrollLock as EventListener,
+      );
     };
   }, []);
 

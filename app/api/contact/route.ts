@@ -33,9 +33,16 @@ export async function POST(request: Request) {
       inquiryType: readString(body.inquiryType) || "General inquiry",
       budget: readString(body.budget),
       timeline: readString(body.timeline),
+      preferredContactMethod:
+        readString(body.preferredContactMethod) || "No preference",
       message: readString(body.message),
       source: readString(body.source) || "site-form",
+      website: readString(body.website),
     };
+
+    if (submission.website) {
+      return NextResponse.json({ message: "Thanks." });
+    }
 
     if (!submission.name) {
       return NextResponse.json(
@@ -68,6 +75,9 @@ export async function POST(request: Request) {
       `Inquiry Type: ${submission.inquiryType}`,
       submission.budget ? `Budget: ${submission.budget}` : "",
       submission.timeline ? `Timeline: ${submission.timeline}` : "",
+      submission.preferredContactMethod
+        ? `Preferred Reply: ${submission.preferredContactMethod}`
+        : "",
       `Source: ${submission.source}`,
       "",
       submission.message,
@@ -100,6 +110,11 @@ export async function POST(request: Request) {
             ${
               submission.timeline
                 ? `<p style="margin:0 0 8px;"><strong>Timeline:</strong> ${escapeHtml(submission.timeline)}</p>`
+                : ""
+            }
+            ${
+              submission.preferredContactMethod
+                ? `<p style="margin:0 0 8px;"><strong>Preferred Reply:</strong> ${escapeHtml(submission.preferredContactMethod)}</p>`
                 : ""
             }
             <p style="margin:0 0 18px;"><strong>Source:</strong> ${escapeHtml(submission.source)}</p>
