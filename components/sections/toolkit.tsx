@@ -44,6 +44,7 @@ import { Hero } from "@/components/sections/hero";
 import { Heading, Text } from "@/components/ui/typography";
 import { toolkitSection } from "@/data/toolkit";
 import { createMetallicSurface } from "@/lib/metallic-surface";
+import { typography } from "@/lib/style";
 import { cn } from "@/lib/utils";
 import type {
   ToolkitCategory,
@@ -297,7 +298,7 @@ function ToolkitRow({ item }: { item: ToolkitItem }) {
             className="min-w-0 overflow-hidden rounded-[1.3rem] bg-[linear-gradient(135deg,#09090b_0%,#18181b_58%,#2a1242_100%)] px-4 py-4 text-white md:px-5"
             style={{ width: progressWidth, transformOrigin: "left center" }}
           >
-            <div className="flex items-start gap-3 md:items-center">
+            <div className="flex items-start gap-3 text-left md:items-center md:gap-4">
               <div
                 className={cn(
                   "flex size-12 shrink-0 items-center justify-center rounded-[1rem]",
@@ -307,13 +308,13 @@ function ToolkitRow({ item }: { item: ToolkitItem }) {
                 <Icon className={cn("size-6", iconClassName)} />
               </div>
 
-              <div className="min-w-0">
-                <Heading variant="h4" as="h3" className="text-white">
+              <div className="min-w-0 flex-1 text-left">
+                <Heading variant="h4" as="h3" className="text-left text-white">
                   {item.title}
                 </Heading>
                 <Text
                   variant="p2"
-                  className="mt-1 max-w-2xl text-white/[0.68] md:text-[15px]"
+                  className="mt-1 max-w-2xl text-left text-white/[0.68] md:text-[15px]"
                 >
                   {item.description}
                 </Text>
@@ -338,10 +339,28 @@ function ToolkitRow({ item }: { item: ToolkitItem }) {
             aria-valuemax={100}
             aria-valuemin={0}
             aria-valuenow={percentage}
-            className="inline-flex min-w-[4.5rem] items-center justify-center rounded-full bg-black/[0.08] px-4 py-2 text-sm font-semibold tracking-tight text-text-primary"
+            className="relative inline-flex select-none items-center justify-center overflow-hidden rounded-full px-5 py-2 md:px-6 md:py-2.5"
             role="progressbar"
           >
-            <AnimatedPercentage value={percentage} isActive={isInView} />
+            <span
+              aria-hidden
+              className="pointer-events-none absolute inset-0 rounded-full"
+              style={switcherMetallicTheme.surfaceStyle}
+            />
+            <span
+              aria-hidden
+              className="pointer-events-none absolute inset-px rounded-full opacity-80"
+              style={switcherMetallicTheme.glowStyle}
+            />
+            <span
+              className={cn(
+                "relative z-10 whitespace-nowrap tabular-nums",
+                typography.heading.h5,
+              )}
+              style={{ color: switcherMetallicTheme.textColor }}
+            >
+              <AnimatedPercentage value={percentage} isActive={isInView} />
+            </span>
           </div>
         </motion.div>
       </div>

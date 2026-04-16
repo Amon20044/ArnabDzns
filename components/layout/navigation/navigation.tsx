@@ -289,7 +289,7 @@ export const Navigation = () => {
               size="compact"
               iconVisibility="always"
               iconOnly
-              className="absolute right-3 top-0 z-[4] -translate-y-[10%]"
+              className="absolute right-0 top-0 z-[4] -translate-y-[30%]"
             />
           ) : null}
 

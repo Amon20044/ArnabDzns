@@ -4,6 +4,7 @@ import {
   MessageCircleMore,
   PhoneCall,
 } from "lucide-react";
+import { Fragment } from "react";
 import { socialIconRegistry } from "@/components/layout/navigation/social-icons";
 import { Hero } from "@/components/sections/hero";
 import { Heading, Text } from "@/components/ui/typography";
@@ -32,6 +33,17 @@ function renderActionIcon(icon: BookCallActionIconId, className: string) {
     default:
       return <PhoneCall className={className} strokeWidth={1.9} />;
   }
+}
+
+function renderActionValue(value: string) {
+  const breakableTokens = new Set([".", "/", "@", "-", "_"]);
+
+  return value.split(/([./@_-])/).map((token, index) => (
+    <Fragment key={`${token}-${index}`}>
+      {token}
+      {breakableTokens.has(token) ? <wbr /> : null}
+    </Fragment>
+  ));
 }
 
 function BookCallActionCard({
@@ -80,9 +92,9 @@ function BookCallActionCard({
               href={action.href}
               target={action.external ? "_blank" : undefined}
               rel={action.external ? "noopener noreferrer" : undefined}
-              className="transition-colors duration-200 hover:text-accent"
+              className="mx-auto block max-w-[12ch] transition-colors duration-200 [overflow-wrap:anywhere] hover:text-accent sm:max-w-full"
             >
-              {action.value}
+              {renderActionValue(action.value)}
             </a>
           </Heading>
 

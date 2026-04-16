@@ -139,7 +139,7 @@ export const PrimaryButton = ({
     fullWidth && "w-full",
     iconOnly
       ? isCompact
-        ? "size-11 p-0 text-[13px] font-semibold leading-none"
+        ? "size-16 p-0 text-[13px] font-semibold leading-none"
         : cn("size-12 p-0 text-[15px] font-semibold", toneTextClass)
       : isCompact
         ? "px-[18px] py-[8px] text-[13px] font-semibold leading-none"

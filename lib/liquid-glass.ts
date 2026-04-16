@@ -20,6 +20,7 @@ export interface LiquidGlassRefractionConfig {
   bezel: number;
   cornerRadius: number;
   displacement: number;
+  chromaticAberration: number;
   blur: number;
   brightness: number;
   saturate: number;
@@ -55,6 +56,7 @@ export const liquidGlassConfig = {
       bezel: 22,
       cornerRadius: 18,
       displacement: 32,
+      chromaticAberration: 0.1,
       blur: 2.0,
       brightness: 1.06,
       saturate: 1.12,
@@ -64,6 +66,7 @@ export const liquidGlassConfig = {
       bezel: 18,
       cornerRadius: 28,
       displacement: 28,
+      chromaticAberration: 0.09,
       blur: 2.0,
       brightness: 1.06,
       saturate: 1.12,

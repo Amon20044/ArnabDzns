@@ -228,12 +228,58 @@ export function LiquidGlassBackdrop({
                 preserveAspectRatio="none"
                 result={`${filterId}-map`}
               />
-              <feDisplacementMap
+              <feColorMatrix
                 in="SourceGraphic"
+                type="matrix"
+                values="1 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 1 0"
+                result={`${filterId}-r`}
+              />
+              <feDisplacementMap
+                in={`${filterId}-r`}
+                in2={`${filterId}-map`}
+                scale={displacementMap.scale * (1 + config.chromaticAberration)}
+                xChannelSelector="R"
+                yChannelSelector="G"
+                result={`${filterId}-rd`}
+              />
+              <feColorMatrix
+                in="SourceGraphic"
+                type="matrix"
+                values="0 0 0 0 0  0 1 0 0 0  0 0 0 0 0  0 0 0 1 0"
+                result={`${filterId}-g`}
+              />
+              <feDisplacementMap
+                in={`${filterId}-g`}
                 in2={`${filterId}-map`}
                 scale={displacementMap.scale}
                 xChannelSelector="R"
                 yChannelSelector="G"
+                result={`${filterId}-gd`}
+              />
+              <feColorMatrix
+                in="SourceGraphic"
+                type="matrix"
+                values="0 0 0 0 0  0 0 0 0 0  0 0 1 0 0  0 0 0 1 0"
+                result={`${filterId}-b`}
+              />
+              <feDisplacementMap
+                in={`${filterId}-b`}
+                in2={`${filterId}-map`}
+                scale={displacementMap.scale * (1 - config.chromaticAberration)}
+                xChannelSelector="R"
+                yChannelSelector="G"
+                result={`${filterId}-bd`}
+              />
+              <feBlend
+                in={`${filterId}-rd`}
+                in2={`${filterId}-gd`}
+                mode="screen"
+                result={`${filterId}-rg`}
+              />
+              <feBlend
+                in={`${filterId}-rg`}
+                in2={`${filterId}-bd`}
+                mode="screen"
               />
             </filter>
           </defs>
