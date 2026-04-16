@@ -147,7 +147,7 @@ function ImpactExpandedModalContent({
               </StatusBadge>
             ) : null}
             {card.updatedAt ? (
-              <StatusBadge compact interactive={false} tone="#ffffff" textColor="#52525b">
+              <StatusBadge compact interactive={false} tone="#ffffff" textColor="#ffffff">
                 Updated {formatDate(card.updatedAt)}
               </StatusBadge>
             ) : null}
