@@ -1,6 +1,7 @@
 import { BookCallSection } from "@/components/sections/book-call";
 import { FAQ } from "@/components/sections/faq";
 import { Hero } from "@/components/sections/hero";
+import { ImpactSection } from "@/components/impact/impact-section";
 import { ProcessRoadmap } from "@/components/sections/process-roadmap";
 import { StructuredData } from "@/components/site/structured-data";
 import { Testimonials } from "@/components/sections/testimonials";
@@ -13,6 +14,7 @@ import { ImageMarquee } from "@/components/ui/image-marquee";
 import { demoImageMarquee, demoImageMarquee2 } from "@/data/demo-image-marquee";
 import { getPageMetadata } from "@/lib/seo";
 import { getPageJsonLd } from "@/lib/structured-data";
+import { impactSection } from "@/data/impact";
 
 export const metadata = getPageMetadata("home");
 
@@ -47,6 +49,10 @@ export default function Home() {
 
         <div id="services" data-nav-section="services" className="scroll-target">
           <Toolkit />
+        </div>
+
+        <div id="impact" className="scroll-target">
+          <ImpactSection content={impactSection} />
         </div>
 
         <div

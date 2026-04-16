@@ -437,3 +437,171 @@ export interface BookCallSectionConfig {
   hero: HeroSectionConfig;
   panel: BookCallPanelConfig;
 }
+
+/* --------------------------------------------------------------------------
+   Impact Showcase
+   --------------------------------------------------------------------------
+   Backend-friendly shape for the impact bento grid. Each card is a
+   self-contained document — identity + metric + optional trend/chart/
+   comparison + a markdown body slug that resolves to an MDX module on
+   the client (today) or a rich-text field in the DB (tomorrow). Field
+   names and enums are intentionally Mongoose-adjacent: string unions
+   widened with `string` so new values don't require a type change, and
+   nested value objects (metric, comparison, chart) that map 1:1 to
+   sub-schemas.
+   -------------------------------------------------------------------------- */
+
+export type ImpactCardType =
+  | "stat"
+  | "stat-trend"
+  | "collaboration-count"
+  | "comparison"
+  | "before-after"
+  | "bar-visualization"
+  | "sparkline"
+  | "breakdown"
+  | "partner-mix"
+  | "featured"
+  | string;
+
+export type ImpactCardSize = "sm" | "md" | "wide" | "tall" | "hero";
+
+export type ImpactTrendDirection = "up" | "down" | "flat";
+export type ImpactTrendStatus = "positive" | "neutral" | "negative";
+
+export type ImpactAccent =
+  | "violet"
+  | "emerald"
+  | "amber"
+  | "rose"
+  | "sky"
+  | "iris"
+  | "lime"
+  | string;
+
+export type ImpactCategoryId =
+  | "collaborations"
+  | "reach"
+  | "engagement"
+  | "growth"
+  | "campaign"
+  | "recognition"
+  | string;
+
+export interface ImpactMetricValue {
+  /** Raw numeric value — drives count-up animation + sorting. */
+  value: number;
+  /** Unit hint, e.g. "%", "x", "M", "K". */
+  unit?: string;
+  /** Pre-formatted display, e.g. "120M+", "3.2x". */
+  display: string;
+  /** Optional companion label ("impressions", "creators"). */
+  label?: string;
+}
+
+export interface ImpactTrend {
+  direction: ImpactTrendDirection;
+  status: ImpactTrendStatus;
+  /** Signed percentage change. */
+  changePercent?: number;
+  /** Pre-formatted display, e.g. "+18.4%". */
+  display: string;
+  /** Human timeframe: "last 90 days", "after launch". */
+  timeframe?: string;
+}
+
+export interface ImpactComparisonPoint {
+  label: string;
+  value: number;
+  display: string;
+}
+
+export interface ImpactComparison {
+  baseline: ImpactComparisonPoint;
+  current: ImpactComparisonPoint;
+  /** Precomputed multiplier string, e.g. "3.2x". */
+  multiplier?: string;
+}
+
+export interface ImpactChartPoint {
+  label?: string;
+  value: number;
+}
+
+export interface ImpactChartData {
+  kind: "sparkline" | "bars" | "area" | "donut";
+  points: ImpactChartPoint[];
+  /** Optional cap used to normalize visuals. */
+  max?: number;
+}
+
+export interface ImpactBreakdownSegment {
+  id: string;
+  label: string;
+  value: number;
+  /** 0..100 share. */
+  share: number;
+  accent?: ImpactAccent;
+}
+
+export interface ImpactPartner {
+  id: string;
+  name: string;
+  role?: string;
+}
+
+export interface ImpactCampaignStats {
+  impressions?: number;
+  likes?: number;
+  reach?: number;
+  engagementRate?: number;
+  clickThroughRate?: number;
+}
+
+export interface ImpactCardConfig {
+  /** Mongo-friendly id (maps to _id). */
+  id: string;
+  slug: string;
+
+  /** Display copy. */
+  title: string;
+  subtitle?: string;
+  shortLabel?: string;
+  category: ImpactCategoryId;
+  tags?: string[];
+
+  /** Visual config. */
+  type: ImpactCardType;
+  size: ImpactCardSize;
+  accent: ImpactAccent;
+
+  /** Admin / ordering flags. */
+  priority?: number;
+  featured?: boolean;
+  active?: boolean;
+
+  /** Metric payload + enrichments. */
+  metric: ImpactMetricValue;
+  trend?: ImpactTrend;
+  comparison?: ImpactComparison;
+  beforeAfter?: ImpactComparison;
+  chart?: ImpactChartData;
+  breakdown?: ImpactBreakdownSegment[];
+  partners?: ImpactPartner[];
+  campaignStats?: ImpactCampaignStats;
+
+  /** Resolves to an MDX module today, a rich-text field tomorrow. */
+  bodySlug?: string;
+
+  /** Reserved for future CMS/admin fields. */
+  metadata?: Record<string, unknown>;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+export interface ImpactSectionConfig {
+  hero: HeroSectionConfig;
+  /** CTA rendered inside the expanded modal. */
+  modalCTA?: HeroCTAConfig;
+  cards: ImpactCardConfig[];
+}
