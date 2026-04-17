@@ -2,6 +2,7 @@
 
 import {
   Mail,
+  MessageCircleMore,
 } from "lucide-react";
 import { InquiryForm } from "@/components/forms/inquiry-form";
 import { Hero } from "@/components/sections/hero";
