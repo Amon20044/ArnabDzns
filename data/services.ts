@@ -19,7 +19,7 @@ export const servicesSection: ServicesSectionConfig = {
   services: [
     {
       id: "logo-design",
-      icon: "https://cdn.simpleicons.org/adobe/1a1a1a",
+      icon: "/icons/logo-design.svg",
       title: "Logo Design",
       description:
         "We make logos that feel right. Not just good-looking but meaningful, memorable and built to last for your brand.",
