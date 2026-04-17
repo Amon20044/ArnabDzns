@@ -75,7 +75,7 @@ export const testimonialsSection = {
           name: "Studio Loop",
           metaLabel: "Founder, Studio Loop",
           message:
-            "Communication was sharp, turnaround was fast, and the work landed exactly where we needed it. Felt like having a senior designer embedded with the team rather than a vendor.",
+            "Communication was sharp, turnaround was fast, and the work landed exactly where I needed it. Felt like having a senior designer embedded with the team rather than a vendor.",
           rating: 5,
           avatar: {
             src: "/demo/avatars/creator-3.png",
@@ -130,7 +130,7 @@ export const testimonialsSection = {
           name: "Apex League",
           metaLabel: "Pro circuit operator",
           message:
-            "We needed a look that felt premium without losing the competitive edge our players love. The final identity hit both, and our sponsors immediately noticed the upgrade.",
+            "I needed a look that felt premium without losing the competitive edge our players love. The final identity hit both, and our sponsors immediately noticed the upgrade.",
           rating: 5,
           avatar: {
             src: "/demo/avatars/to-2.png",

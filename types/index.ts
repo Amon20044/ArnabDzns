@@ -218,7 +218,7 @@ export interface ToolkitSectionConfig {
 
 export interface ServiceCardItem {
   id: string;
-  /** SVG path in public folder OR external image URL */
+  /** Local asset path, external image URL, or `lucide:<icon-id>` */
   icon: string;
   title: string;
   description: string;
