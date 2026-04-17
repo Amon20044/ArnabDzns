@@ -277,8 +277,9 @@ function MarqueeRow({
               const isClient = type === "clients";
               const clientLabel = image.alt ?? image.client ?? "";
               const ClientIcon = image.icon ? CLIENT_ICON_REGISTRY[image.icon] : undefined;
+              const imageSrc = image.src;
 
-              if (!isClient && !image.src) {
+              if (!isClient && !imageSrc) {
                 return null;
               }
 
@@ -330,7 +331,7 @@ function MarqueeRow({
                   style={{ aspectRatio, height }}
                 >
                   <Image
-                    src={image.src}
+                    src={imageSrc!}
                     alt={image.alt ?? ""}
                     fill
                     sizes={imageSizes}
