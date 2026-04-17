@@ -2,7 +2,6 @@
 
 import {
   Mail,
-  MessageCircleMore,
 } from "lucide-react";
 import { InquiryForm } from "@/components/forms/inquiry-form";
 import { Hero } from "@/components/sections/hero";
@@ -71,13 +70,6 @@ export function ContactPageExperience() {
                   </div>
 
                   <div className="flex flex-col items-start gap-3 md:items-end [&>*]:w-full [&>*]:min-w-[14.5rem]">
-                    <PrimaryButton
-                      label={siteConfig.contact.callLabel}
-                      href={siteConfig.contact.callUrl}
-                      external
-                      Icon={MessageCircleMore}
-                      fullWidth
-                    />
                     <PrimaryButton
                       label="Email directly"
                       href={`mailto:${siteConfig.contact.emailAddress}`}

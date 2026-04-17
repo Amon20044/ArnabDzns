@@ -26,17 +26,17 @@ export const testimonialsSection = {
         label: "Trusted by Visionaries",
         avatars: [
           {
-            src: "/demo/avatars/onespot.png",
+            src: "",
             alt: "Onespot Tech",
             fallback: "OT",
           },
           {
-            src: "/demo/avatars/creator-2.png",
+            src: "",
             alt: "Independent creator",
             fallback: "IC",
           },
           {
-            src: "/demo/avatars/creator-3.png",
+            src: "",
             alt: "Studio partner",
             fallback: "SP",
           },
@@ -51,7 +51,7 @@ export const testimonialsSection = {
             "Absolutely loved the thumbnails! The designer truly understands what works for my audience and created vibrant, engaging designs that stand out. The process was smooth, and they were open to my feedback, making sure everything was perfect before finalizing. I've already seen an increase in views since switching to these new thumbnails.",
           rating: 5,
           avatar: {
-            src: "/demo/avatars/onespot.png",
+            src: "",
             alt: "Onespot Tech",
             fallback: "OT",
           },
@@ -65,7 +65,7 @@ export const testimonialsSection = {
             "The level of detail was unreal. Every thumbnail felt purposeful — color, composition, hierarchy — and our CTR jumped within the first week. Easily the smoothest design partnership I've had this year.",
           rating: 5,
           avatar: {
-            src: "/demo/avatars/creator-2.png",
+            src: "",
             alt: "Pixel Room",
             fallback: "PR",
           },
@@ -78,7 +78,7 @@ export const testimonialsSection = {
             "Communication was sharp, turnaround was fast, and the work landed exactly where I needed it. Felt like having a senior designer embedded with the team rather than a vendor.",
           rating: 5,
           avatar: {
-            src: "/demo/avatars/creator-3.png",
+            src: "",
             alt: "Studio Loop",
             fallback: "SL",
           },
@@ -95,17 +95,17 @@ export const testimonialsSection = {
         label: "Trusted by Tournament Organizers",
         avatars: [
           {
-            src: "/demo/avatars/to-1.png",
+            src: "",
             alt: "Skyline Esports",
             fallback: "SE",
           },
           {
-            src: "/demo/avatars/to-2.png",
+            src: "",
             alt: "Apex League",
             fallback: "AL",
           },
           {
-            src: "/demo/avatars/to-3.png",
+            src: "",
             alt: "Vanguard Cup",
             fallback: "VC",
           },
@@ -120,7 +120,7 @@ export const testimonialsSection = {
             "Brand identity, broadcast overlays, and bracket graphics — everything tied together so cleanly that our production team didn't need a single revision on stream day. Genuinely raised the bar for our event.",
           rating: 5,
           avatar: {
-            src: "/demo/avatars/to-1.png",
+            src: "",
             alt: "Skyline Esports",
             fallback: "SE",
           },
@@ -133,7 +133,7 @@ export const testimonialsSection = {
             "I needed a look that felt premium without losing the competitive edge our players love. The final identity hit both, and our sponsors immediately noticed the upgrade.",
           rating: 5,
           avatar: {
-            src: "/demo/avatars/to-2.png",
+            src: "",
             alt: "Apex League",
             fallback: "AL",
           },
@@ -150,12 +150,12 @@ export const testimonialsSection = {
         label: "Trusted by Growing Teams",
         avatars: [
           {
-            src: "/demo/avatars/org-1.png",
+            src: "",
             alt: "Northwind Labs",
             fallback: "NL",
           },
           {
-            src: "/demo/avatars/org-2.png",
+            src: "",
             alt: "Lumen Studio",
             fallback: "LS",
           },
@@ -170,7 +170,7 @@ export const testimonialsSection = {
             "Took our marketing site from generic to genuinely memorable. The motion details and surface treatments make the product feel five times its size. Our investors actually commented on the new site.",
           rating: 5,
           avatar: {
-            src: "/demo/avatars/org-1.png",
+            src: "",
             alt: "Northwind Labs",
             fallback: "NL",
           },

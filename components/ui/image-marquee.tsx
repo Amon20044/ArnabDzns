@@ -2,13 +2,35 @@
 
 import Image from "next/image";
 import { useEffect, useMemo, useRef } from "react";
+import type { IconType } from "react-icons";
+import {
+  SiApple,
+  SiDiscord,
+  SiGithub,
+  SiGoogle,
+  SiNetflix,
+  SiReddit,
+  SiSpotify,
+  SiTelegram,
+  SiYoutube,
+} from "react-icons/si";
 import { cn } from "@/lib/utils";
 
 export type ImageMarqueeDirection = "left" | "right";
+export type ClientMarqueeIconId =
+  | "apple"
+  | "discord"
+  | "github"
+  | "google"
+  | "netflix"
+  | "reddit"
+  | "spotify"
+  | "telegram"
+  | "youtube";
 
 export interface ImageMarqueeItem {
   id?: string;
-  src: string;
+  src?: string;
   alt?: string;
   width?: number;
   height?: number;
@@ -18,6 +40,10 @@ export interface ImageMarqueeItem {
   client?: string;
   /** Link to client website or relevant page */
   link?: string;
+  /** Local icon id for client marquees, used instead of remote image URLs. */
+  icon?: ClientMarqueeIconId;
+  /** Optional brand color applied to icon-only client items. */
+  iconColor?: string;
 }
 
 export interface ImageMarqueeRow {
@@ -62,6 +88,17 @@ const DEFAULT_HEIGHT = "clamp(8.25rem, 18vw, 13rem)";
 const DEFAULT_GAP = "1rem";
 const DEFAULT_SPEED = 52;
 const DEFAULT_IMAGE_SIZES = "(max-width: 640px) 72vw, (max-width: 1024px) 40vw, 24vw";
+const CLIENT_ICON_REGISTRY: Record<ClientMarqueeIconId, IconType> = {
+  apple: SiApple,
+  discord: SiDiscord,
+  github: SiGithub,
+  google: SiGoogle,
+  netflix: SiNetflix,
+  reddit: SiReddit,
+  spotify: SiSpotify,
+  telegram: SiTelegram,
+  youtube: SiYoutube,
+};
 
 function toCssValue(value: number | string | undefined, fallback: string) {
   if (typeof value === "number") {
@@ -238,6 +275,12 @@ function MarqueeRow({
             {images.map((image, imageIndex) => {
               const aspectRatio = resolveAspectRatio(image);
               const isClient = type === "clients";
+              const clientLabel = image.alt ?? image.client ?? "";
+              const ClientIcon = image.icon ? CLIENT_ICON_REGISTRY[image.icon] : undefined;
+
+              if (!isClient && !image.src) {
+                return null;
+              }
 
               const inner = isClient ? (
                 <div
@@ -247,15 +290,36 @@ function MarqueeRow({
                   )}
                   style={{ height }}
                 >
-                  <Image
-                    src={image.src}
-                    alt={image.alt ?? image.client ?? ""}
-                    width={image.width ?? 160}
-                    height={image.height ?? 48}
-                    sizes={imageSizes}
-                    priority={image.priority ?? (segmentIndex === 0 && rowIndex === 0 && imageIndex < 2)}
-                    className="h-full w-auto object-contain brightness-0 opacity-40 transition-all duration-400 ease-out hover:brightness-100 hover:opacity-100"
-                  />
+                  {ClientIcon ? (
+                    <div
+                      role="img"
+                      aria-label={clientLabel}
+                      className="flex items-center gap-3 rounded-full border border-black/8 bg-white/72 px-4 py-2 text-text-primary/72 shadow-[0_10px_24px_rgba(15,23,42,0.06)] backdrop-blur-sm transition-all duration-300 ease-out group-hover:-translate-y-0.5 group-hover:border-black/14 group-hover:text-text-primary group-hover:shadow-[0_14px_32px_rgba(15,23,42,0.10)]"
+                    >
+                      <ClientIcon
+                        aria-hidden
+                        className="size-5 shrink-0 transition-transform duration-300 ease-out group-hover:scale-105"
+                        style={{ color: image.iconColor ?? "currentColor" }}
+                      />
+                      <span className="text-[0.68rem] font-semibold uppercase tracking-[0.18em]">
+                        {image.client ?? clientLabel}
+                      </span>
+                    </div>
+                  ) : image.src ? (
+                    <Image
+                      src={image.src}
+                      alt={clientLabel}
+                      width={image.width ?? 160}
+                      height={image.height ?? 48}
+                      sizes={imageSizes}
+                      priority={image.priority ?? (segmentIndex === 0 && rowIndex === 0 && imageIndex < 2)}
+                      className="h-full w-auto object-contain brightness-0 opacity-40 transition-all duration-400 ease-out hover:brightness-100 hover:opacity-100"
+                    />
+                  ) : (
+                    <span className="text-sm font-semibold uppercase tracking-[0.18em] text-text-secondary">
+                      {image.client ?? clientLabel}
+                    </span>
+                  )}
                 </div>
               ) : (
                 <div
@@ -278,7 +342,7 @@ function MarqueeRow({
 
               return (
                 <article
-                  key={`${image.id ?? image.src}-${segmentIndex}-${imageIndex}`}
+                  key={`${image.id ?? image.src ?? image.icon ?? image.client ?? "marquee-item"}-${segmentIndex}-${imageIndex}`}
                   className="group relative shrink-0"
                   onPointerEnter={() => {
                     hoverRef.current = true;
@@ -292,6 +356,7 @@ function MarqueeRow({
                       href={image.link}
                       target="_blank"
                       rel="noopener noreferrer"
+                      aria-label={clientLabel}
                       title={image.client}
                     >
                       {inner}

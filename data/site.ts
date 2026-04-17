@@ -62,7 +62,6 @@ export function buildWhatsAppMessage({
     "*Brief*",
     safeMessage || "I would like to discuss a project with you.",
     "",
-    `*Source:* ${sourceLabel}`,
   ]
     .filter(Boolean)
     .join("\n");
