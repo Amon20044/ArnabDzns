@@ -295,16 +295,13 @@ function MarqueeRow({
                     <div
                       role="img"
                       aria-label={clientLabel}
-                      className="flex items-center gap-3 rounded-full border border-black/8 bg-white/72 px-4 py-2 text-text-primary/72 shadow-[0_10px_24px_rgba(15,23,42,0.06)] backdrop-blur-sm transition-all duration-300 ease-out group-hover:-translate-y-0.5 group-hover:border-black/14 group-hover:text-text-primary group-hover:shadow-[0_14px_32px_rgba(15,23,42,0.10)]"
+                      className="flex items-center justify-center"
                     >
                       <ClientIcon
                         aria-hidden
-                        className="size-5 shrink-0 transition-transform duration-300 ease-out group-hover:scale-105"
+                        className="size-7 shrink-0 opacity-45 transition-all duration-300 ease-out group-hover:scale-110 group-hover:opacity-100 md:size-8"
                         style={{ color: image.iconColor ?? "currentColor" }}
                       />
-                      <span className="text-[0.68rem] font-semibold uppercase tracking-[0.18em]">
-                        {image.client ?? clientLabel}
-                      </span>
                     </div>
                   ) : image.src ? (
                     <Image
