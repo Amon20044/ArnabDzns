@@ -1,10 +1,76 @@
 import type { SiteConfig } from "@/types";
 
 const normalizeUrl = (value: string) => value.replace(/\/+$/, "");
+const whatsappNumber = "918200962735";
+const whatsappDisplay = "+91 82009 62735";
 
 const siteUrl = normalizeUrl(
   process.env.NEXT_PUBLIC_SITE_URL || "https://arnabdzns.com",
 );
+
+type WhatsAppPrefillInput = {
+  name?: string;
+  brand?: string;
+  inquiryType?: string;
+  message?: string;
+  source?: string;
+};
+
+function clampMessage(value: string, maxLength = 700) {
+  const trimmed = value.trim();
+
+  if (trimmed.length <= maxLength) {
+    return trimmed;
+  }
+
+  return `${trimmed.slice(0, maxLength - 3).trimEnd()}...`;
+}
+
+function prettifySource(source?: string) {
+  if (!source) {
+    return "Website";
+  }
+
+  return source
+    .split(/[-_]/g)
+    .filter(Boolean)
+    .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
+    .join(" ");
+}
+
+export function buildWhatsAppMessage({
+  name,
+  brand,
+  inquiryType,
+  message,
+  source,
+}: WhatsAppPrefillInput = {}) {
+  const safeName = name?.trim();
+  const safeBrand = brand?.trim();
+  const safeInquiryType = inquiryType?.trim();
+  const safeMessage = clampMessage(message ?? "");
+  const sourceLabel = prettifySource(source);
+
+  return [
+    "Hi Arnab,",
+    "",
+    safeName
+      ? `I am *${safeName}* and I am contacting you for my inquiry on *${safeInquiryType || "a project"}*.`
+      : `I want to discuss *${safeInquiryType || "a project"}* with you.`,
+    safeBrand ? `*Project / Brand:* ${safeBrand}` : "",
+    "",
+    "*Brief*",
+    safeMessage || "I would like to discuss a project with you.",
+    "",
+    `*Source:* ${sourceLabel}`,
+  ]
+    .filter(Boolean)
+    .join("\n");
+}
+
+export function buildWhatsAppUrl(input: WhatsAppPrefillInput = {}) {
+  return `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(buildWhatsAppMessage(input))}`;
+}
 
 export const siteConfig: SiteConfig = {
   name: "Arnab",
@@ -26,12 +92,22 @@ export const siteConfig: SiteConfig = {
     bookingDisplay: "connect.arnabdzns.com",
     primaryCtaLabel: "Contact",
     emailAddress: "arnabdzns@gmail.com",
-    callLabel: "Book a call",
-    callUrl: "https://connect.arnabdzns.com",
-    callDisplay: "connect.arnabdzns.com",
-    whatsappLabel: "Connect on WhatsApp",
-    whatsappUrl: "https://connect.arnabdzns.com",
-    whatsappDisplay: "connect.arnabdzns.com",
+    callLabel: `WhatsApp ${whatsappDisplay}`,
+    callUrl: buildWhatsAppUrl({
+      inquiryType: "project discussion",
+      message:
+        "I want to discuss a project with you and would love to explore the right next step.",
+      source: "quick-connect",
+    }),
+    callDisplay: whatsappDisplay,
+    whatsappLabel: whatsappDisplay,
+    whatsappUrl: buildWhatsAppUrl({
+      inquiryType: "project discussion",
+      message:
+        "I want to discuss a project with you and would love to share a quick brief.",
+      source: "whatsapp-button",
+    }),
+    whatsappDisplay,
   },
   agenda: {
     summary:

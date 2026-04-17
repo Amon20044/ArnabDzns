@@ -3,6 +3,13 @@ import type { HeroSectionConfig } from "@/types";
 export const homeHeroSection = {
   badges: [
     {
+      id: "returning",
+      label: "60+ Returning Clients",
+      icon: "building",
+      tone: "#2563eb",
+      iconColor: "#dbeafe",
+    },
+    {
       id: "customers",
       label: "200+ Projects Delivered",
       icon: "stars",
@@ -18,9 +25,9 @@ export const homeHeroSection = {
       iconColor: "#dbeafe",
     },
   ],
-  title: ["Brand-forward websites", "built to feel premium"],
+  title: ["Good design gets noticed.", " Great design gets chosen."],
   description:
-    "Design, frontend development, and launch polish for creators, founders, and teams that want a sharper digital presence.",
+    "Creative work built for clicks, trust, and attention. I help brands and businesses connect with their audience through thoughtful, strategic design.",
   cta: {
     label: "Get in Touch",
     href: "/contact",

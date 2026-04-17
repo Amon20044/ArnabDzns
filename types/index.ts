@@ -216,6 +216,19 @@ export interface ToolkitSectionConfig {
   categories: ToolkitCategory[];
 }
 
+export interface ServiceCardItem {
+  id: string;
+  /** SVG path in public folder OR external image URL */
+  icon: string;
+  title: string;
+  description: string;
+}
+
+export interface ServicesSectionConfig {
+  hero: HeroSectionConfig;
+  services: ServiceCardItem[];
+}
+
 export type HeroBadgeIconId =
   | "stars"
   | "building"

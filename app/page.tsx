@@ -11,6 +11,9 @@ import { homeHeroSection } from "@/data/home-hero";
 import { portfolioSection } from "@/data/portfolio-section";
 import { processRoadmapSection } from "@/data/process-roadmap";
 import { ImageMarquee } from "@/components/ui/image-marquee";
+import { ServiceMarquee } from "@/components/ui/service-marquee";
+import { clientMarqueeRows } from "@/data/clients";
+import { servicesMarquee } from "@/data/services-marquee";
 import { demoImageMarquee, demoImageMarquee2 } from "@/data/demo-image-marquee";
 import { getPageMetadata } from "@/lib/seo";
 import { getPageJsonLd } from "@/lib/structured-data";
@@ -24,8 +27,20 @@ export default function Home() {
       <div className="mx-auto flex w-full max-w-6xl flex-1 flex-col gap-12 px-6 pb-32 pt-4 md:px-10 md:pb-40">
         <StructuredData data={getPageJsonLd("home") ?? {}} />
         <div id="home" data-nav-section="home" className="scroll-target">
+          {/* <ServiceMarquee services={servicesMarquee} /> */}
           <Hero content={homeHeroSection} />
         </div>
+
+        <section className="page-reveal">
+          <ImageMarquee
+            rows={clientMarqueeRows}
+            type="clients"
+            height="3rem"
+            rowGap=".25rem"
+            itemGap="3rem"
+            minItemsPerRow={16}
+          />
+        </section>
 
         <section className="page-reveal">
           <ImageMarquee
@@ -46,15 +61,6 @@ export default function Home() {
             />
           </section>
         </div>
-
-        <div id="services" data-nav-section="services" className="scroll-target">
-          <Toolkit />
-        </div>
-
-        <div id="impact" className="scroll-target">
-          <ImpactSection content={impactSection} />
-        </div>
-
         <div
           id="testimonials"
           data-nav-section="testimonials"
@@ -62,6 +68,16 @@ export default function Home() {
         >
           <Testimonials />
         </div>
+        <div id="impact" className="scroll-target">
+          <ImpactSection content={impactSection} />
+        </div>
+
+
+        <div id="services" data-nav-section="services" className="scroll-target">
+          <Toolkit />
+        </div>
+
+
 
         <ProcessRoadmap
           hero={processRoadmapSection.hero}

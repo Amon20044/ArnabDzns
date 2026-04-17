@@ -8,7 +8,7 @@ import { cn } from "@/lib/utils";
 
 type PrimaryButtonSize = "default" | "compact";
 type PrimaryButtonIconVisibility = "always" | "hover";
-type PrimaryButtonTone = "default" | "white";
+type PrimaryButtonTone = "default" | "white" | "whatsapp";
 
 interface PrimaryButtonProps {
   label: string;
@@ -59,6 +59,7 @@ export const PrimaryButton = ({
   const [hovered, setHovered] = useState(false);
   const isCompact = size === "compact";
   const isWhiteTone = tone === "white";
+  const isWhatsappTone = tone === "whatsapp";
   const resolvedIconVisibility = iconVisibility ?? (isCompact ? "hover" : "always");
   const showLeadingIcon =
     !!Icon && (iconOnly || resolvedIconVisibility === "always" || hovered);
@@ -68,8 +69,8 @@ export const PrimaryButton = ({
   const iconSlotWidth = isCompact ? 20 : 24;
   const iconGap = isCompact ? 8 : 10;
   const iconStrokeWidth = isCompact ? 2.2 : 2.3;
-  const labelColorClass = isWhiteTone ? "text-text-primary" : "text-white";
-  const toneTextClass = isWhiteTone ? "text-text-primary" : "text-white";
+  const labelColorClass = isWhatsappTone ? "text-green-800" : isWhiteTone ? "text-text-primary" : "text-white";
+  const toneTextClass = isWhatsappTone ? "text-green-800" : isWhiteTone ? "text-text-primary" : "text-white";
   const enableTilt = !fullWidth && !iconOnly;
   const isMailOrPhoneLink = href?.startsWith("mailto:") || href?.startsWith("tel:");
   const shouldRenderAnchor = !!href && (external || isMailOrPhoneLink);
@@ -134,7 +135,7 @@ export const PrimaryButton = ({
 
   const linkClassName = cn(
     "primary-button group relative inline-flex items-center justify-center gap-0 overflow-hidden rounded-full select-none",
-    isWhiteTone && "primary-button--white",
+    (isWhiteTone || isWhatsappTone) && "primary-button--white",
     "will-change-transform",
     fullWidth && "w-full",
     iconOnly
@@ -147,11 +148,20 @@ export const PrimaryButton = ({
   );
 
   const surfaceOpacity = 1;
-  const glowOpacity = hovered ? (isWhiteTone ? 0.92 : 0.86) : isWhiteTone ? 0.72 : 0.46;
+  const isLightTone = isWhiteTone || isWhatsappTone;
+  const glowOpacity = hovered ? (isLightTone ? 0.92 : 0.86) : isLightTone ? 0.72 : 0.46;
 
   const content = (
     <>
-      {isWhiteTone ? (
+      {isWhatsappTone ? (
+        <motion.span
+          aria-hidden
+          className="pointer-events-none absolute inset-0 rounded-full bg-[linear-gradient(120deg,rgba(220,252,231,0.96)_8%,rgba(187,247,208,0.95)_34%,rgba(74,222,128,0.72)_62%,rgba(220,252,231,0.96)_100%)]"
+          initial={false}
+          animate={{ opacity: hovered ? 0.92 : 0.68 }}
+          transition={{ duration: 0.28, ease }}
+        />
+      ) : isWhiteTone ? (
         <motion.span
           aria-hidden
           className="pointer-events-none absolute inset-0 rounded-full bg-[linear-gradient(120deg,rgba(255,255,255,0.96)_8%,rgba(243,232,255,0.95)_34%,rgba(216,180,254,0.72)_62%,rgba(255,255,255,0.96)_100%)]"
@@ -164,7 +174,7 @@ export const PrimaryButton = ({
         aria-hidden
         className={cn(
           "pointer-events-none absolute rounded-full",
-          isWhiteTone ? "inset-px glass-capsule" : "inset-0 glass-capsule-primary",
+          isLightTone ? "inset-px glass-capsule" : "inset-0 glass-capsule-primary",
         )}
         initial={false}
         animate={{ opacity: surfaceOpacity }}
@@ -174,9 +184,11 @@ export const PrimaryButton = ({
         aria-hidden
         className={cn(
           "pointer-events-none absolute inset-px rounded-full",
-          isWhiteTone
-            ? "bg-[radial-gradient(circle_at_20%_18%,rgba(255,255,255,0.92)_0%,rgba(243,232,255,0.72)_40%,rgba(168,85,247,0.08)_72%,transparent_88%)]"
-            : "bg-[radial-gradient(circle_at_20%_18%,rgba(216,180,254,0.72)_0%,rgba(168,85,247,0.28)_38%,rgba(76,29,149,0.08)_62%,transparent_82%)]",
+          isWhatsappTone
+            ? "bg-[radial-gradient(circle_at_20%_18%,rgba(220,252,231,0.92)_0%,rgba(187,247,208,0.72)_40%,rgba(34,197,94,0.08)_72%,transparent_88%)]"
+            : isWhiteTone
+              ? "bg-[radial-gradient(circle_at_20%_18%,rgba(255,255,255,0.92)_0%,rgba(243,232,255,0.72)_40%,rgba(168,85,247,0.08)_72%,transparent_88%)]"
+              : "bg-[radial-gradient(circle_at_20%_18%,rgba(216,180,254,0.72)_0%,rgba(168,85,247,0.28)_38%,rgba(76,29,149,0.08)_62%,transparent_82%)]",
         )}
         initial={false}
         animate={{ opacity: glowOpacity }}
@@ -186,7 +198,7 @@ export const PrimaryButton = ({
         aria-hidden
         className={cn(
           "pointer-events-none absolute z-[5] block -rotate-[18deg]",
-          isWhiteTone
+          isLightTone
             ? "bg-[linear-gradient(110deg,transparent_0%,rgba(255,255,255,0.18)_20%,rgba(255,255,255,0.94)_50%,rgba(255,255,255,0.22)_80%,transparent_100%)]"
             : "bg-[linear-gradient(110deg,transparent_0%,rgba(255,255,255,0.06)_20%,rgba(255,255,255,0.62)_50%,rgba(255,255,255,0.08)_80%,transparent_100%)]",
         )}
@@ -240,9 +252,9 @@ export const PrimaryButton = ({
       onHoverEnd={() => setHovered(false)}
       initial={false}
       animate={{
-        scale: hovered ? (isWhiteTone ? 1.03 : 1.06) : 1,
-        rotate: hovered && enableTilt && !isWhiteTone ? -10 : 0,
-        y: hovered ? (isWhiteTone ? -1 : -1.5) : 0,
+        scale: hovered ? (isLightTone ? 1.03 : 1.06) : 1,
+        rotate: hovered && enableTilt && !isLightTone ? -10 : 0,
+        y: hovered ? (isLightTone ? -1 : -1.5) : 0,
       }}
       whileTap={{ scale: 0.97 }}
       transition={spring}

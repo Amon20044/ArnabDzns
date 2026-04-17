@@ -14,6 +14,10 @@ export interface ImageMarqueeItem {
   height?: number;
   aspectRatio?: number;
   priority?: boolean;
+  /** Client / brand name (used when type="clients") */
+  client?: string;
+  /** Link to client website or relevant page */
+  link?: string;
 }
 
 export interface ImageMarqueeRow {
@@ -26,6 +30,8 @@ export interface ImageMarqueeRow {
 
 export interface ImageMarqueeProps {
   rows: ImageMarqueeRow[];
+  /** "gallery" (default) renders full images; "clients" renders compact logos */
+  type?: "gallery" | "clients";
   height?: number | string;
   rowGap?: number | string;
   itemGap?: number | string;
@@ -41,6 +47,7 @@ export interface ImageMarqueeProps {
 interface MarqueeRowProps {
   row: ImageMarqueeRow;
   rowIndex: number;
+  type: "gallery" | "clients";
   defaultHeight: string;
   itemGap: string;
   hoverSlowdownFactor: number;
@@ -81,19 +88,23 @@ function expandImages(images: ImageMarqueeItem[], minimumItems: number) {
     return [];
   }
 
-  const targetLength = Math.max(images.length, minimumItems);
+  // Always expand to at least minimumItems, rounding up to a full multiple of source length
+  // so the loop is seamless (no partial set at the boundary)
+  const targetLength = Math.max(minimumItems, images.length);
+  const copies = Math.ceil(targetLength / images.length);
   const expanded: ImageMarqueeItem[] = [];
 
-  while (expanded.length < targetLength) {
+  for (let i = 0; i < copies; i++) {
     expanded.push(...images);
   }
 
-  return expanded.slice(0, targetLength);
+  return expanded;
 }
 
 function MarqueeRow({
   row,
   rowIndex,
+  type,
   defaultHeight,
   itemGap,
   hoverSlowdownFactor,
@@ -226,6 +237,44 @@ function MarqueeRow({
           >
             {images.map((image, imageIndex) => {
               const aspectRatio = resolveAspectRatio(image);
+              const isClient = type === "clients";
+
+              const inner = isClient ? (
+                <div
+                  className={cn(
+                    "relative flex items-center justify-center",
+                    itemClassName,
+                  )}
+                  style={{ height }}
+                >
+                  <Image
+                    src={image.src}
+                    alt={image.alt ?? image.client ?? ""}
+                    width={image.width ?? 160}
+                    height={image.height ?? 48}
+                    sizes={imageSizes}
+                    priority={image.priority ?? (segmentIndex === 0 && rowIndex === 0 && imageIndex < 2)}
+                    className="h-full w-auto object-contain brightness-0 opacity-40 transition-all duration-400 ease-out hover:brightness-100 hover:opacity-100"
+                  />
+                </div>
+              ) : (
+                <div
+                  className={cn(
+                    "relative overflow-hidden rounded-[0.5rem] transition-transform duration-300 ease-out group-hover:-translate-y-1",
+                    itemClassName,
+                  )}
+                  style={{ aspectRatio, height }}
+                >
+                  <Image
+                    src={image.src}
+                    alt={image.alt ?? ""}
+                    fill
+                    sizes={imageSizes}
+                    priority={image.priority ?? (segmentIndex === 0 && rowIndex === 0 && imageIndex < 2)}
+                    className="object-cover transition-transform duration-500 ease-out group-hover:scale-[1.035]"
+                  />
+                </div>
+              );
 
               return (
                 <article
@@ -238,22 +287,18 @@ function MarqueeRow({
                     hoverRef.current = false;
                   }}
                 >
-                  <div
-                    className={cn(
-                      "relative overflow-hidden rounded-[0.5rem] transition-transform duration-300 ease-out group-hover:-translate-y-1",
-                      itemClassName,
-                    )}
-                    style={{ aspectRatio, height }}
-                  >
-                    <Image
-                      src={image.src}
-                      alt={image.alt ?? ""}
-                      fill
-                      sizes={imageSizes}
-                      priority={image.priority ?? (segmentIndex === 0 && rowIndex === 0 && imageIndex < 2)}
-                      className="object-cover transition-transform duration-500 ease-out group-hover:scale-[1.035]"
-                    />
-                  </div>
+                  {isClient && image.link ? (
+                    <a
+                      href={image.link}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      title={image.client}
+                    >
+                      {inner}
+                    </a>
+                  ) : (
+                    inner
+                  )}
                 </article>
               );
             })}
@@ -266,6 +311,7 @@ function MarqueeRow({
 
 export function ImageMarquee({
   rows,
+  type = "gallery",
   height,
   rowGap,
   itemGap,
@@ -299,6 +345,7 @@ export function ImageMarquee({
             key={row.id ?? `marquee-row-${rowIndex}`}
             row={row}
             rowIndex={rowIndex}
+            type={type}
             defaultHeight={resolvedHeight}
             itemGap={resolvedItemGap}
             hoverSlowdownFactor={hoverSlowdownFactor}

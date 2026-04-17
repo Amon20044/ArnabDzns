@@ -4,16 +4,10 @@ import { useMemo, useState, type ComponentType } from "react";
 import Image from "next/image";
 import { AnimatePresence, motion } from "framer-motion";
 import {
-  Building2,
   ChevronLeft,
   ChevronRight,
-  Crown,
-  type LucideIcon,
   Quote,
-  Sparkles,
   Star,
-  Trophy,
-  Users,
 } from "lucide-react";
 import { Hero } from "@/components/sections/hero";
 import { Heading, Text } from "@/components/ui/typography";
@@ -23,8 +17,6 @@ import { cn } from "@/lib/utils";
 import type {
   HeroSectionConfig,
   TestimonialAvatar,
-  TestimonialCategory,
-  TestimonialCategoryIconId,
   TestimonialItem,
   TestimonialsSectionConfig,
 } from "@/types";
@@ -33,23 +25,6 @@ interface TestimonialsProps {
   /** Override the default static content (e.g. when wired to a CMS later). */
   content?: TestimonialsSectionConfig;
   className?: string;
-}
-
-const categoryIconRegistry: Record<TestimonialCategoryIconId, LucideIcon> = {
-  users: Users,
-  trophy: Trophy,
-  building: Building2,
-  sparkles: Sparkles,
-  crown: Crown,
-  none: Users, // sane default; "none" callers should branch instead
-};
-
-function resolveCategoryIcon(id?: TestimonialCategoryIconId): LucideIcon | null {
-  if (!id || id === "none") {
-    return null;
-  }
-
-  return (categoryIconRegistry as Record<string, LucideIcon | undefined>)[id] ?? null;
 }
 
 const cardEase = [0.22, 1, 0.36, 1] as const;
@@ -142,102 +117,29 @@ function Avatar({
   );
 }
 
-function TrustedByGroup({ category }: { category: TestimonialCategory }) {
-  const { trustedBy } = category;
 
-  if (!trustedBy.avatars.length) {
-    return null;
-  }
+const metaBadgeTheme = createMetallicSurface({ tone: "#a855f7" });
 
+function MetaBadge({ label }: { label: string }) {
   return (
-    <div className="flex flex-col items-center gap-3">
-      <div className="flex -space-x-3">
-        {trustedBy.avatars.map((avatar, index) => (
-          <Avatar
-            key={`${avatar.alt}-${index}`}
-            avatar={avatar}
-            size={44}
-            className="shadow-[0_4px_14px_rgba(24,24,27,0.12)]"
-          />
-        ))}
-      </div>
-      <Text variant="p3" as="span" className="text-sm font-semibold text-text-primary">
-        {trustedBy.label}
-      </Text>
-    </div>
-  );
-}
-
-// Single source of truth for the metallic pill — same tone as the
-// "Testimonials" StatusBadge so the active tab visually rhymes with it.
-const switcherMetallicTheme = createMetallicSurface({ tone: "#a855f7" });
-
-function CategorySwitcher({
-  categories,
-  activeId,
-  onChange,
-}: {
-  categories: TestimonialCategory[];
-  activeId: string;
-  onChange: (id: string) => void;
-}) {
-  if (categories.length <= 1) {
-    return null;
-  }
-
-  return (
-    <div
-      role="tablist"
-      aria-label="Testimonial categories"
-      className="inline-flex flex-wrap items-center justify-center gap-1 rounded-full border border-border-accent bg-white/80 p-1 shadow-[0_10px_30px_rgba(88,28,135,0.08)] backdrop-blur-md"
-    >
-      {categories.map((category) => {
-        const isActive = category.id === activeId;
-        const Icon = resolveCategoryIcon(category.icon);
-        return (
-          <button
-            key={category.id}
-            type="button"
-            role="tab"
-            aria-selected={isActive}
-            aria-controls={`testimonials-panel-${category.id}`}
-            id={`testimonials-tab-${category.id}`}
-            onClick={() => onChange(category.id)}
-            className={cn(
-              "group relative overflow-hidden rounded-full px-4 py-2 text-xs font-semibold uppercase tracking-[0.14em] transition-colors duration-200 sm:px-5 sm:text-[0.78rem]",
-              isActive
-                ? "text-white"
-                : "text-text-secondary hover:text-text-primary",
-            )}
-            style={isActive ? { color: switcherMetallicTheme.textColor } : undefined}
-          >
-            {isActive ? (
-              <motion.span
-                layoutId="testimonials-tab-pill"
-                className="pointer-events-none absolute inset-0 rounded-full"
-                transition={{ type: "spring", stiffness: 380, damping: 32 }}
-              >
-                <span
-                  aria-hidden
-                  className="pointer-events-none absolute inset-0 rounded-full"
-                  style={switcherMetallicTheme.surfaceStyle}
-                />
-                <span
-                  aria-hidden
-                  className="pointer-events-none absolute inset-px rounded-full opacity-80"
-                  style={switcherMetallicTheme.glowStyle}
-                />
-              </motion.span>
-            ) : null}
-            <span className="relative z-10 flex items-center gap-2">
-              {Icon ? <Icon className="size-3.5" strokeWidth={2.2} aria-hidden /> : null}
-              <span className="hidden sm:inline">{category.label}</span>
-              <span className="sm:hidden">{category.shortLabel ?? category.label}</span>
-            </span>
-          </button>
-        );
-      })}
-    </div>
+    <span className="relative inline-flex items-center overflow-hidden rounded-full px-3 py-1">
+      <span
+        aria-hidden
+        className="pointer-events-none absolute inset-0 rounded-full"
+        style={metaBadgeTheme.surfaceStyle}
+      />
+      <span
+        aria-hidden
+        className="pointer-events-none absolute inset-px rounded-full opacity-70"
+        style={metaBadgeTheme.glowStyle}
+      />
+      <span
+        className="relative z-10 whitespace-nowrap text-[11px] font-semibold tracking-tight"
+        style={{ color: metaBadgeTheme.textColor }}
+      >
+        {label}
+      </span>
+    </span>
   );
 }
 
@@ -256,9 +158,9 @@ function TestimonialCard({ testimonial }: { testimonial: TestimonialItem }) {
           <Heading variant="h4" as="h3" className="truncate text-text-primary">
             {testimonial.name}
           </Heading>
-          <Text variant="p3" className="mt-1 text-text-secondary">
-            {testimonial.metaLabel}
-          </Text>
+          <div className="mt-1.5">
+            <MetaBadge label={testimonial.metaLabel} />
+          </div>
         </div>
       </header>
 
@@ -274,62 +176,23 @@ function TestimonialCard({ testimonial }: { testimonial: TestimonialItem }) {
 }
 
 export function Testimonials({ content = testimonialsSection, className }: TestimonialsProps) {
-  const categories = content.categories;
+  const allTestimonials = useMemo(
+    () => content.categories.flatMap((category) => category.testimonials),
+    [content.categories],
+  );
 
-  const initialCategoryId = useMemo(() => {
-    if (
-      content.defaultCategoryId &&
-      categories.some((category) => category.id === content.defaultCategoryId)
-    ) {
-      return content.defaultCategoryId;
-    }
-
-    return categories[0]?.id ?? "";
-  }, [categories, content.defaultCategoryId]);
-
-  const [activeCategoryId, setActiveCategoryId] = useState(initialCategoryId);
   const [cardIndex, setCardIndex] = useState(0);
   const [direction, setDirection] = useState(1);
 
-  const activeCategory = useMemo(
-    () => categories.find((category) => category.id === activeCategoryId) ?? categories[0],
-    [activeCategoryId, categories],
-  );
-
-  if (!activeCategory) {
-    return null;
-  }
-
-  const testimonials = activeCategory.testimonials;
-  const safeIndex = testimonials.length ? cardIndex % testimonials.length : 0;
-  const activeTestimonial = testimonials[safeIndex];
-
-  const handleCategoryChange = (id: string) => {
-    if (id === activeCategoryId) {
-      return;
-    }
-
-    setActiveCategoryId(id);
-    setCardIndex(0);
-    setDirection(1);
-  };
+  const safeIndex = allTestimonials.length ? cardIndex % allTestimonials.length : 0;
+  const activeTestimonial = allTestimonials[safeIndex];
 
   const handleStep = (step: number) => {
-    if (testimonials.length <= 1) {
-      return;
-    }
-
+    if (allTestimonials.length <= 1) return;
     setDirection(step);
-    setCardIndex((current) => {
-      const next = (current + step + testimonials.length) % testimonials.length;
-      return next;
-    });
+    setCardIndex((current) => (current + step + allTestimonials.length) % allTestimonials.length);
   };
 
-  // Project the testimonials section header onto the shared HeroSectionConfig
-  // shape so we can reuse the Hero component verbatim. The eyebrow string is
-  // promoted to a metallic StatusBadge (Hero's `badges` slot) so the chip
-  // matches the rest of the site's badge language.
   const heroContent: HeroSectionConfig = {
     badges: [
       {
@@ -363,26 +226,13 @@ export function Testimonials({ content = testimonialsSection, className }: Testi
         childrenClassName="mt-12"
       >
         <div className="flex flex-col items-center gap-10">
-          <CategorySwitcher
-            categories={categories}
-            activeId={activeCategory.id}
-            onChange={handleCategoryChange}
-          />
-
-          <TrustedByGroup category={activeCategory} />
-
-          <div
-            id={`testimonials-panel-${activeCategory.id}`}
-            role="tabpanel"
-            aria-labelledby={`testimonials-tab-${activeCategory.id}`}
-            className="w-full"
-          >
+          <div className="w-full">
             {activeTestimonial ? (
               <div className="relative mx-auto w-full max-w-3xl">
                 <div className="relative overflow-hidden">
                   <AnimatePresence mode="wait" custom={direction} initial={false}>
                     <motion.div
-                      key={`${activeCategory.id}-${activeTestimonial.id}`}
+                      key={activeTestimonial.id}
                       custom={direction}
                       variants={cardVariants}
                       initial="enter"
@@ -394,7 +244,7 @@ export function Testimonials({ content = testimonialsSection, className }: Testi
                   </AnimatePresence>
                 </div>
 
-                {testimonials.length > 1 ? (
+                {allTestimonials.length > 1 ? (
                   <div className="mt-6 flex items-center justify-center gap-3">
                     <CarouselButton
                       label="Previous testimonial"
@@ -405,7 +255,7 @@ export function Testimonials({ content = testimonialsSection, className }: Testi
                       aria-live="polite"
                       className="min-w-[3.5rem] text-center text-xs font-semibold uppercase tracking-[0.18em] text-text-secondary"
                     >
-                      {safeIndex + 1} / {testimonials.length}
+                      {safeIndex + 1} / {allTestimonials.length}
                     </div>
                     <CarouselButton
                       label="Next testimonial"
@@ -417,7 +267,7 @@ export function Testimonials({ content = testimonialsSection, className }: Testi
               </div>
             ) : (
               <Text variant="p2" className="text-center text-text-secondary">
-                No testimonials yet for this category.
+                No testimonials yet.
               </Text>
             )}
           </div>
