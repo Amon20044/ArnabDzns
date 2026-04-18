@@ -92,9 +92,9 @@
   --font-sans: var(--font-sans-stack);
   --font-secondary: var(--font-secondary-stack);
   --font-mono: var(--font-mono-stack);
-  --page-section-gap: 1.25rem;
+  --page-section-gap: 7.5rem;
   --page-section-pad-x: 1.25rem;
-  --page-section-pad-y: 1.5rem;
+  --page-section-pad-y: 7.5rem;
 }
 
 @media (min-width: 40rem) {

@@ -1,6 +1,8 @@
+import type { CSSProperties } from "react";
 import { BookCallSection } from "@/components/sections/book-call";
 import { FAQ } from "@/components/sections/faq";
 import { Hero } from "@/components/sections/hero";
+import { HomeLandingHero } from "@/components/sections/home-landing-hero";
 import { ImpactSection } from "@/components/impact/impact-section";
 import { ProcessRoadmap } from "@/components/sections/process-roadmap";
 import { StructuredData } from "@/components/site/structured-data";
@@ -20,6 +22,9 @@ import { getPageJsonLd } from "@/lib/structured-data";
 import { impactSection } from "@/data/impact";
 
 export const metadata = getPageMetadata("home");
+const homeHeroToClientsGapStyle = {
+  "--page-section-gap": "clamp(0.75rem, 2vw, 1.1rem)",
+} as CSSProperties;
 
 export default function Home() {
   return (
@@ -28,10 +33,10 @@ export default function Home() {
         <StructuredData data={getPageJsonLd("home") ?? {}} />
         <div id="home" data-nav-section="home" className="scroll-target">
           {/* <ServiceMarquee services={servicesMarquee} /> */}
-          <Hero content={homeHeroSection} />
+          <HomeLandingHero content={homeHeroSection} />
         </div>
 
-        <section className="page-reveal">
+        <section className="page-reveal" style={homeHeroToClientsGapStyle}>
           <ImageMarquee
             rows={clientMarqueeRows}
             type="clients"
