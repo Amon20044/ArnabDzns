@@ -39,7 +39,7 @@ const stepIconRegistry: Record<string, LucideIcon> = {
   wand: WandSparkles,
   "package-check": PackageCheck,
 };
-const timelineSpeedMultiplier = 1.3;
+const timelineSpeedMultiplier = 2;
 
 function resolveStepSide(startFrom: RoadmapStartSide, index: number) {
   const isEven = index % 2 === 0;
