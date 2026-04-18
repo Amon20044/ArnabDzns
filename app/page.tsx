@@ -48,7 +48,7 @@ export default function Home() {
           />
         </section>
 
-        <section className="page-reveal">
+        <section className="page-reveal" style={homeHeroToClientsGapStyle}>
           <ImageMarquee
             rows={demoImageMarquee2}
             height="clamp(14.5rem, 26vw, 20rem)"
