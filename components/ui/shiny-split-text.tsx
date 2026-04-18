@@ -273,7 +273,7 @@ export function ShinySplitText({
     <motion.span
       ref={containerRef}
       className={cn(
-        "inline-block text-balance text-4xl font-semibold leading-[0.95] tracking-tight text-text-primary md:text-6xl",
+        "font-sans inline-block text-balance text-4xl font-semibold leading-[0.95] tracking-tight text-text-primary md:text-6xl",
         className,
       )}
       style={rootStyle}

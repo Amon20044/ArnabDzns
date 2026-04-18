@@ -140,6 +140,7 @@ export const typography = {
   heading: {
     /** Display — hero headlines (44 → 96 px fluid) */
     h1: compose(
+      "font-sans",
       fontSize["8xl"],
       leading.display,
       tracking.display,
@@ -148,6 +149,7 @@ export const typography = {
     ),
     /** Page / section headers (30 → 60 px fluid) */
     h2: compose(
+      "font-sans",
       fontSize["6xl"],
       leading.tight,
       tracking.tight,
@@ -156,6 +158,7 @@ export const typography = {
     ),
     /** Subsections (28 → 44 px fluid) */
     h3: compose(
+      "font-sans",
       fontSize["4xl"],
       leading.snug,
       tracking.snug,
@@ -164,6 +167,7 @@ export const typography = {
     ),
     /** Card titles (24 → 34 px fluid) */
     h4: compose(
+      "font-sans",
       fontSize["3xl"],
       leading.normal,
       tracking.snug,
@@ -171,6 +175,7 @@ export const typography = {
     ),
     /** Inline / list headings (18 → 20 px fluid) */
     h5: compose(
+      "font-sans",
       fontSize.xl,
       leading.relaxed,
       tracking.normal,
@@ -178,6 +183,7 @@ export const typography = {
     ),
     /** Eyebrow / micro label — UPPERCASE, wide tracking */
     h6: compose(
+      "font-sans",
       fontSize.xs,
       leading.loose,
       tracking.eyebrow,
@@ -189,6 +195,7 @@ export const typography = {
   text: {
     /** Lead paragraph — sits beneath an h1 / h2 (16 → 18 px) */
     p1: compose(
+      "font-secondary",
       fontSize.lg,
       leading.prose,
       tracking.body,
@@ -196,6 +203,7 @@ export const typography = {
     ),
     /** Default body copy (15 → 16 px) */
     p2: compose(
+      "font-secondary",
       fontSize.md,
       leading.body,
       tracking.body,
@@ -203,6 +211,7 @@ export const typography = {
     ),
     /** Caption / meta (13 → 14 px) */
     p3: compose(
+      "font-secondary",
       fontSize.sm,
       leading.loose,
       tracking.normal,
@@ -212,6 +221,7 @@ export const typography = {
 
   /** Eyebrow label — UPPERCASE chip-style intro for sections */
   eyebrow: compose(
+    "font-sans",
     fontSize.xs,
     leading.none,
     tracking.eyebrow,
@@ -221,6 +231,7 @@ export const typography = {
 
   /** Form / button labels — short, single-line, semi-bold */
   label: compose(
+    "font-sans",
     fontSize.sm,
     leading.none,
     tracking.normal,

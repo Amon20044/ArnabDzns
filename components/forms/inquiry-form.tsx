@@ -4,6 +4,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import {
   CheckCircle2,
   LoaderCircle,
+  MessageCircleMore,
   SendHorizonal,
   Sparkles,
   X,
@@ -381,7 +382,7 @@ export function InquiryForm({
             />
           </label>
 
-          <div className="grid gap-4 border-t border-border-accent/55 pt-6">
+          <div className="grid gap-4 border-t border-border-accent/55 pt-6 mt-6">
             <AnimatePresence mode="wait" initial={false}>
               <motion.div
                 key={`${status.type}-${status.message}`}
@@ -566,8 +567,8 @@ function SuccessCelebrationOverlay({
                   label={`WhatsApp ${siteConfig.contact.whatsappDisplay}`}
                   href={whatsappUrl}
                   external
-                  Icon={Sparkles}
-                  tone="white"
+                  Icon={MessageCircleMore}
+                  tone="whatsapp"
                   className="w-full"
                   fullWidth
                 />

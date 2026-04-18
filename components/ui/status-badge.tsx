@@ -37,6 +37,12 @@ export const StatusBadge = ({
   indicatorColor,
 }: StatusBadgeProps) => {
   const theme = createMetallicSurface({ tone, textColor, iconColor, indicatorColor });
+  const rootClassName = compact
+    ? "gap-1.5 px-3 py-1.5 sm:gap-2 sm:px-3.5 sm:py-[7px]"
+    : "gap-2 px-3.5 py-2 sm:gap-2.5 sm:px-4 sm:py-2.5";
+  const contentTypographyClassName = compact
+    ? "text-[12px] leading-[1.05] sm:text-[12.5px]"
+    : "text-[12.5px] leading-[1.1] sm:text-[13px]";
 
   const indicator =
     leading ??
@@ -47,8 +53,8 @@ export const StatusBadge = ({
   return (
     <motion.div
       className={cn(
-        "group relative inline-flex w-fit items-center overflow-hidden rounded-full select-none",
-        compact ? "gap-2 px-3.5 py-[7px]" : "gap-2.5 px-4 py-2.5",
+        "group relative inline-flex w-fit max-w-full items-center justify-center overflow-hidden rounded-full text-center select-none",
+        rootClassName,
         className,
       )}
       whileHover={interactive ? { y: -2, scale: 1.03 } : undefined}
@@ -69,7 +75,7 @@ export const StatusBadge = ({
 
       {indicator ? (
         <span
-          className="relative z-10 inline-flex shrink-0"
+          className="relative z-10 inline-flex shrink-0 self-center"
           style={{ color: theme.iconColor }}
         >
           {indicator}
@@ -78,8 +84,8 @@ export const StatusBadge = ({
 
       <span
         className={cn(
-          "relative z-10 whitespace-nowrap font-semibold tracking-tight",
-          compact ? "text-[12.5px] leading-none" : "text-[13px] max-md:text-[10px] font-medium",
+          "relative z-10 whitespace-nowrap text-center font-semibold tracking-[-0.01em]",
+          contentTypographyClassName,
           contentClassName,
         )}
         style={{ color: theme.textColor }}

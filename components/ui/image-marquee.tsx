@@ -299,7 +299,7 @@ function MarqueeRow({
                     >
                       <ClientIcon
                         aria-hidden
-                        className="size-7 shrink-0 opacity-45 transition-all duration-300 ease-out group-hover:scale-110 group-hover:opacity-100 md:size-8"
+                        className="size-7 shrink-0 opacity-80 transition-all duration-300 ease-out group-hover:scale-110 group-hover:opacity-100 md:size-8"
                         style={{ color: image.iconColor ?? "currentColor" }}
                       />
                     </div>

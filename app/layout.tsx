@@ -6,6 +6,7 @@ import { ProfileBioContent } from "@/components/layout/navigation/profile-bio-co
 import { LocomotiveScrollProvider } from "@/components/providers/locomotive-scroll-provider";
 import { StructuredData } from "@/components/site/structured-data";
 import { LiquidGlassDefs } from "@/components/ui/liquid-glass-defs";
+import { aeonik, poppins } from "@/config/fonts";
 import { siteConfig } from "@/data/site";
 import { getRootMetadata } from "@/lib/seo";
 import { getSiteJsonLd } from "@/lib/structured-data";
@@ -20,7 +21,10 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang={siteConfig.seo.language} className="h-full antialiased">
+    <html
+      lang={siteConfig.seo.language}
+      className={`h-full antialiased ${aeonik.variable} ${poppins.variable}`}
+    >
       <body
         className="min-h-full flex flex-col overflow-x-hidden bg-transparent text-foreground"
         style={liquidGlassCssVariables as CSSProperties}
