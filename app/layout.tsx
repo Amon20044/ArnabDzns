@@ -1,6 +1,7 @@
 import type { CSSProperties } from "react";
 import "locomotive-scroll/locomotive-scroll.css";
 import { IridescenceBackground } from "@/components/background/iridescence";
+import { SiteFooter } from "@/components/layout/site-footer";
 import { Header, Navigation } from "@/components/layout/navigation";
 import { ProfileBioContent } from "@/components/layout/navigation/profile-bio-content";
 import { LocomotiveScrollProvider } from "@/components/providers/locomotive-scroll-provider";
@@ -36,24 +37,8 @@ export default function RootLayout({
           <Header profileBioContent={<ProfileBioContent />} />
           <div className="flex flex-1 flex-col pt-24">
             {children}
-            <footer className="mt-auto px-6 pb-28 pt-10 text-center text-sm text-text-secondary md:px-10 md:pb-24">
-              <p className="flex flex-wrap items-center justify-center gap-x-2 gap-y-1">
-                <span>Arnabdzns &copy; 2026 All Rights Reserved</span>
-                <span aria-hidden="true">--</span>
-                <span>
-                  Made by{" "}
-                  <a
-                    href="https://amonsharma.com"
-                    target="_blank"
-                    rel="noreferrer"
-                    className="font-medium text-text-primary transition-colors hover:text-accent"
-                  >
-                    Amon Sharma
-                  </a>
-                </span>
-              </p>
-            </footer>
           </div>
+          <SiteFooter />
           <Navigation />
         </LocomotiveScrollProvider>
       </body>

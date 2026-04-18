@@ -24,7 +24,7 @@ export const metadata = getPageMetadata("home");
 export default function Home() {
   return (
     <div className="flex">
-      <div className="mx-auto flex w-full max-w-6xl flex-1 flex-col gap-12 px-2 pb-32 pt-4 md:px-10 md:pb-40">
+      <div className="page-section-stack mx-auto flex w-full max-w-6xl flex-1 flex-col px-2 pb-32 pt-4 md:px-10 md:pb-40">
         <StructuredData data={getPageJsonLd("home") ?? {}} />
         <div id="home" data-nav-section="home" className="scroll-target">
           {/* <ServiceMarquee services={servicesMarquee} /> */}

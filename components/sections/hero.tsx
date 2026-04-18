@@ -54,14 +54,14 @@ const renderBadgeLeading = (badge: HeroBadgeConfig) => {
       );
     case "building":
       return (
-        <span className="flex size-[18px] items-center justify-center rounded-full bg-white/14">
-          <Building2 className="size-[11px]" strokeWidth={2.4} />
+        <span className="inline-flex shrink-0 items-center justify-center">
+          <Building2 className="size-[14px]" strokeWidth={2.2} />
         </span>
       );
     case "quote":
       return (
-        <span className="flex size-[18px] items-center justify-center rounded-full bg-white/14">
-          <MessageSquareQuote className="size-[11px]" strokeWidth={2.4} />
+        <span className="inline-flex shrink-0 items-center justify-center">
+          <MessageSquareQuote className="size-[14px]" strokeWidth={2.2} />
         </span>
       );
     default:
@@ -103,6 +103,7 @@ export const Hero = ({
   const descriptionStep = titleStep + 1;
   const ctaStep = descriptionStep + (content.description ? 1 : 0);
   const childrenStep = ctaStep + (content.cta ? 1 : 0);
+  const titleSpacingClassName = badges.length || content.eyebrow ? "mt-4" : undefined;
 
   return (
     <section
@@ -154,7 +155,7 @@ export const Hero = ({
         initial="hidden"
         animate="visible"
         variants={blurUp}
-        className={badges.length || content.eyebrow ? "mt-9" : undefined}
+        className={titleSpacingClassName}
       >
         <Heading variant="h2">
           {titleLines.map((line, index) => (
@@ -172,7 +173,7 @@ export const Hero = ({
           initial="hidden"
           animate="visible"
           variants={blurUp}
-          className="mt-7 max-w-md"
+          className="mt-5 max-w-md"
         >
           <Text variant="p1">{content.description}</Text>
         </motion.div>

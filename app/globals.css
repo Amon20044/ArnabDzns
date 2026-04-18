@@ -92,6 +92,19 @@
   --font-sans: var(--font-sans-stack);
   --font-secondary: var(--font-secondary-stack);
   --font-mono: var(--font-mono-stack);
+  --page-section-gap: 1.5rem;
+}
+
+@media (min-width: 48rem) {
+  :root {
+    --page-section-gap: 2.25rem;
+  }
+}
+
+@media (min-width: 64rem) {
+  :root {
+    --page-section-gap: 3rem;
+  }
 }
 
 html {
@@ -131,6 +144,10 @@ body > :is(div, main) {
 
 .scroll-target {
   scroll-margin-top: calc(72px + 1.25rem);
+}
+
+.page-section-stack {
+  gap: var(--page-section-gap);
 }
 
 .page-surface {

@@ -14,7 +14,12 @@ export const headerConfig: HeaderConfig = {
   availabilityLabel: "Available",
   socials: siteConfig.social
     .filter((social) =>
-      ["discord", "instagram", "linkedin"].includes(social.platform),
+      ["linkedin", "instagram", "discord"].includes(social.platform),
+    )
+    .sort(
+      (left, right) =>
+        ["linkedin", "instagram", "discord"].indexOf(left.platform) -
+        ["linkedin", "instagram", "discord"].indexOf(right.platform),
     )
     .map((social) => ({
       id: social.platform,
@@ -32,16 +37,16 @@ export const navigationConfig: NavigationConfig = {
       sectionId: "home",
     },
     {
-      id: "portfolio",
-      label: "Portfolio",
-      path: "/#portfolio",
-      sectionId: "portfolio",
-    },
-    {
       id: "services",
       label: "Services",
       path: "/#services",
       sectionId: "services",
+    },
+    {
+      id: "portfolio",
+      label: "Portfolio",
+      path: "/#portfolio",
+      sectionId: "portfolio",
     },
     {
       id: "testimonials",
