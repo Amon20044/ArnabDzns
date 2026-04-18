@@ -55,12 +55,13 @@ export function buildWhatsAppMessage({
     "Hi Arnab,",
     "",
     safeName
-      ? `I am *${safeName}* and I am contacting you for my inquiry on *${safeInquiryType || "a project"}*.`
-      : `I want to discuss *${safeInquiryType || "a project"}* with you.`,
+      ? `We are reaching out regarding *${safeInquiryType || "a project"}*.`
+      : `We want to discuss *${safeInquiryType || "a project"}* with you.`,
+    safeName ? `*Contact:* ${safeName}` : "",
     safeBrand ? `*Project / Brand:* ${safeBrand}` : "",
     "",
     "*Brief*",
-    safeMessage || "I would like to discuss a project with you.",
+    safeMessage || "We would like to discuss a project with you.",
     "",
   ]
     .filter(Boolean)
@@ -95,7 +96,7 @@ export const siteConfig: SiteConfig = {
     callUrl: buildWhatsAppUrl({
       inquiryType: "project discussion",
       message:
-        "I want to discuss a project with you and would love to explore the right next step.",
+        "We want to discuss a project with you and would love to explore the right next step.",
       source: "quick-connect",
     }),
     callDisplay: whatsappDisplay,
@@ -103,7 +104,7 @@ export const siteConfig: SiteConfig = {
     whatsappUrl: buildWhatsAppUrl({
       inquiryType: "project discussion",
       message:
-        "I want to discuss a project with you and would love to share a quick brief.",
+        "We want to discuss a project with you and would love to share a quick brief.",
       source: "whatsapp-button",
     }),
     whatsappDisplay,

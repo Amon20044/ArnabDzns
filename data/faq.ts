@@ -15,13 +15,13 @@ export const faqSection = {
   items: [
     {
       id: "faq-getting-started",
-      question: "What do you need from me to get started?",
+      question: "What do you need to get started?",
       answer:
         "A short brief, your goals, the audience you want to reach, and any references or brand materials you already trust are enough to start. If the direction still feels messy, that is fine too.",
     },
     {
       id: "faq-revisions",
-      question: "What if I need more revisions?",
+      question: "What if more revisions are needed?",
       answer:
         "Every project includes focused revision rounds so we can refine the direction without losing momentum. If the scope grows beyond the original plan, we can keep iterating with a clear add-on structure instead of letting things get vague.",
     },
