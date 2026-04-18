@@ -13,7 +13,7 @@ export const testimonialsSection = {
   eyebrow: "Testimonials",
   title: "What Our Clients Say",
   description:
-    "Feedback from clients who turned their ideas into success with my expertise.",
+    "Feedback from clients who turned their ideas into success with our expertise.",
   defaultCategoryId: "clients",
   categories: [
     {
@@ -21,7 +21,7 @@ export const testimonialsSection = {
       label: "Clients",
       shortLabel: "Clients",
       icon: "users",
-      description: "Creators and brands I've shipped thumbnail and design work for.",
+      description: "Creators and brands we've shipped thumbnail and design work for.",
       trustedBy: {
         label: "Trusted by Visionaries",
         avatars: [
@@ -90,7 +90,7 @@ export const testimonialsSection = {
       label: "Tournament Orgs",
       shortLabel: "TOs",
       icon: "trophy",
-      description: "Esports tournament organizers I've designed brands and broadcasts for.",
+      description: "Esports tournament organizers we've designed brands and broadcasts for.",
       trustedBy: {
         label: "Trusted by Tournament Organizers",
         avatars: [
@@ -145,7 +145,7 @@ export const testimonialsSection = {
       label: "Organizations",
       shortLabel: "Orgs",
       icon: "building",
-      description: "Teams and orgs that brought me in for longer-form brand and product work.",
+      description: "Teams and orgs that brought us in for longer-form brand and product work.",
       trustedBy: {
         label: "Trusted by Growing Teams",
         avatars: [

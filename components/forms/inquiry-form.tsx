@@ -219,7 +219,7 @@ export function InquiryForm({
             data?.message ??
             (confirmationSent
               ? "Your note is in. A confirmation email is already on the way."
-              : "Your note is in. I will reach out soon with the clearest next step."),
+              : "Your note is in. We will reach out soon with the clearest next step."),
         });
       } catch {
         setStatus({
@@ -255,10 +255,10 @@ export function InquiryForm({
 
             <div className="max-w-2xl">
               <Heading variant="h3" as="h2" className="text-balance">
-                Tell me what you need.
+                Tell us what you need.
               </Heading>
               <Text variant="p2" className="mt-4 max-w-2xl text-pretty">
-                Share the goal, context, and what you are trying to launch. I will reply with the
+                Share the goal, context, and what you are trying to launch. We will reply with the
                 clearest next step.
               </Text>
             </div>
@@ -355,7 +355,7 @@ export function InquiryForm({
                   className={inputClassName}
                   name="customInquiryType"
                   type="text"
-                  placeholder="Tell me what this is about"
+                  placeholder="Tell us what this is about"
                   value={customInquiryType}
                   onChange={(event) => setCustomInquiryType(event.target.value)}
                   required={isOtherInquiry}
@@ -521,7 +521,7 @@ function SuccessCelebrationOverlay({
                 id="contact-success-title"
                 className="mt-5 text-balance"
               >
-                Your brief is in. I will reach out soon.
+                Your brief is in. We will reach out soon.
               </Heading>
 
               <Text
@@ -529,7 +529,7 @@ function SuccessCelebrationOverlay({
                 id="contact-success-description"
                 className="mt-4 max-w-xl text-pretty text-text-secondary"
               >
-                Thanks for taking the time to write it out. The next reply you get from me should
+                Thanks for taking the time to write it out. The next reply you get from us should
                 feel useful, specific, and worth the wait.
               </Text>
 
@@ -544,7 +544,7 @@ function SuccessCelebrationOverlay({
                   <Text variant="p2" className="mt-2 text-text-secondary">
                     {autoReplySent
                       ? "A confirmation email is also on its way, so you have a clean paper trail."
-                      : "Your submission is secured, and I will follow up from the inbox you used."}
+                      : "Your submission is secured, and we will follow up from the inbox you used."}
                   </Text>
                 </div>
 

@@ -31,7 +31,7 @@ const heroContent: HeroSectionConfig = {
       pulse: true,
     },
   ],
-  title: ["Tell me what you are building."],
+  title: ["Tell us what you are building."],
   description:
     "Share the scope, context, and goal. If WhatsApp is faster, jump straight into chat.",
   cta: false,
@@ -65,7 +65,7 @@ export function ContactPageExperience() {
                       Need a faster route?
                     </Heading>
                     <Text variant="p2" className="mt-2 max-w-xl">
-                      Message me directly on WhatsApp for the fastest route. For fuller project
+                      Message us directly on WhatsApp for the fastest route. For fuller project
                       context, use the form below.
                     </Text>
                   </div>

@@ -30,7 +30,7 @@ export const processRoadmapSection = {
       label: "Step #2",
       title: "Discuss timeline and budget",
       description:
-        "I align on delivery windows, revision scope, and the level of polish so the whole project moves with clarity.",
+        "We align on delivery windows, revision scope, and the level of polish so the whole project moves with clarity.",
     },
     {
       id: "roadmap-build-review",

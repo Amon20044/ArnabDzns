@@ -146,7 +146,7 @@ function buildCustomerEmailText(submission: {
     `Hi ${firstName},`,
     "",
     "Your inquiry has been received.",
-    "Thanks for sharing the brief. I will reach out soon with the clearest next step.",
+    "Thanks for sharing the brief. We will reach out soon with the clearest next step.",
     "",
     `Inquiry Type: ${submission.inquiryType}`,
     submission.brand ? `Brand / Project: ${submission.brand}` : "",
@@ -204,7 +204,7 @@ function buildCustomerEmailHtml(submission: {
             </h1>
 
             <p style="margin:14px 0 0;max-width:540px;font-size:15px;line-height:1.8;color:#52525b;">
-              Your message landed safely on my side. I will follow up with a clear, useful next
+              Your message landed safely with our team. We will follow up with a clear, useful next
               step tailored to what you are building - not a generic autoresponse.
             </p>
 
@@ -254,7 +254,7 @@ function buildCustomerEmailHtml(submission: {
                 Need a faster route?
               </p>
               <h2 style="margin:0;font-size:22px;line-height:1.15;color:#09090b;">
-                Reach me directly if timing is tight.
+                Reach us directly if timing is tight.
               </h2>
               <p style="margin:12px 0 18px;font-size:15px;line-height:1.8;color:#52525b;">
                 WhatsApp is already prefilled from the brief you sent. If email is easier, just
@@ -308,14 +308,14 @@ export async function POST(request: Request) {
 
     if (!submission.name) {
       return NextResponse.json(
-        { message: "Please add your name so I know who the message is from." },
+        { message: "Please add your name so we know who the message is from." },
         { status: 400 },
       );
     }
 
     if (!emailPattern.test(submission.email)) {
       return NextResponse.json(
-        { message: "Please use a valid email address so I can reply." },
+        { message: "Please use a valid email address so we can reply." },
         { status: 400 },
       );
     }
@@ -367,7 +367,7 @@ export async function POST(request: Request) {
     }
 
     return NextResponse.json({
-      message: "Inquiry sent. I will reach out soon.",
+      message: "Inquiry sent. We will reach out soon.",
       autoReplySent: customerMailResult.status === "fulfilled",
     });
   } catch (error) {

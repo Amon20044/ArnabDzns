@@ -23,7 +23,7 @@ export const faqSection = {
       id: "faq-revisions",
       question: "What if I need more revisions?",
       answer:
-        "Every project includes focused revision rounds so I can refine the direction without losing momentum. If the scope grows beyond the original plan, I can keep iterating with a clear add-on structure instead of letting things get vague.",
+        "Every project includes focused revision rounds so we can refine the direction without losing momentum. If the scope grows beyond the original plan, we can keep iterating with a clear add-on structure instead of letting things get vague.",
     },
     {
       id: "faq-timeline",

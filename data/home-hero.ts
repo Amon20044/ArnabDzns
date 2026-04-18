@@ -27,7 +27,7 @@ export const homeHeroSection = {
   ],
   title: ["Good design gets noticed.", " Great design gets chosen."],
   description:
-    "Creative work built for clicks, trust, and attention. I help brands and businesses connect with their audience through thoughtful, strategic design.",
+    "Creative work built for clicks, trust, and attention. We help brands and businesses connect with their audience through thoughtful, strategic design.",
   cta: {
     label: "Get in Touch",
     href: "/contact",
