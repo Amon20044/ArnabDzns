@@ -66,6 +66,7 @@ export const StatusBadge = ({
         style={theme.glowStyle}
       />
 
+
       {indicator ? (
         <span
           className="relative z-10 inline-flex shrink-0"
