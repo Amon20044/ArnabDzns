@@ -79,7 +79,7 @@ export const StatusBadge = ({
       <span
         className={cn(
           "relative z-10 whitespace-nowrap font-semibold tracking-tight",
-          compact ? "text-[12.5px] leading-none" : "text-[13px]",
+          compact ? "text-[12.5px] leading-none" : "text-[13px] max-md:text-[10px] font-medium",
           contentClassName,
         )}
         style={{ color: theme.textColor }}

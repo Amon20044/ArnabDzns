@@ -24,7 +24,7 @@ export const metadata = getPageMetadata("home");
 export default function Home() {
   return (
     <div className="flex">
-      <div className="mx-auto flex w-full max-w-6xl flex-1 flex-col gap-12 px-6 pb-32 pt-4 md:px-10 md:pb-40">
+      <div className="mx-auto flex w-full max-w-6xl flex-1 flex-col gap-12 px-2 pb-32 pt-4 md:px-10 md:pb-40">
         <StructuredData data={getPageJsonLd("home") ?? {}} />
         <div id="home" data-nav-section="home" className="scroll-target">
           {/* <ServiceMarquee services={servicesMarquee} /> */}
@@ -39,6 +39,7 @@ export default function Home() {
             rowGap=".25rem"
             itemGap="3rem"
             minItemsPerRow={16}
+            fullBleed
           />
         </section>
 
@@ -48,6 +49,7 @@ export default function Home() {
             height="clamp(14.5rem, 26vw, 20rem)"
             rowGap=".2rem"
             itemGap="1rem"
+            fullBleed
           />
         </section>
         <div id="portfolio" data-nav-section="portfolio" className="scroll-target">
@@ -58,6 +60,7 @@ export default function Home() {
               height="clamp(8.5rem, 18vw, 13rem)"
               rowGap=".2rem"
               itemGap="1rem"
+              fullBleed
             />
           </section>
         </div>

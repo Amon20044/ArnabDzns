@@ -55,7 +55,7 @@ function FAQAccordionItem({
   return (
     <div
       className={cn(
-        "group/faq relative overflow-hidden rounded-[2rem] border border-border-accent/60 bg-white/92 shadow-[0_18px_44px_rgba(24,24,27,0.06)] backdrop-blur-sm transition-[transform,box-shadow,border-color] duration-200 ease-out hover:-translate-y-0.5 hover:scale-[1.005] hover:shadow-[0_22px_52px_rgba(24,24,27,0.08)]",
+        "group/faq relative overflow-hidden rounded-[2rem] border border-border-accent/60 bg-white/92 shadow-[0_18px_44px_rgba(24,24,27,0.06)] backdrop-blur-sm transition-[transform,box-shadow,border-color] duration-200 ease-out hover:-translate-y-0.5 hover:scale-[1.005] hover:shadow-[0_22px_52px_rgba(24,24,27,0.08)] max-md:!shadow-none max-md:hover:!shadow-none",
         isOpen && "border-border-accent/80 shadow-[0_22px_52px_rgba(24,24,27,0.08)]",
       )}
     >
@@ -78,7 +78,7 @@ function FAQAccordionItem({
         <span
           aria-hidden
           className={cn(
-            "relative flex size-10 shrink-0 items-center justify-center rounded-full border border-border-accent/60 bg-white text-text-primary shadow-[0_6px_18px_rgba(24,24,27,0.08)] transition-[transform,background-color,border-color,color] duration-200 group-hover/faq:scale-105",
+            "relative flex size-10 shrink-0 items-center justify-center rounded-full border border-border-accent/60 bg-white text-text-primary shadow-[0_6px_18px_rgba(24,24,27,0.08)] transition-[transform,background-color,border-color,color] duration-200 group-hover/faq:scale-105 max-md:!shadow-none",
             isOpen && "bg-accent-muted/60 text-accent-dark",
           )}
         >
@@ -152,12 +152,13 @@ export function FAQ({ content = faqSection, className }: FAQProps) {
     <section
       className={cn(
         "page-surface page-reveal relative overflow-hidden p-8 md:p-10 lg:p-12",
+        "max-md:!rounded-none max-md:!border-transparent max-md:!bg-none max-md:!shadow-none max-md:!backdrop-blur-none max-md:!p-0",
         className,
       )}
     >
       <div
         aria-hidden
-        className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(168,85,247,0.10),transparent_46%)]"
+        className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(168,85,247,0.10),transparent_46%)] max-md:hidden"
       />
 
       <Hero

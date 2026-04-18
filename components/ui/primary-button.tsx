@@ -136,6 +136,7 @@ export const PrimaryButton = ({
   const linkClassName = cn(
     "primary-button group relative inline-flex items-center justify-center gap-0 overflow-hidden rounded-full select-none",
     (isWhiteTone || isWhatsappTone) && "primary-button--white",
+    "max-md:!shadow-none",
     "will-change-transform",
     fullWidth && "w-full",
     iconOnly
@@ -170,14 +171,15 @@ export const PrimaryButton = ({
           transition={{ duration: 0.28, ease }}
         />
       ) : null}
-      <motion.span
-        aria-hidden
-        className={cn(
-          "pointer-events-none absolute rounded-full",
-          isLightTone ? "inset-px glass-capsule" : "inset-0 glass-capsule-primary",
-        )}
-        initial={false}
-        animate={{ opacity: surfaceOpacity }}
+        <motion.span
+          aria-hidden
+          className={cn(
+            "pointer-events-none absolute rounded-full",
+            isLightTone ? "inset-px glass-capsule" : "inset-0 glass-capsule-primary",
+            "max-md:!shadow-none",
+          )}
+          initial={false}
+          animate={{ opacity: surfaceOpacity }}
         transition={{ duration: 0.22, ease: "easeOut" }}
       />
       <motion.span

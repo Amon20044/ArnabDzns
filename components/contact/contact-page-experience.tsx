@@ -41,17 +41,17 @@ const heroContent: HeroSectionConfig = {
 export function ContactPageExperience() {
   return (
     <div className="flex flex-1">
-      <main className="mx-auto flex w-full max-w-6xl flex-1 flex-col gap-6 px-6 pb-32 pt-16 md:px-10 md:pb-40 md:pt-24">
-        <section className="page-surface page-reveal relative overflow-hidden p-8 md:p-10 lg:p-12">
-          <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(168,85,247,0.18),transparent_42%),radial-gradient(circle_at_left_center,rgba(255,255,255,0.42),transparent_30%)]" />
+      <main className="mx-auto flex w-full max-w-6xl flex-1 flex-col gap-6 px-3 pb-32 pt-16 md:px-10 md:pb-40 md:pt-24">
+        <section className="page-surface page-reveal relative overflow-hidden p-8 md:p-10 lg:p-12 max-md:!rounded-none max-md:!border-transparent max-md:!bg-none max-md:!shadow-none max-md:!backdrop-blur-none max-md:!p-0">
+          <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(168,85,247,0.18),transparent_42%),radial-gradient(circle_at_left_center,rgba(255,255,255,0.42),transparent_30%)] max-md:hidden" />
 
           <Hero
             content={heroContent}
             className="min-h-0 py-2 sm:py-4"
             childrenClassName="mt-12"
           >
-            <div className="mx-auto max-w-4xl">
-              <div className="liquid-glass-shell relative overflow-hidden rounded-[2rem] border border-white/70 p-6 text-left shadow-[0_22px_58px_rgba(88,28,135,0.12)] sm:p-7">
+            <div className="mx-auto w-full max-w-4xl max-md:flex max-md:justify-center">
+              <div className="liquid-glass-shell relative mx-auto w-full overflow-hidden rounded-[2rem] border border-white/70 p-6 text-left shadow-[0_22px_58px_rgba(88,28,135,0.12)] max-md:max-w-[23.5rem] max-md:[--lg-shadow:none] max-md:!shadow-none sm:p-7">
                 <div
                   aria-hidden
                   className="pointer-events-none absolute inset-x-10 top-0 h-px bg-gradient-to-r from-transparent via-white to-transparent"

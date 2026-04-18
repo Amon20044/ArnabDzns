@@ -311,7 +311,7 @@ function MarqueeRow({
                       height={image.height ?? 48}
                       sizes={imageSizes}
                       priority={image.priority ?? (segmentIndex === 0 && rowIndex === 0 && imageIndex < 2)}
-                      className="h-full w-auto object-contain brightness-0 opacity-40 transition-all duration-400 ease-out hover:brightness-100 hover:opacity-100"
+                      className="h-full w-auto object-contain brightness-0 opacity-100 transition-all duration-400 ease-out hover:brightness-100 hover:opacity-100"
                     />
                   ) : (
                     <span className="text-sm font-semibold uppercase tracking-[0.18em] text-text-secondary">
@@ -381,7 +381,7 @@ export function ImageMarquee({
   className,
   rowClassName,
   itemClassName,
-  fullBleed = true,
+  fullBleed = false,
   hoverSlowdownFactor = 0.28,
   minItemsPerRow = 8,
   imageSizes = DEFAULT_IMAGE_SIZES,

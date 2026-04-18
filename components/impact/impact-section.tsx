@@ -37,12 +37,13 @@ export function ImpactSection({
       <section
         className={cn(
           "page-reveal relative overflow-hidden rounded-[2.25rem] border border-border-accent/45 bg-[linear-gradient(180deg,rgba(255,255,255,0.92)_0%,rgba(248,247,252,0.96)_100%)] text-text-primary shadow-[0_34px_110px_rgba(88,28,135,0.12)]",
+          "max-md:!rounded-none max-md:!border-transparent max-md:!bg-none max-md:!shadow-none",
           className,
         )}
       >
         <div
           aria-hidden
-          className="pointer-events-none absolute inset-0 opacity-95"
+          className="pointer-events-none absolute inset-0 opacity-95 max-md:hidden"
           style={{
             background:
               "radial-gradient(circle at 16% 14%, rgba(168,85,247,0.14) 0%, transparent 26%), radial-gradient(circle at 82% 12%, rgba(14,165,233,0.12) 0%, transparent 22%), radial-gradient(circle at 76% 78%, rgba(244,63,94,0.1) 0%, transparent 24%)",
@@ -50,14 +51,14 @@ export function ImpactSection({
         />
         <div
           aria-hidden
-          className="pointer-events-none absolute inset-x-12 top-0 h-px bg-gradient-to-r from-transparent via-white to-transparent"
+          className="pointer-events-none absolute inset-x-12 top-0 h-px bg-gradient-to-r from-transparent via-white to-transparent max-md:hidden"
         />
         <div
           aria-hidden
-          className="pointer-events-none absolute inset-0 bg-[linear-gradient(180deg,rgba(255,255,255,0.36)_0%,transparent_18%)]"
+          className="pointer-events-none absolute inset-0 bg-[linear-gradient(180deg,rgba(255,255,255,0.36)_0%,transparent_18%)] max-md:hidden"
         />
 
-        <div className="relative z-10 px-5 py-6 sm:px-7 sm:py-8 md:px-10 md:py-10">
+        <div className="relative z-10 px-5 py-6 sm:px-7 sm:py-8 md:px-10 md:py-10 max-md:!px-0 max-md:!py-0">
           <header className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(18rem,24rem)] lg:items-end">
             <div>
               <div className="flex flex-wrap gap-3">

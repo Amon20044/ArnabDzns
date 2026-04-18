@@ -48,12 +48,13 @@ export function ProcessRoadmap({
     <section
       className={cn(
         "page-surface page-reveal relative overflow-hidden p-8 md:p-10 lg:p-12",
+        "max-md:!rounded-none max-md:!border-transparent max-md:!bg-none max-md:!shadow-none max-md:!backdrop-blur-none max-md:!p-0",
         className,
       )}
     >
       <div
         aria-hidden
-        className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(168,85,247,0.10),transparent_46%)]"
+        className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(168,85,247,0.10),transparent_46%)] max-md:hidden"
       />
 
       <Hero
@@ -108,7 +109,7 @@ export function ProcessRoadmap({
                           transition: { duration: 0.72, ease, delay: 0.14 },
                         },
                       }}
-                      className="w-full max-w-sm rounded-[1.75rem] border border-white/80 bg-[linear-gradient(180deg,rgba(255,255,255,0.98)_0%,rgba(255,255,255,0.90)_100%)] p-6 shadow-[0_22px_54px_rgba(15,23,42,0.10)] ring-1 ring-black/5 transition-[transform,box-shadow] duration-300 ease-out hover:-translate-y-1 hover:shadow-[0_28px_68px_rgba(15,23,42,0.14)] sm:p-7"
+                      className="w-full max-w-sm rounded-[1.75rem] border border-white/80 bg-[linear-gradient(180deg,rgba(255,255,255,0.98)_0%,rgba(255,255,255,0.90)_100%)] p-6 shadow-[0_22px_54px_rgba(15,23,42,0.10)] ring-1 ring-black/5 transition-[transform,box-shadow] duration-300 ease-out hover:-translate-y-1 hover:shadow-[0_28px_68px_rgba(15,23,42,0.14)] max-md:!shadow-none max-md:hover:!shadow-none sm:p-7"
                     >
                       <Text
                         as="span"

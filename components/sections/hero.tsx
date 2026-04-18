@@ -107,7 +107,7 @@ export const Hero = ({
   return (
     <section
       className={cn(
-        "relative flex min-h-[60vh] w-full flex-col items-center justify-center py-16 text-center sm:py-20",
+        "relative flex min-h-[10vh] w-full flex-col items-center justify-center py-2 text-center sm:py-14",
         className,
       )}
     >

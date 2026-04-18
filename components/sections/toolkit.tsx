@@ -54,7 +54,7 @@ function ServiceCard({
     <motion.article
       ref={cardRef}
       style={{ y, opacity, scale }}
-      className="liquid-glass group relative flex min-h-[21rem] h-full flex-col overflow-hidden rounded-[1.75rem] border border-white/70 p-6 sm:p-7"
+      className="liquid-glass group relative flex h-full min-h-[15rem] flex-col overflow-hidden rounded-[1.75rem] border border-white/70 p-6 max-md:[--lg-shadow:none] max-md:!shadow-none sm:p-7"
     >
       <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(180deg,rgba(168,85,247,0.24)_0%,rgba(168,85,247,0.14)_24%,rgba(168,85,247,0.06)_52%,transparent_100%)]" />
       <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(216,180,254,0.46),transparent_34%)]" />
@@ -112,10 +112,11 @@ export function Toolkit({
     <section
       className={cn(
         "page-surface page-reveal relative overflow-hidden p-8 md:p-10 lg:p-12",
+        "max-md:!rounded-none max-md:!border-transparent max-md:!bg-none max-md:!shadow-none max-md:!backdrop-blur-none max-md:!p-0",
         className,
       )}
     >
-      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(168,85,247,0.14),transparent_42%)]" />
+      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(168,85,247,0.14),transparent_42%)] max-md:hidden" />
 
       <Hero
         content={content.hero}

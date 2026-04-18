@@ -1,14 +1,9 @@
 "use client";
 
-import { useMemo, useState, type ComponentType } from "react";
+import { useMemo, useState } from "react";
 import Image from "next/image";
-import { AnimatePresence, motion } from "framer-motion";
-import {
-  ChevronLeft,
-  ChevronRight,
-  Quote,
-  Star,
-} from "lucide-react";
+import { AnimatePresence, motion, type PanInfo } from "framer-motion";
+import { Quote, Star } from "lucide-react";
 import { Hero } from "@/components/sections/hero";
 import { Heading, Text } from "@/components/ui/typography";
 import { testimonialsSection } from "@/data/testimonials";
@@ -145,7 +140,7 @@ function MetaBadge({ label }: { label: string }) {
 
 function TestimonialCard({ testimonial }: { testimonial: TestimonialItem }) {
   return (
-    <article className="relative flex h-full flex-col gap-6 rounded-[1.75rem] border border-border bg-white/95 p-6 text-left sm:p-8">
+    <article className="relative flex h-full flex-col gap-6 rounded-[1.75rem] border border-border bg-white/95 p-6 text-left max-md:!shadow-none sm:p-8">
       <Quote
         aria-hidden
         className="absolute right-6 top-6 size-10 text-accent/20 sm:right-8 sm:top-8 sm:size-12"
@@ -193,6 +188,24 @@ export function Testimonials({ content = testimonialsSection, className }: Testi
     setCardIndex((current) => (current + step + allTestimonials.length) % allTestimonials.length);
   };
 
+  const handleJumpTo = (nextIndex: number) => {
+    if (allTestimonials.length <= 1 || nextIndex === safeIndex) return;
+    const forward = (nextIndex - safeIndex + allTestimonials.length) % allTestimonials.length;
+    const backward = (safeIndex - nextIndex + allTestimonials.length) % allTestimonials.length;
+    setDirection(forward <= backward ? 1 : -1);
+    setCardIndex(nextIndex);
+  };
+
+  const handleDragEnd = (_: unknown, info: PanInfo) => {
+    const offsetThreshold = 70;
+    const velocityThreshold = 450;
+    if (info.offset.x < -offsetThreshold || info.velocity.x < -velocityThreshold) {
+      handleStep(1);
+    } else if (info.offset.x > offsetThreshold || info.velocity.x > velocityThreshold) {
+      handleStep(-1);
+    }
+  };
+
   const heroContent: HeroSectionConfig = {
     badges: [
       {
@@ -212,12 +225,13 @@ export function Testimonials({ content = testimonialsSection, className }: Testi
     <section
       className={cn(
         "page-surface page-reveal relative overflow-hidden p-8 md:p-10 lg:p-12",
+        "max-md:!rounded-none max-md:!border-transparent max-md:!bg-none max-md:!shadow-none max-md:!backdrop-blur-none max-md:!p-0",
         className,
       )}
     >
       <div
         aria-hidden
-        className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(168,85,247,0.10),transparent_46%)]"
+        className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(168,85,247,0.10),transparent_46%)] max-md:hidden"
       />
 
       <Hero
@@ -229,7 +243,16 @@ export function Testimonials({ content = testimonialsSection, className }: Testi
           <div className="w-full">
             {activeTestimonial ? (
               <div className="relative mx-auto w-full max-w-3xl">
-                <div className="relative overflow-hidden">
+                <motion.div
+                  className="relative overflow-hidden touch-pan-y select-none"
+                  drag="x"
+                  dragConstraints={{ left: 0, right: 0 }}
+                  dragElastic={0.18}
+                  dragMomentum={false}
+                  onDragEnd={handleDragEnd}
+                  whileTap={{ cursor: "grabbing" }}
+                  style={{ cursor: allTestimonials.length > 1 ? "grab" : "default" }}
+                >
                   <AnimatePresence mode="wait" custom={direction} initial={false}>
                     <motion.div
                       key={activeTestimonial.id}
@@ -242,27 +265,14 @@ export function Testimonials({ content = testimonialsSection, className }: Testi
                       <TestimonialCard testimonial={activeTestimonial} />
                     </motion.div>
                   </AnimatePresence>
-                </div>
+                </motion.div>
 
                 {allTestimonials.length > 1 ? (
-                  <div className="mt-6 flex items-center justify-center gap-3">
-                    <CarouselButton
-                      label="Previous testimonial"
-                      Icon={ChevronLeft}
-                      onClick={() => handleStep(-1)}
-                    />
-                    <div
-                      aria-live="polite"
-                      className="min-w-[3.5rem] text-center text-xs font-semibold uppercase tracking-[0.18em] text-text-secondary"
-                    >
-                      {safeIndex + 1} / {allTestimonials.length}
-                    </div>
-                    <CarouselButton
-                      label="Next testimonial"
-                      Icon={ChevronRight}
-                      onClick={() => handleStep(1)}
-                    />
-                  </div>
+                  <TestimonialDots
+                    count={allTestimonials.length}
+                    activeIndex={safeIndex}
+                    onSelect={handleJumpTo}
+                  />
                 ) : null}
               </div>
             ) : (
@@ -277,23 +287,45 @@ export function Testimonials({ content = testimonialsSection, className }: Testi
   );
 }
 
-function CarouselButton({
-  label,
-  Icon,
-  onClick,
+function TestimonialDots({
+  count,
+  activeIndex,
+  onSelect,
 }: {
-  label: string;
-  Icon: ComponentType<{ className?: string; strokeWidth?: number }>;
-  onClick: () => void;
+  count: number;
+  activeIndex: number;
+  onSelect: (index: number) => void;
 }) {
+  const maxSize = 10;
+  const minSize = 3;
+  const decay = 0.55;
+
   return (
-    <button
-      type="button"
-      aria-label={label}
-      onClick={onClick}
-      className="flex size-11 items-center justify-center rounded-full bg-black text-white shadow-[0_12px_28px_rgba(24,24,27,0.22)] transition-transform duration-200 hover:-translate-y-0.5 hover:bg-accent-dark"
+    <div
+      aria-label="Testimonial pagination"
+      className="mt-6 flex items-center justify-center gap-2"
     >
-      <Icon className="size-5" strokeWidth={2.2} />
-    </button>
+      {Array.from({ length: count }, (_, index) => {
+        const raw = Math.abs(index - activeIndex);
+        const distance = Math.min(raw, count - raw);
+        const falloff = Math.exp(-distance * decay);
+        const size = minSize + (maxSize - minSize) * falloff;
+        const opacity = 0.22 + 0.78 * falloff;
+        const isActive = index === activeIndex;
+
+        return (
+          <motion.button
+            key={index}
+            type="button"
+            aria-current={isActive ? "true" : undefined}
+            aria-label={`Go to testimonial ${index + 1}`}
+            onClick={() => onSelect(index)}
+            animate={{ width: size, height: size, opacity }}
+            transition={{ duration: 0.32, ease: [0.22, 1, 0.36, 1] }}
+            className="shrink-0 rounded-full bg-text-primary"
+          />
+        );
+      })}
+    </div>
   );
 }

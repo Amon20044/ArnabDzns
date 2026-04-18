@@ -54,6 +54,7 @@ const inputClassName = cn(
   "outline-none transition-[transform,border-color,box-shadow,background-color] duration-200",
   "placeholder:text-text-secondary/72",
   "focus:-translate-y-0.5 focus:border-accent/42 focus:bg-white focus:shadow-[0_0_0_5px_rgba(168,85,247,0.08),0_18px_38px_rgba(88,28,135,0.10)]",
+  "max-md:!shadow-none max-md:focus:!shadow-none",
 );
 
 const fieldLabelClassName =
@@ -232,18 +233,18 @@ export function InquiryForm({
     <>
       <form
         onSubmit={handleSubmit}
-        className="page-surface page-reveal relative overflow-hidden p-6 sm:p-8 lg:p-9"
+        className="page-surface page-reveal relative overflow-hidden p-6 sm:p-8 lg:p-9 max-md:!rounded-none max-md:!border-transparent max-md:!bg-none max-md:!shadow-none max-md:!backdrop-blur-none max-md:!p-0"
       >
         <div
           aria-hidden
-          className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(255,255,255,0.72)_0%,transparent_30%),radial-gradient(circle_at_bottom_right,rgba(168,85,247,0.16)_0%,transparent_42%)]"
+          className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(255,255,255,0.72)_0%,transparent_30%),radial-gradient(circle_at_bottom_right,rgba(168,85,247,0.16)_0%,transparent_42%)] max-md:hidden"
         />
         <div
           aria-hidden
-          className="pointer-events-none absolute right-8 top-8 h-32 w-32 rounded-full bg-[radial-gradient(circle,rgba(216,180,254,0.38)_0%,transparent_72%)] blur-2xl"
+          className="pointer-events-none absolute right-8 top-8 h-32 w-32 rounded-full bg-[radial-gradient(circle,rgba(216,180,254,0.38)_0%,transparent_72%)] blur-2xl max-md:hidden"
         />
 
-        <div className="relative z-[1] page-stack">
+        <div className="relative z-[1] page-stack max-md:px-6 max-md:pb-6">
           <div className="mb-6 flex flex-col gap-5 border-b border-border-accent/55 pb-6">
             <div className="flex flex-wrap items-center gap-3">
               <StatusBadge tone="#18181b" textColor="#fafafa" iconColor="#fafafa">
@@ -388,7 +389,7 @@ export function InquiryForm({
                 animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
                 exit={{ opacity: 0, y: -6, filter: "blur(8px)" }}
                 transition={{ duration: 0.24, ease }}
-                className="flex min-h-14 items-center gap-3 rounded-[1.4rem] border border-border-accent/55 bg-white/74 px-4 py-3 shadow-[0_10px_24px_rgba(88,28,135,0.05)]"
+                className="flex min-h-14 items-center gap-3 rounded-[1.4rem] border border-border-accent/55 bg-white/74 px-4 py-3 shadow-[0_10px_24px_rgba(88,28,135,0.05)] max-md:!shadow-none"
                 role="status"
                 aria-live="polite"
               >
@@ -485,7 +486,7 @@ function SuccessCelebrationOverlay({
             aria-modal="true"
             aria-labelledby="contact-success-title"
             aria-describedby="contact-success-description"
-            className="page-surface relative z-[1] w-full max-w-2xl overflow-hidden rounded-[2rem] border-white/70 p-6 shadow-[0_30px_100px_rgba(15,23,42,0.22)] sm:p-8"
+            className="page-surface relative z-[1] w-full max-w-2xl overflow-hidden rounded-[2rem] border-white/70 p-6 shadow-[0_30px_100px_rgba(15,23,42,0.22)] max-md:!shadow-none sm:p-8"
             initial={{ opacity: 0, y: 28, scale: 0.98 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 18, scale: 0.98 }}
@@ -503,7 +504,7 @@ function SuccessCelebrationOverlay({
             <button
               type="button"
               onClick={onClose}
-              className="absolute right-4 top-4 inline-flex size-10 items-center justify-center rounded-full border border-border-accent/60 bg-white/82 text-text-primary shadow-[0_12px_28px_rgba(88,28,135,0.08)] transition-transform duration-200 hover:-translate-y-0.5 hover:text-accent"
+              className="absolute right-4 top-4 inline-flex size-10 items-center justify-center rounded-full border border-border-accent/60 bg-white/82 text-text-primary shadow-[0_12px_28px_rgba(88,28,135,0.08)] transition-transform duration-200 hover:-translate-y-0.5 hover:text-accent max-md:!shadow-none"
             >
               <X className="size-4.5" />
             </button>
@@ -532,7 +533,7 @@ function SuccessCelebrationOverlay({
               </Text>
 
               <div className="mt-6 grid gap-3 sm:grid-cols-2">
-                <div className="rounded-[1.5rem] border border-white/70 bg-white/78 p-4 shadow-[0_16px_38px_rgba(88,28,135,0.08)]">
+                <div className="rounded-[1.5rem] border border-white/70 bg-white/78 p-4 shadow-[0_16px_38px_rgba(88,28,135,0.08)] max-md:!shadow-none">
                   <Text as="span" variant="p3" className="text-text-secondary/74">
                     What just happened
                   </Text>
@@ -546,16 +547,9 @@ function SuccessCelebrationOverlay({
                   </Text>
                 </div>
 
-                <div className="rounded-[1.5rem] border border-white/70 bg-[linear-gradient(180deg,rgba(250,245,255,0.92)_0%,rgba(255,255,255,0.88)_100%)] p-4 shadow-[0_16px_38px_rgba(88,28,135,0.08)]">
+                <div className="rounded-[1.5rem] border border-white/70 bg-[linear-gradient(180deg,rgba(250,245,255,0.92)_0%,rgba(255,255,255,0.88)_100%)] p-4 shadow-[0_16px_38px_rgba(88,28,135,0.08)] max-md:!shadow-none">
                   <Text as="span" variant="p3" className="text-text-secondary/74">
-                    Need faster alignment?
-                  </Text>
-                  <Heading variant="h5" as="h3" className="mt-2">
-                    WhatsApp is ready with your brief.
-                  </Heading>
-                  <Text variant="p2" className="mt-2 text-text-secondary">
-                    If this is time-sensitive, open WhatsApp and your message will already be
-                    formatted with the context you just submitted.
+                    Need faster alignment? Feel free to reach out on WhatsApp.
                   </Text>
                 </div>
               </div>

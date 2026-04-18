@@ -55,6 +55,7 @@ export function ImpactCard({ card, onSelect, hidden = false }: ImpactCardProps) 
         "bg-[linear-gradient(180deg,rgba(255,255,255,0.94)_0%,rgba(248,247,252,0.98)_100%)]",
         "border border-border-accent/55",
         "shadow-[0_24px_60px_rgba(88,28,135,0.10),0_4px_12px_rgba(15,23,42,0.06)]",
+        "max-md:!shadow-none",
         "focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/22",
         sizeSpanClass[card.size],
       )}
