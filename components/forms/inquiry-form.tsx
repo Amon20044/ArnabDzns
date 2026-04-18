@@ -11,6 +11,7 @@ import {
 } from "lucide-react";
 import { useEffect, useState, useTransition } from "react";
 import { StatusBadge } from "@/components/ui/status-badge";
+import { renderStatusBadgeLeading } from "@/components/ui/status-badge-leading";
 import { PrimaryButton } from "@/components/ui/primary-button";
 import { Heading, Text } from "@/components/ui/typography";
 import { buildWhatsAppUrl, siteConfig } from "@/data/site";
@@ -234,7 +235,7 @@ export function InquiryForm({
     <>
       <form
         onSubmit={handleSubmit}
-        className="page-surface page-reveal relative overflow-hidden p-6 sm:p-8 lg:p-9 max-md:!rounded-none max-md:!border-transparent max-md:!bg-none max-md:!shadow-none max-md:!backdrop-blur-none max-md:!p-0"
+        className="page-section-frame page-surface page-reveal relative overflow-hidden max-md:!rounded-none max-md:!border-transparent max-md:!bg-none max-md:!shadow-none max-md:!backdrop-blur-none max-md:!p-0"
       >
         <div
           aria-hidden
@@ -248,7 +249,12 @@ export function InquiryForm({
         <div className="relative z-[1] page-stack max-md:px-6 max-md:pb-6">
           <div className="mb-6 flex flex-col gap-5 border-b border-border-accent/55 pb-6">
             <div className="flex flex-wrap items-center gap-3">
-              <StatusBadge tone="#18181b" textColor="#fafafa" iconColor="#fafafa">
+              <StatusBadge
+                tone="#18181b"
+                textColor="#fafafa"
+                iconColor="#fafafa"
+                leading={renderStatusBadgeLeading("file-text")}
+              >
                 Project Form
               </StatusBadge>
             </div>
@@ -511,7 +517,12 @@ function SuccessCelebrationOverlay({
             </button>
 
             <div className="relative z-[1]">
-              <StatusBadge tone="#059669" textColor="#ecfdf5" iconColor="#bbf7d0">
+              <StatusBadge
+                tone="#059669"
+                textColor="#ecfdf5"
+                iconColor="#bbf7d0"
+                leading={renderStatusBadgeLeading("check-check")}
+              >
                 Inquiry sent
               </StatusBadge>
 

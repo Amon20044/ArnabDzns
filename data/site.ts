@@ -1,8 +1,8 @@
 import type { SiteConfig } from "@/types";
 
 const normalizeUrl = (value: string) => value.replace(/\/+$/, "");
-const whatsappNumber = "918200962735";
-const whatsappDisplay = "+91 82009 62735";
+const whatsappNumber = "916289135345";
+const whatsappDisplay = "+91 6289 135 345";
 
 const siteUrl = normalizeUrl(
   process.env.NEXT_PUBLIC_SITE_URL || "https://arnabdzns.com",
@@ -173,19 +173,19 @@ export const siteConfig: SiteConfig = {
     },
     {
       platform: "discord",
-      url: "https://discord.com/users/your-id",
+      url: "https://discord.gg/zmGFSaA2BY",
       label: "Discord",
       seo: false,
     },
     {
       platform: "instagram",
-      url: "https://instagram.com/yourhandle",
+      url: "https://www.instagram.com/arnab.dzns",
       label: "Instagram",
       seo: false,
     },
     {
       platform: "linkedin",
-      url: "https://linkedin.com/in/yourprofile",
+      url: "https://www.linkedin.com/in/arnab-shaw-09448a329",
       label: "LinkedIn",
       seo: false,
     },

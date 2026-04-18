@@ -111,7 +111,7 @@ export function Toolkit({
   return (
     <section
       className={cn(
-        "page-surface page-reveal relative overflow-hidden p-8 md:p-10 lg:p-12",
+        "page-section-frame page-surface page-reveal relative overflow-hidden",
         "max-md:!rounded-none max-md:!border-transparent max-md:!bg-none max-md:!shadow-none max-md:!backdrop-blur-none max-md:!p-0",
         className,
       )}

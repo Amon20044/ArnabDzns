@@ -6,6 +6,7 @@ import {
 } from "lucide-react";
 import { InquiryForm } from "@/components/forms/inquiry-form";
 import { Hero } from "@/components/sections/hero";
+import { renderStatusBadgeLeading } from "@/components/ui/status-badge-leading";
 import { StatusBadge } from "@/components/ui/status-badge";
 import { PrimaryButton } from "@/components/ui/primary-button";
 import { Heading, Text } from "@/components/ui/typography";
@@ -17,7 +18,7 @@ const heroContent: HeroSectionConfig = {
     {
       id: "contact-primary",
       label: "Contact",
-      icon: "none",
+      icon: "mail",
       tone: "#18181b",
       textColor: "#fafafa",
       iconColor: "#fafafa",
@@ -25,10 +26,10 @@ const heroContent: HeroSectionConfig = {
     {
       id: "contact-response",
       label: "Replies within 1 business day",
-      icon: "indicator",
+      icon: "clock",
       tone: "#059669",
-      indicatorColor: "#34d399",
-      pulse: true,
+      textColor: "#ecfdf5",
+      iconColor: "#bbf7d0",
     },
   ],
   title: ["Tell us what you are building."],
@@ -42,7 +43,7 @@ export function ContactPageExperience() {
   return (
     <div className="flex flex-1">
       <main className="page-section-stack mx-auto flex w-full max-w-6xl flex-1 flex-col px-3 pb-32 pt-16 md:px-10 md:pb-40 md:pt-24">
-        <section className="page-surface page-reveal relative overflow-hidden p-8 md:p-10 lg:p-12 max-md:!rounded-none max-md:!border-transparent max-md:!bg-none max-md:!shadow-none max-md:!backdrop-blur-none max-md:!p-0">
+        <section className="page-section-frame page-surface page-reveal relative overflow-hidden max-md:!rounded-none max-md:!border-transparent max-md:!bg-none max-md:!shadow-none max-md:!backdrop-blur-none max-md:!p-0">
           <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(168,85,247,0.18),transparent_42%),radial-gradient(circle_at_left_center,rgba(255,255,255,0.42),transparent_30%)] max-md:hidden" />
 
           <Hero
@@ -58,7 +59,11 @@ export function ContactPageExperience() {
                 />
                 <div className="flex flex-col gap-5 md:flex-row md:items-center md:justify-between">
                   <div>
-                    <StatusBadge tone="#a855f7" iconColor="#f5e1ff">
+                    <StatusBadge
+                      tone="#a855f7"
+                      iconColor="#f5e1ff"
+                      leading={renderStatusBadgeLeading("message")}
+                    >
                       WhatsApp direct
                     </StatusBadge>
                     <Heading variant="h5" as="h2" className="mt-4">

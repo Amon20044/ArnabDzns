@@ -234,6 +234,28 @@ export type HeroBadgeIconId =
   | "building"
   | "indicator"
   | "quote"
+  | "briefcase"
+  | "chart"
+  | "check-check"
+  | "clock"
+  | "file-text"
+  | "gallery"
+  | "help-circle"
+  | "layout"
+  | "mail"
+  | "message"
+  | "package-check"
+  | "pen-tool"
+  | "phone-call"
+  | "shield-check"
+  | "sparkles"
+  | "target"
+  | "trending-down"
+  | "trending-up"
+  | "trending-up-down"
+  | "wallet"
+  | "wand"
+  | "workflow"
   | "none";
 
 export interface HeroBadgeConfig {
@@ -406,6 +428,7 @@ export type RoadmapStartSide = "left" | "right";
 export interface RoadmapStepConfig {
   id: string;
   label?: string;
+  icon?: "target" | "wallet" | "wand" | "package-check" | string;
   title: string;
   description: string;
 }

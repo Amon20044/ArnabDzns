@@ -37,6 +37,12 @@ export const navigationConfig: NavigationConfig = {
       sectionId: "home",
     },
     {
+      id: "testimonials",
+      label: "Testimonials",
+      path: "/#testimonials",
+      sectionId: "testimonials",
+    },
+    {
       id: "services",
       label: "Services",
       path: "/#services",
@@ -47,12 +53,6 @@ export const navigationConfig: NavigationConfig = {
       label: "Portfolio",
       path: "/#portfolio",
       sectionId: "portfolio",
-    },
-    {
-      id: "testimonials",
-      label: "Testimonials",
-      path: "/#testimonials",
-      sectionId: "testimonials",
     },
     {
       id: "faq",

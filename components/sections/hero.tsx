@@ -2,11 +2,12 @@
 
 import { Fragment, type ReactNode } from "react";
 import { motion, type Variants } from "framer-motion";
-import { ArrowRight, Building2, MessageSquareQuote, Star } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import { PrimaryButton } from "@/components/ui/primary-button";
+import { renderStatusBadgeLeading } from "@/components/ui/status-badge-leading";
 import { StatusBadge } from "@/components/ui/status-badge";
 import { Heading, Text } from "@/components/ui/typography";
-import type { HeroBadgeConfig, HeroCTAConfig, HeroSectionConfig } from "@/types";
+import type { HeroCTAConfig, HeroSectionConfig } from "@/types";
 import { cn } from "@/lib/utils";
 
 const ease = [0.22, 1, 0.36, 1] as const;
@@ -37,37 +38,6 @@ interface HeroProps {
   /** Wrapper class applied to the children slot. */
   childrenClassName?: string;
 }
-
-const renderBadgeLeading = (badge: HeroBadgeConfig) => {
-  switch (badge.icon) {
-    case "stars":
-      return (
-        <span className="flex items-center gap-0.5">
-          {Array.from({ length: badge.starCount ?? 5 }, (_, index) => (
-            <Star
-              key={`${badge.id ?? badge.label}-star-${index}`}
-              className="size-[14px] fill-current stroke-current"
-              strokeWidth={1.5}
-            />
-          ))}
-        </span>
-      );
-    case "building":
-      return (
-        <span className="inline-flex shrink-0 items-center justify-center">
-          <Building2 className="size-[14px]" strokeWidth={2.2} />
-        </span>
-      );
-    case "quote":
-      return (
-        <span className="inline-flex shrink-0 items-center justify-center">
-          <MessageSquareQuote className="size-[14px]" strokeWidth={2.2} />
-        </span>
-      );
-    default:
-      return undefined;
-  }
-};
 
 const resolveCTAIcon = (cta: HeroCTAConfig) => {
   switch (cta.icon) {
@@ -141,7 +111,7 @@ export const Hero = ({
                 indicatorColor={badge.indicatorColor}
                 showIndicator={badge.icon === "indicator"}
                 pulse={badge.pulse}
-                leading={renderBadgeLeading(badge)}
+                leading={renderStatusBadgeLeading(badge)}
               >
                 {badge.label}
               </StatusBadge>

@@ -5,8 +5,7 @@ export const portfolioSection = {
         {
             id: "portfolio",
             label: "Portfolio",
-            icon: "stars",
-            starCount: 1,
+            icon: "gallery",
             tone: "#cafe52",
             iconColor: "#ffffff",
         }

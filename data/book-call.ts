@@ -8,7 +8,7 @@ export const bookCallSection = {
       {
         id: "book-call-contact",
         label: "Contact",
-        icon: "none",
+        icon: "phone-call",
         tone: "#18181b",
         textColor: "#fafafa",
         iconColor: "#fafafa",

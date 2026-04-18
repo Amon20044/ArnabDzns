@@ -4,6 +4,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { ArrowUpRight, X } from "lucide-react";
 import { useEffect, useId } from "react";
 import { PrimaryButton } from "@/components/ui/primary-button";
+import { renderStatusBadgeLeading } from "@/components/ui/status-badge-leading";
 import { StatusBadge } from "@/components/ui/status-badge";
 import type { HeroCTAConfig, ImpactCardConfig, ImpactTrendStatus } from "@/types";
 import { impactBodyRegistry } from "@/content/impact/registry";
@@ -27,6 +28,18 @@ interface SummaryTile {
   label: string;
   value: string;
   note?: string;
+}
+
+function resolveTrendBadgeIcon(status: ImpactTrendStatus) {
+  switch (status) {
+    case "positive":
+      return "trending-up" as const;
+    case "negative":
+      return "trending-down" as const;
+    case "neutral":
+    default:
+      return "trending-up-down" as const;
+  }
 }
 
 export function ImpactExpandedModal({ card, cta, onClose }: ImpactExpandedModalProps) {
@@ -132,22 +145,47 @@ function ImpactExpandedModalContent({
 
         <div className="relative z-10 flex items-start justify-between gap-4 border-b border-border-accent/55 bg-white/68 px-4 py-4 backdrop-blur-xl sm:px-6">
           <div className="flex flex-wrap items-center gap-2.5">
-            <StatusBadge compact interactive={false} tone={tokens.badgeTone} textColor="#fafafa" iconColor="#fafafa">
+            <StatusBadge
+              compact
+              interactive={false}
+              tone={tokens.badgeTone}
+              textColor="#fafafa"
+              iconColor="#fafafa"
+              leading={renderStatusBadgeLeading("chart")}
+            >
               {formatLabel(card.category)}
             </StatusBadge>
             {card.featured ? (
-              <StatusBadge compact interactive={false} tone="#18181b" textColor="#fafafa">
+              <StatusBadge
+                compact
+                interactive={false}
+                tone="#18181b"
+                textColor="#fafafa"
+                leading={renderStatusBadgeLeading("sparkles")}
+              >
                 Featured snapshot
               </StatusBadge>
             ) : null}
             {card.trend ? (
-              <StatusBadge compact interactive={false} tone={resolveTrendTone(card.trend.status)} textColor="#fafafa">
+              <StatusBadge
+                compact
+                interactive={false}
+                tone={resolveTrendTone(card.trend.status)}
+                textColor="#fafafa"
+                leading={renderStatusBadgeLeading(resolveTrendBadgeIcon(card.trend.status))}
+              >
                 {card.trend.display}
                 {card.trend.timeframe ? ` ${card.trend.timeframe}` : ""}
               </StatusBadge>
             ) : null}
             {card.updatedAt ? (
-              <StatusBadge compact interactive={false} tone="#ffffff" textColor="#ffffff">
+              <StatusBadge
+                compact
+                interactive={false}
+                tone="#ffffff"
+                textColor="#ffffff"
+                leading={renderStatusBadgeLeading("clock")}
+              >
                 Updated {formatDate(card.updatedAt)}
               </StatusBadge>
             ) : null}

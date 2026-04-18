@@ -2,6 +2,7 @@
 
 import { LayoutGroup, motion } from "framer-motion";
 import { useState } from "react";
+import { renderStatusBadgeLeading } from "@/components/ui/status-badge-leading";
 import { StatusBadge } from "@/components/ui/status-badge";
 import { Heading, Text } from "@/components/ui/typography";
 import { impactSection } from "@/data/impact";
@@ -72,6 +73,7 @@ export function ImpactSection({
                     indicatorColor={badge.indicatorColor}
                     pulse={badge.pulse}
                     showIndicator={badge.icon === "indicator"}
+                    leading={renderStatusBadgeLeading(badge)}
                   >
                     {badge.label}
                   </StatusBadge>

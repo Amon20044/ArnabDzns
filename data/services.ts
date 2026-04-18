@@ -6,7 +6,7 @@ export const servicesSection: ServicesSectionConfig = {
       {
         id: "services",
         label: "What We Do",
-        icon: "none",
+        icon: "pen-tool",
         tone: "#a855f7",
         iconColor: "#f5e1ff",
       },
