@@ -88,10 +88,13 @@ void main() {
   // Clamp total additive contribution so plus-lighter never blows out
   col = clamp(col, 0.0, 0.45);
 
-  // Shape mask with 1px AA
-  float aa = clamp(0.5 - sdf, 0.0, 1.0);
+  // Shape mask with 1px AA (kills anything outside the rounded rect)
+  float shapeMask = clamp(0.5 - sdf, 0.0, 1.0);
 
-  outColor = vec4(col, aa);
+  // Pre-multiplied output: alpha is highlight intensity, not shape coverage.
+  // Interior with no highlights => alpha 0 => fully transparent.
+  float intensity = max(col.r, max(col.g, col.b));
+  outColor = vec4(col, intensity) * shapeMask;
 }`;
 
 const FRAGMENT_SHADER_WEBGL1 = /* glsl */ `
@@ -152,8 +155,9 @@ void main() {
   vec3 col = rim + vec3(sweep + topLight);
   col = clamp(col, 0.0, 0.45);
 
-  float aa = clamp(0.5 - sdf, 0.0, 1.0);
-  gl_FragColor = vec4(col, aa);
+  float shapeMask = clamp(0.5 - sdf, 0.0, 1.0);
+  float intensity = max(col.r, max(col.g, col.b));
+  gl_FragColor = vec4(col, intensity) * shapeMask;
 }`;
 
 const VERTEX_SHADER_WEBGL1 = /* glsl */ `
