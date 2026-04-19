@@ -159,12 +159,7 @@ export const Hero = ({
           initial="hidden"
           animate="visible"
           variants={blurUp}
-          className={cn(
-            "mt-10 gap-3",
-            ctas.length > 1
-              ? "mx-auto grid w-full max-w-[21rem] grid-cols-2 sm:max-w-[30rem]"
-              : "flex items-center justify-center",
-          )}
+          className="mt-10 flex flex-wrap items-center justify-center gap-3"
         >
           {ctas.map((cta) => (
             <PrimaryButton
@@ -175,8 +170,7 @@ export const Hero = ({
               Icon={resolveCTAIcon(cta)}
               iconVisibility={cta.iconVisibility}
               tone={cta.tone}
-              fullWidth={ctas.length > 1}
-              className={cn(ctas.length > 1 && "w-full")}
+              className="shrink-0"
             />
           ))}
         </motion.div>

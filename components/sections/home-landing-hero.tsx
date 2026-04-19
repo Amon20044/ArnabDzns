@@ -160,7 +160,7 @@ export function HomeLandingHero({
               />
             </>
           ) : isDesktop ? (
-            <div className="relative mx-auto h-[clamp(11.5rem,32vw,26rem)] w-full">
+            <div className="relative mx-auto h-[clamp(12.5rem,36vw,23rem)] w-full">
               <DotLottieReact
                 src="/HeroTitle.lottie"
                 autoplay
@@ -198,12 +198,7 @@ export function HomeLandingHero({
           initial="hidden"
           animate="visible"
           variants={blurUp}
-          className={cn(
-            "mt-4 gap-3 sm:mt-6",
-            ctas.length > 1
-              ? "mx-auto grid w-full max-w-[21rem] grid-cols-2"
-              : "flex items-center justify-center",
-          )}
+          className="mt-4 flex flex-nowrap items-center justify-center gap-3 sm:mt-6"
         >
           {ctas.map((cta) => (
             <PrimaryButton
@@ -215,8 +210,7 @@ export function HomeLandingHero({
               iconVisibility={cta.iconVisibility}
               tone={cta.tone}
               size={ctaSize}
-              fullWidth={ctas.length > 1}
-              className={cn(ctas.length > 1 && "w-full")}
+              className="shrink-0"
             />
           ))}
         </motion.div>

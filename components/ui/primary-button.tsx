@@ -64,11 +64,13 @@ export const PrimaryButton = ({
   const showLeadingIcon =
     !!Icon && (iconOnly || resolvedIconVisibility === "always" || hovered);
   const showLabel = !iconOnly;
-  const showBalanceSlot =
-    !!Icon && !iconOnly && resolvedIconVisibility === "hover" && hovered;
+  const reserveHoverIconSpace =
+    !!Icon && !iconOnly && resolvedIconVisibility === "hover";
   const iconSlotWidth = isCompact ? 20 : 24;
   const iconGap = isCompact ? 8 : 10;
   const iconStrokeWidth = isCompact ? 2.2 : 2.3;
+  const leadingSlotWidth = Icon && !iconOnly ? iconSlotWidth : 0;
+  const trailingSlotWidth = reserveHoverIconSpace ? iconSlotWidth : 0;
   const labelColorClass = isWhatsappTone
     ? "text-green-800"
     : isWhiteTone
@@ -107,15 +109,14 @@ export const PrimaryButton = ({
     <motion.span
       aria-hidden
       className={cn(
-        "relative z-10 inline-flex items-center overflow-hidden",
+        "relative z-10 inline-flex items-center justify-center self-center",
         labelColorClass
       )}
       initial={false}
       animate={{
-        maxWidth: showLeadingIcon ? iconSlotWidth : 0,
         opacity: showLeadingIcon ? 1 : 0,
-        marginRight: showLeadingIcon && showLabel ? iconGap : 0,
-        x: showLeadingIcon ? 0 : -6,
+        x: showLeadingIcon ? 0 : -4,
+        scale: showLeadingIcon ? 1 : 0.94,
       }}
       transition={{ duration: 0.38, ease }}
     >
@@ -127,18 +128,12 @@ export const PrimaryButton = ({
   ) : null;
 
   const balanceSlot = Icon ? (
-    <motion.span
+    <span
       aria-hidden
-      className="pointer-events-none inline-flex overflow-hidden opacity-0"
-      initial={false}
-      animate={{
-        maxWidth: showBalanceSlot ? iconSlotWidth : 0,
-        marginLeft: showBalanceSlot ? iconGap : 0,
-      }}
-      transition={{ duration: 0.38, ease }}
+      className="pointer-events-none inline-flex items-center justify-center self-center opacity-0"
     >
       <span className={cn("block shrink-0", isCompact ? "size-[18px]" : "size-[18px]")} />
-    </motion.span>
+    </span>
   ) : null;
 
   const linkClassName = cn(
@@ -229,24 +224,27 @@ export const PrimaryButton = ({
       {iconOnly ? (
         iconOnlyContent
       ) : (
-        <>
+        <span
+          className="relative z-10 inline-grid items-center"
+          style={{
+            gridTemplateColumns: `${leadingSlotWidth}px auto ${trailingSlotWidth}px`,
+            columnGap:
+              showLabel && (leadingSlotWidth > 0 || trailingSlotWidth > 0)
+                ? `${iconGap}px`
+                : "0px",
+          }}
+        >
           {leadingIcon}
-          <motion.span
+          <span
             className={cn(
-              "relative z-10 inline-block overflow-hidden whitespace-nowrap transition-colors duration-200",
+              "relative z-10 inline-block min-w-0 whitespace-nowrap text-center transition-colors duration-200",
               labelColorClass,
             )}
-            initial={false}
-            animate={{
-              maxWidth: showLabel ? 180 : 0,
-              opacity: showLabel ? 1 : 0,
-            }}
-            transition={{ duration: 0.32, ease }}
           >
             {label}
-          </motion.span>
+          </span>
           {balanceSlot}
-        </>
+        </span>
       )}
     </>
   );
