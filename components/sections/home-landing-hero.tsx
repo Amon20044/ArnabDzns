@@ -152,7 +152,7 @@ export function HomeLandingHero({
             <>
               <div
                 aria-hidden
-                className="mx-auto aspect-[384/475] w-full max-w-[24rem] sm:hidden"
+                className="mx-auto aspect-[384/475] w-full sm:hidden"
               />
               <div
                 aria-hidden
@@ -170,7 +170,7 @@ export function HomeLandingHero({
               />
             </div>
           ) : hasMobileLottie ? (
-            <div className="relative mx-auto h-[clamp(18rem,88vw,29.5rem)] w-full max-w-[24rem]">
+            <div className="relative mx-auto aspect-[384/475] w-full sm:max-w-[24rem]">
               <DotLottieReact
                 src={MOBILE_HERO_LOTTIE_SRC}
                 autoplay
@@ -186,7 +186,7 @@ export function HomeLandingHero({
               width={384}
               height={475}
               preload
-              className="mx-auto h-auto w-full max-w-[24rem]"
+              className="mx-auto h-auto w-full sm:max-w-[24rem]"
             />
           )}
         </div>
