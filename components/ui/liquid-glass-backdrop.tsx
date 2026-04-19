@@ -315,6 +315,7 @@ export function LiquidGlassBackdrop({
       <div
         ref={elementRef}
         aria-hidden
+        data-glass-mode={useWebGLFallback ? "webgl" : undefined}
         className={cn(variantClassName, "pointer-events-none absolute inset-0", className)}
         style={{
           backdropFilter,

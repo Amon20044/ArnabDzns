@@ -64,39 +64,29 @@ void main() {
     sdRoundedRect(centered - vec2(0.0, eps), half_, r);
   vec2 n = normalize(vec2(gx, gy) + vec2(1e-6));
 
-  // Fresnel rim glow
-  float fresnel = pow(smoothEdge, 1.6) * 0.55;
+  // White Fresnel rim glow
+  float fresnel = pow(smoothEdge, 1.8) * 0.22;
 
-  // Chromatic rim (RGB separation along SDF normal)
-  float chromaStrength = uChroma * 1.8;
-  float rimR = pow(clamp(smoothEdge + 0.06, 0.0, 1.0), 1.6) * chromaStrength;
-  float rimB = pow(clamp(smoothEdge - 0.06, 0.0, 1.0), 1.6) * chromaStrength;
-  // Push red outward, blue inward along normal for fringe feel
-  vec3 rim = vec3(rimR, fresnel * 0.6, rimB);
+  // Subtle chromatic fringe — small R/B offset added on top of white rim
+  float chroma = uChroma * 0.55;
+  float rimR = pow(clamp(smoothEdge + 0.04, 0.0, 1.0), 1.8) * chroma;
+  float rimB = pow(clamp(smoothEdge - 0.04, 0.0, 1.0), 1.8) * chroma;
+  vec3 rim = vec3(fresnel + rimR, fresnel, fresnel + rimB);
 
   // Animated specular sweep (diagonal band travelling across glass)
   float t = uTime * uAnimate;
   vec2 sweepDir = normalize(vec2(1.0, -0.55));
   float sweepCoord = dot(vUv - 0.5, sweepDir) * 2.2 - fract(t * 0.08) * 4.4 + 1.1;
-  float sweep = exp(-pow(sweepCoord, 2.0) * 14.0) * 0.45;
+  float sweep = exp(-pow(sweepCoord, 2.0) * 18.0) * 0.16;
 
   // Top-left global light reflecting off the bezel
   vec2 lightDir = normalize(vec2(-1.0, -1.0));
-  float topLight = clamp(dot(n, lightDir), 0.0, 1.0) * smoothEdge * 0.5;
+  float topLight = clamp(dot(n, lightDir), 0.0, 1.0) * smoothEdge * 0.18;
 
-  // Faint animated "liquid" breathing on the interior (very subtle)
-  float inner = 1.0 - smoothEdge;
-  float breathe =
-    inner *
-    (0.5 + 0.5 * sin(t * 0.8 + vUv.x * 3.14159 + vUv.y * 2.2)) *
-    0.04 *
-    uAnimate;
+  vec3 col = rim + vec3(sweep + topLight);
 
-  vec3 col = rim + vec3(sweep + topLight + breathe);
-
-  // Slight displacement-driven brightness pull at the bezel (fakes refraction shift)
-  float refractBrightness = smoothEdge * (uDisplacement / 80.0) * 0.25;
-  col += vec3(refractBrightness);
+  // Clamp total additive contribution so plus-lighter never blows out
+  col = clamp(col, 0.0, 0.45);
 
   // Shape mask with 1px AA
   float aa = clamp(0.5 - sdf, 0.0, 1.0);
@@ -144,31 +134,23 @@ void main() {
     sdRoundedRect(centered - vec2(0.0, eps), half_, r);
   vec2 n = normalize(vec2(gx, gy) + vec2(1e-6));
 
-  float fresnel = pow(smoothEdge, 1.6) * 0.55;
+  float fresnel = pow(smoothEdge, 1.8) * 0.22;
 
-  float chromaStrength = uChroma * 1.8;
-  float rimR = pow(clamp(smoothEdge + 0.06, 0.0, 1.0), 1.6) * chromaStrength;
-  float rimB = pow(clamp(smoothEdge - 0.06, 0.0, 1.0), 1.6) * chromaStrength;
-  vec3 rim = vec3(rimR, fresnel * 0.6, rimB);
+  float chroma = uChroma * 0.55;
+  float rimR = pow(clamp(smoothEdge + 0.04, 0.0, 1.0), 1.8) * chroma;
+  float rimB = pow(clamp(smoothEdge - 0.04, 0.0, 1.0), 1.8) * chroma;
+  vec3 rim = vec3(fresnel + rimR, fresnel, fresnel + rimB);
 
   float t = uTime * uAnimate;
   vec2 sweepDir = normalize(vec2(1.0, -0.55));
   float sweepCoord = dot(vUv - 0.5, sweepDir) * 2.2 - fract(t * 0.08) * 4.4 + 1.1;
-  float sweep = exp(-pow(sweepCoord, 2.0) * 14.0) * 0.45;
+  float sweep = exp(-pow(sweepCoord, 2.0) * 18.0) * 0.16;
 
   vec2 lightDir = normalize(vec2(-1.0, -1.0));
-  float topLight = clamp(dot(n, lightDir), 0.0, 1.0) * smoothEdge * 0.5;
+  float topLight = clamp(dot(n, lightDir), 0.0, 1.0) * smoothEdge * 0.18;
 
-  float inner = 1.0 - smoothEdge;
-  float breathe =
-    inner *
-    (0.5 + 0.5 * sin(t * 0.8 + vUv.x * 3.14159 + vUv.y * 2.2)) *
-    0.04 *
-    uAnimate;
-
-  vec3 col = rim + vec3(sweep + topLight + breathe);
-  float refractBrightness = smoothEdge * (uDisplacement / 80.0) * 0.25;
-  col += vec3(refractBrightness);
+  vec3 col = rim + vec3(sweep + topLight);
+  col = clamp(col, 0.0, 0.45);
 
   float aa = clamp(0.5 - sdf, 0.0, 1.0);
   gl_FragColor = vec4(col, aa);
