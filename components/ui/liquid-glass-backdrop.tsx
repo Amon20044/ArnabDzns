@@ -3,6 +3,7 @@
 import { useEffect, useId, useMemo, useRef, useState } from "react";
 import { liquidGlassConfig, type LiquidGlassRefractionConfig } from "@/lib/liquid-glass";
 import { cn } from "@/lib/utils";
+import { LiquidGlassWebGL } from "@/components/ui/liquid-glass-webgl";
 
 type LiquidGlassBackdropVariant = "header" | "shell";
 
@@ -23,6 +24,23 @@ type ElementSize = {
 
 const clamp = (value: number, min: number, max: number) =>
   Math.min(max, Math.max(min, value));
+
+const detectSvgFilterInBackdropSupport = (): boolean => {
+  if (typeof window === "undefined" || typeof CSS === "undefined") {
+    return true;
+  }
+  const ua = window.navigator.userAgent;
+  const isSafari = /^((?!chrome|crios|fxios|android).)*safari/i.test(ua);
+  if (isSafari) return false;
+  try {
+    return (
+      CSS.supports("backdrop-filter", "url(#x)") ||
+      CSS.supports("-webkit-backdrop-filter", "url(#x)")
+    );
+  } catch {
+    return true;
+  }
+};
 
 const smoothStep = (value: number) => value * value * (3 - 2 * value);
 
@@ -139,6 +157,14 @@ export function LiquidGlassBackdrop({
 }: LiquidGlassBackdropProps) {
   const elementRef = useRef<HTMLDivElement>(null);
   const [size, setSize] = useState<ElementSize | null>(null);
+  const [useWebGLFallback, setUseWebGLFallback] = useState(false);
+
+  useEffect(() => {
+    if (!detectSvgFilterInBackdropSupport()) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- one-time post-mount feature detection; starts false on server to avoid hydration mismatch
+      setUseWebGLFallback(true);
+    }
+  }, []);
   const reactId = useId();
   const filterId = useMemo(
     () => `liquid-glass-${variant}-${reactId.replace(/:/g, "")}`,
@@ -189,10 +215,10 @@ export function LiquidGlassBackdrop({
 
   const displacementMap = useMemo(
     () =>
-      size
+      size && !useWebGLFallback
         ? createDisplacementMap(size.width, size.height, config)
         : null,
-    [config, size]
+    [config, size, useWebGLFallback]
   );
 
   const backdropFilter = useMemo(
@@ -202,7 +228,7 @@ export function LiquidGlassBackdrop({
 
   return (
     <>
-      {size && displacementMap ? (
+      {size && displacementMap && !useWebGLFallback ? (
         <svg
           aria-hidden
           focusable="false"
@@ -294,7 +320,9 @@ export function LiquidGlassBackdrop({
           backdropFilter,
           WebkitBackdropFilter: formatBackdropFilter(null, config),
         }}
-      />
+      >
+        {useWebGLFallback ? <LiquidGlassWebGL variant={variant} /> : null}
+      </div>
     </>
   );
 }
