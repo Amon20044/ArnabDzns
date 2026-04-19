@@ -40,7 +40,8 @@ export const homeHeroSection = {
   secondaryCta: {
     label: "Explore Services",
     href: "#services",
-    icon: "none",
+    icon: "arrow-right",
+    iconVisibility: "hover",
     tone: "white",
   },
 } satisfies HeroSectionConfig;

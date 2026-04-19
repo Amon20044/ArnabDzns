@@ -198,7 +198,12 @@ export function HomeLandingHero({
           initial="hidden"
           animate="visible"
           variants={blurUp}
-          className="mt-4 flex flex-nowrap items-center justify-center gap-3 sm:mt-6"
+          className={cn(
+            "mt-4 gap-3 sm:mt-6",
+            ctas.length > 1
+              ? "mx-auto grid w-full max-w-[21rem] grid-cols-2"
+              : "flex items-center justify-center",
+          )}
         >
           {ctas.map((cta) => (
             <PrimaryButton
@@ -210,7 +215,8 @@ export function HomeLandingHero({
               iconVisibility={cta.iconVisibility}
               tone={cta.tone}
               size={ctaSize}
-              className="shrink-0"
+              fullWidth={ctas.length > 1}
+              className={cn(ctas.length > 1 && "w-full")}
             />
           ))}
         </motion.div>
