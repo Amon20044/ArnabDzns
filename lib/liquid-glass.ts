@@ -25,6 +25,16 @@ export interface LiquidGlassRefractionConfig {
   brightness: number;
   saturate: number;
   contrast: number;
+  /** Index of refraction. Bar default 1.15. Higher = more bezel refraction + chromatic spread. */
+  ior?: number;
+  /** Simulated glass thickness (arbitrary units). Bar default 10. Drives attenuation + refraction magnitude. */
+  thickness?: number;
+  /** 0..1. How much of "behind" shows through the glass. Bar default 1. Scales the specular sweep contribution. */
+  transmission?: number;
+  /** 0..1. Frosted-glass factor. Bar default 0. Softens rim, widens specular lobe, adds micro-noise. */
+  roughness?: number;
+  /** 0..1. Directional smear of highlights along the sweep axis. Bar default 0.01. */
+  anisotropy?: number;
 }
 
 export interface LiquidGlassConfig {
@@ -61,6 +71,11 @@ export const liquidGlassConfig = {
       brightness: 1.06,
       saturate: 1.12,
       contrast: 1.04,
+      ior: 1.15,
+      thickness: 10,
+      transmission: 1,
+      roughness: 0,
+      anisotropy: 0.01,
     },
     shell: {
       bezel: 18,
@@ -71,6 +86,11 @@ export const liquidGlassConfig = {
       brightness: 1.06,
       saturate: 1.12,
       contrast: 1.04,
+      ior: 1.15,
+      thickness: 10,
+      transmission: 1,
+      roughness: 0,
+      anisotropy: 0.01,
     },
   },
   presets: {

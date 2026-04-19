@@ -32,14 +32,24 @@ uniform vec2  uResolution;
 uniform float uTime;
 uniform float uBezelPx;
 uniform float uRadiusPx;
-uniform float uDisplacement;
-uniform float uChroma;
 uniform float uDpr;
 uniform float uAnimate;
+
+// Bar material (stolen from FluidGlass / MeshTransmissionMaterial)
+uniform float uIor;           // index of refraction, ~1.15 for default glass
+uniform float uThickness;     // simulated slab thickness, default 10
+uniform float uTransmission;  // 0..1, how much light passes through
+uniform float uRoughness;     // 0..1, frosted-glass factor
+uniform float uAnisotropy;    // 0..1, directional smear of highlights
+uniform float uChroma;        // base chromatic aberration, scaled by IOR
 
 float sdRoundedRect(vec2 p, vec2 b, float r) {
   vec2 q = abs(p) - b + vec2(r);
   return min(max(q.x, q.y), 0.0) + length(max(q, 0.0)) - r;
+}
+
+float hash12(vec2 p) {
+  return fract(sin(dot(p, vec2(12.9898, 78.233))) * 43758.5453);
 }
 
 void main() {
@@ -54,7 +64,7 @@ void main() {
   float edge = clamp(1.0 - inside / bezel, 0.0, 1.0);
   float smoothEdge = edge * edge * (3.0 - 2.0 * edge);
 
-  // SDF normal via central differences
+  // In-plane gradient of SDF
   float eps = 1.5;
   float gx =
     sdRoundedRect(centered + vec2(eps, 0.0), half_, r) -
@@ -62,39 +72,72 @@ void main() {
   float gy =
     sdRoundedRect(centered + vec2(0.0, eps), half_, r) -
     sdRoundedRect(centered - vec2(0.0, eps), half_, r);
-  vec2 n = normalize(vec2(gx, gy) + vec2(1e-6));
+  vec2 n2 = normalize(vec2(gx, gy) + vec2(1e-6));
 
-  // White Fresnel rim glow
-  float fresnel = pow(smoothEdge, 1.8) * 0.22;
+  // Pseudo-3D normal of a convex bevel: tilts outward at the rim, flat in center
+  vec3 normal = normalize(vec3(-n2 * smoothEdge, mix(1.0, 0.35, smoothEdge)));
+  vec3 viewDir = vec3(0.0, 0.0, 1.0);
+  vec3 lightDir = normalize(vec3(-0.55, -0.7, 0.65));
+  vec3 halfDir = normalize(lightDir + viewDir);
+  float NdotV = clamp(dot(normal, viewDir), 0.0, 1.0);
+  float NdotH = clamp(dot(normal, halfDir), 0.0, 1.0);
 
-  // Subtle chromatic fringe — small R/B offset added on top of white rim
-  float chroma = uChroma * 0.55;
-  float rimR = pow(clamp(smoothEdge + 0.04, 0.0, 1.0), 1.8) * chroma;
-  float rimB = pow(clamp(smoothEdge - 0.04, 0.0, 1.0), 1.8) * chroma;
-  vec3 rim = vec3(fresnel + rimR, fresnel, fresnel + rimB);
+  // Schlick Fresnel parameterized by real IOR
+  float F0 = pow((uIor - 1.0) / (uIor + 1.0), 2.0);
+  float fresnel = F0 + (1.0 - F0) * pow(1.0 - NdotV, 5.0);
 
-  // Animated specular sweep (diagonal band travelling across glass)
+  // Blinn-Phong specular — shininess narrows for low roughness
+  float shininess = mix(96.0, 6.0, clamp(uRoughness, 0.0, 1.0));
+  float spec = pow(NdotH, shininess);
+
+  // Thickness shapes the rim presence and chromatic spread
+  float thicknessFactor = clamp(uThickness / 10.0, 0.25, 2.5);
+
+  // Rim glow: fresnel focused on the bezel, damped by roughness
+  float rimGlow =
+    fresnel * smoothEdge * 0.78 * thicknessFactor * (1.0 - uRoughness * 0.4);
+
+  // Animated glare sweep, width controlled by anisotropy + roughness
   float t = uTime * uAnimate;
   vec2 sweepDir = normalize(vec2(1.0, -0.55));
-  float sweepCoord = dot(vUv - 0.5, sweepDir) * 2.2 - fract(t * 0.08) * 4.4 + 1.1;
-  float sweep = exp(-pow(sweepCoord, 2.0) * 18.0) * 0.16;
+  float sweepCoord =
+    dot(vUv - 0.5, sweepDir) * 2.2 - fract(t * 0.08) * 4.4 + 1.1;
+  float tightness =
+    mix(22.0, 3.5, clamp(uAnisotropy * 30.0 + uRoughness * 0.6, 0.0, 1.0));
+  float sweep =
+    exp(-pow(sweepCoord, 2.0) * tightness) * 0.28 * uTransmission;
 
-  // Top-left global light reflecting off the bezel
-  vec2 lightDir = normalize(vec2(-1.0, -1.0));
-  float topLight = clamp(dot(n, lightDir), 0.0, 1.0) * smoothEdge * 0.18;
+  // Chromatic aberration widens with IOR and thickness
+  float chroma = uChroma * (1.0 + (uIor - 1.0) * 2.0) * thicknessFactor;
+  float rimR = pow(clamp(smoothEdge + 0.04, 0.0, 1.0), 1.6) * chroma;
+  float rimB = pow(clamp(smoothEdge - 0.04, 0.0, 1.0), 1.6) * chroma;
 
-  vec3 col = rim + vec3(sweep + topLight);
+  // Frosted micro-noise only when roughness > 0
+  float micro = (hash12(frag + t * 0.5) - 0.5) * uRoughness * 0.06;
 
-  // Clamp total additive contribution so plus-lighter never blows out
-  col = clamp(col, 0.0, 0.45);
+  vec3 col =
+    vec3(rimGlow + micro) +
+    vec3(rimR, 0.0, rimB) +
+    vec3(sweep) +
+    vec3(spec * 0.45 * (1.0 - uRoughness * 0.6) * uTransmission);
 
-  // Shape mask with 1px AA (kills anything outside the rounded rect)
+  col = clamp(col, 0.0, 0.55);
+
+  // Shape mask kills anything outside the rounded rect with sub-pixel AA
   float shapeMask = clamp(0.5 - sdf, 0.0, 1.0);
 
-  // Pre-multiplied output: alpha is highlight intensity, not shape coverage.
-  // Interior with no highlights => alpha 0 => fully transparent.
+  // Premultiplied alpha: alpha is highlight intensity, interior with no
+  // highlight is fully transparent (no black plate)
   float intensity = max(col.r, max(col.g, col.b));
   outColor = vec4(col, intensity) * shapeMask;
+}`;
+
+const VERTEX_SHADER_WEBGL1 = /* glsl */ `
+attribute vec2 aPosition;
+varying vec2 vUv;
+void main() {
+  vUv = aPosition * 0.5 + 0.5;
+  gl_Position = vec4(aPosition, 0.0, 1.0);
 }`;
 
 const FRAGMENT_SHADER_WEBGL1 = /* glsl */ `
@@ -106,14 +149,23 @@ uniform vec2  uResolution;
 uniform float uTime;
 uniform float uBezelPx;
 uniform float uRadiusPx;
-uniform float uDisplacement;
-uniform float uChroma;
 uniform float uDpr;
 uniform float uAnimate;
+
+uniform float uIor;
+uniform float uThickness;
+uniform float uTransmission;
+uniform float uRoughness;
+uniform float uAnisotropy;
+uniform float uChroma;
 
 float sdRoundedRect(vec2 p, vec2 b, float r) {
   vec2 q = abs(p) - b + vec2(r);
   return min(max(q.x, q.y), 0.0) + length(max(q, 0.0)) - r;
+}
+
+float hash12(vec2 p) {
+  return fract(sin(dot(p, vec2(12.9898, 78.233))) * 43758.5453);
 }
 
 void main() {
@@ -135,37 +187,52 @@ void main() {
   float gy =
     sdRoundedRect(centered + vec2(0.0, eps), half_, r) -
     sdRoundedRect(centered - vec2(0.0, eps), half_, r);
-  vec2 n = normalize(vec2(gx, gy) + vec2(1e-6));
+  vec2 n2 = normalize(vec2(gx, gy) + vec2(1e-6));
 
-  float fresnel = pow(smoothEdge, 1.8) * 0.22;
+  vec3 normal = normalize(vec3(-n2 * smoothEdge, mix(1.0, 0.35, smoothEdge)));
+  vec3 viewDir = vec3(0.0, 0.0, 1.0);
+  vec3 lightDir = normalize(vec3(-0.55, -0.7, 0.65));
+  vec3 halfDir = normalize(lightDir + viewDir);
+  float NdotV = clamp(dot(normal, viewDir), 0.0, 1.0);
+  float NdotH = clamp(dot(normal, halfDir), 0.0, 1.0);
 
-  float chroma = uChroma * 0.55;
-  float rimR = pow(clamp(smoothEdge + 0.04, 0.0, 1.0), 1.8) * chroma;
-  float rimB = pow(clamp(smoothEdge - 0.04, 0.0, 1.0), 1.8) * chroma;
-  vec3 rim = vec3(fresnel + rimR, fresnel, fresnel + rimB);
+  float F0 = pow((uIor - 1.0) / (uIor + 1.0), 2.0);
+  float fresnel = F0 + (1.0 - F0) * pow(1.0 - NdotV, 5.0);
+
+  float shininess = mix(96.0, 6.0, clamp(uRoughness, 0.0, 1.0));
+  float spec = pow(NdotH, shininess);
+
+  float thicknessFactor = clamp(uThickness / 10.0, 0.25, 2.5);
+
+  float rimGlow =
+    fresnel * smoothEdge * 0.78 * thicknessFactor * (1.0 - uRoughness * 0.4);
 
   float t = uTime * uAnimate;
   vec2 sweepDir = normalize(vec2(1.0, -0.55));
-  float sweepCoord = dot(vUv - 0.5, sweepDir) * 2.2 - fract(t * 0.08) * 4.4 + 1.1;
-  float sweep = exp(-pow(sweepCoord, 2.0) * 18.0) * 0.16;
+  float sweepCoord =
+    dot(vUv - 0.5, sweepDir) * 2.2 - fract(t * 0.08) * 4.4 + 1.1;
+  float tightness =
+    mix(22.0, 3.5, clamp(uAnisotropy * 30.0 + uRoughness * 0.6, 0.0, 1.0));
+  float sweep =
+    exp(-pow(sweepCoord, 2.0) * tightness) * 0.28 * uTransmission;
 
-  vec2 lightDir = normalize(vec2(-1.0, -1.0));
-  float topLight = clamp(dot(n, lightDir), 0.0, 1.0) * smoothEdge * 0.18;
+  float chroma = uChroma * (1.0 + (uIor - 1.0) * 2.0) * thicknessFactor;
+  float rimR = pow(clamp(smoothEdge + 0.04, 0.0, 1.0), 1.6) * chroma;
+  float rimB = pow(clamp(smoothEdge - 0.04, 0.0, 1.0), 1.6) * chroma;
 
-  vec3 col = rim + vec3(sweep + topLight);
-  col = clamp(col, 0.0, 0.45);
+  float micro = (hash12(frag + t * 0.5) - 0.5) * uRoughness * 0.06;
+
+  vec3 col =
+    vec3(rimGlow + micro) +
+    vec3(rimR, 0.0, rimB) +
+    vec3(sweep) +
+    vec3(spec * 0.45 * (1.0 - uRoughness * 0.6) * uTransmission);
+
+  col = clamp(col, 0.0, 0.55);
 
   float shapeMask = clamp(0.5 - sdf, 0.0, 1.0);
   float intensity = max(col.r, max(col.g, col.b));
   gl_FragColor = vec4(col, intensity) * shapeMask;
-}`;
-
-const VERTEX_SHADER_WEBGL1 = /* glsl */ `
-attribute vec2 aPosition;
-varying vec2 vUv;
-void main() {
-  vUv = aPosition * 0.5 + 0.5;
-  gl_Position = vec4(aPosition, 0.0, 1.0);
 }`;
 
 function compile(
@@ -211,10 +278,14 @@ type GLHandles = {
     uTime: WebGLUniformLocation | null;
     uBezelPx: WebGLUniformLocation | null;
     uRadiusPx: WebGLUniformLocation | null;
-    uDisplacement: WebGLUniformLocation | null;
-    uChroma: WebGLUniformLocation | null;
     uDpr: WebGLUniformLocation | null;
     uAnimate: WebGLUniformLocation | null;
+    uIor: WebGLUniformLocation | null;
+    uThickness: WebGLUniformLocation | null;
+    uTransmission: WebGLUniformLocation | null;
+    uRoughness: WebGLUniformLocation | null;
+    uAnisotropy: WebGLUniformLocation | null;
+    uChroma: WebGLUniformLocation | null;
   };
 };
 
@@ -280,10 +351,14 @@ function initGL(canvas: HTMLCanvasElement): GLHandles | null {
       uTime: gl.getUniformLocation(program, "uTime"),
       uBezelPx: gl.getUniformLocation(program, "uBezelPx"),
       uRadiusPx: gl.getUniformLocation(program, "uRadiusPx"),
-      uDisplacement: gl.getUniformLocation(program, "uDisplacement"),
-      uChroma: gl.getUniformLocation(program, "uChroma"),
       uDpr: gl.getUniformLocation(program, "uDpr"),
       uAnimate: gl.getUniformLocation(program, "uAnimate"),
+      uIor: gl.getUniformLocation(program, "uIor"),
+      uThickness: gl.getUniformLocation(program, "uThickness"),
+      uTransmission: gl.getUniformLocation(program, "uTransmission"),
+      uRoughness: gl.getUniformLocation(program, "uRoughness"),
+      uAnisotropy: gl.getUniformLocation(program, "uAnisotropy"),
+      uChroma: gl.getUniformLocation(program, "uChroma"),
     },
   };
 }
@@ -304,6 +379,13 @@ export function LiquidGlassWebGL({
     const { gl, program, buffer, uniforms } = handles;
     const config: LiquidGlassRefractionConfig =
       liquidGlassConfig.refraction[variant];
+
+    // Bar defaults (mirroring FluidGlass's Bar material)
+    const ior = config.ior ?? 1.15;
+    const thickness = config.thickness ?? 10;
+    const transmission = config.transmission ?? 1;
+    const roughness = config.roughness ?? 0;
+    const anisotropy = config.anisotropy ?? 0.01;
 
     const reducedMotion =
       typeof window !== "undefined" &&
@@ -336,10 +418,14 @@ export function LiquidGlassWebGL({
       gl.uniform1f(uniforms.uTime, elapsed);
       gl.uniform1f(uniforms.uBezelPx, config.bezel);
       gl.uniform1f(uniforms.uRadiusPx, config.cornerRadius);
-      gl.uniform1f(uniforms.uDisplacement, config.displacement);
-      gl.uniform1f(uniforms.uChroma, config.chromaticAberration);
       gl.uniform1f(uniforms.uDpr, dpr);
       gl.uniform1f(uniforms.uAnimate, reducedMotion ? 0 : 1);
+      gl.uniform1f(uniforms.uIor, ior);
+      gl.uniform1f(uniforms.uThickness, thickness);
+      gl.uniform1f(uniforms.uTransmission, transmission);
+      gl.uniform1f(uniforms.uRoughness, roughness);
+      gl.uniform1f(uniforms.uAnisotropy, anisotropy);
+      gl.uniform1f(uniforms.uChroma, config.chromaticAberration);
       gl.clearColor(0, 0, 0, 0);
       gl.clear(gl.COLOR_BUFFER_BIT);
       gl.drawArrays(gl.TRIANGLES, 0, 3);
