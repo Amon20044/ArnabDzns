@@ -64,7 +64,7 @@ export const liquidGlassConfig = {
   refraction: {
     header: {
       bezel: 22,
-      cornerRadius: 18,
+      cornerRadius: 22,
       displacement: 32,
       chromaticAberration: 0.3,
       blur: 2.0,
@@ -79,7 +79,7 @@ export const liquidGlassConfig = {
     },
     shell: {
       bezel: 18,
-      cornerRadius: 28,
+      cornerRadius: 32,
       displacement: 28,
       chromaticAberration: 0.3,
       blur: 2.0,
