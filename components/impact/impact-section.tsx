@@ -66,6 +66,7 @@ export function ImpactSection({
                 {content.hero.badges?.map((badge, index) => (
                   <StatusBadge
                     key={badge.id ?? `${badge.label}-${index}`}
+                    className={cn(badge.showInMobile === false && "hidden sm:inline-flex")}
                     interactive={false}
                     tone={badge.tone}
                     textColor={badge.textColor}

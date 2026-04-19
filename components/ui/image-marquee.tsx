@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { useEffect, useMemo, useRef } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import type { IconType } from "react-icons";
 import {
   SiApple,
@@ -150,6 +150,7 @@ function MarqueeRow({
   rowClassName,
   itemClassName,
 }: MarqueeRowProps) {
+  const containerRef = useRef<HTMLDivElement>(null);
   const trackRef = useRef<HTMLDivElement>(null);
   const segmentRef = useRef<HTMLDivElement>(null);
   const hoverRef = useRef(false);
@@ -157,6 +158,8 @@ function MarqueeRow({
   const widthRef = useRef(0);
   const speedScaleRef = useRef(1);
   const frameRef = useRef<number | null>(null);
+  const nextSegmentKeyRef = useRef(2);
+  const [segmentKeys, setSegmentKeys] = useState([0, 1]);
 
   const direction = row.direction ?? (rowIndex % 2 === 0 ? "left" : "right");
   const speed = row.speed ?? DEFAULT_SPEED + rowIndex * 8;
@@ -168,10 +171,11 @@ function MarqueeRow({
   );
 
   useEffect(() => {
+    const container = containerRef.current;
     const track = trackRef.current;
     const segment = segmentRef.current;
 
-    if (!track || !segment || !images.length) {
+    if (!container || !track || !segment || !images.length) {
       return;
     }
 
@@ -192,14 +196,37 @@ function MarqueeRow({
       track.style.transform = `translate3d(${translateX}px, 0px, 0px)`;
     };
 
-    const updateWidth = () => {
+    const updateMetrics = () => {
       widthRef.current = segment.getBoundingClientRect().width;
+      const containerWidth = container.getBoundingClientRect().width;
 
       if (widthRef.current > 0) {
         offsetRef.current %= widthRef.current;
       } else {
         offsetRef.current = 0;
       }
+
+      const nextSegmentCopies =
+        widthRef.current > 0
+          ? Math.max(2, Math.ceil(containerWidth / widthRef.current) + 1)
+          : 2;
+
+      setSegmentKeys((current) => {
+        if (current.length === nextSegmentCopies) {
+          return current;
+        }
+
+        if (current.length > nextSegmentCopies) {
+          return current.slice(0, nextSegmentCopies);
+        }
+
+        const appendedKeys = Array.from(
+          { length: nextSegmentCopies - current.length },
+          () => nextSegmentKeyRef.current++,
+        );
+
+        return [...current, ...appendedKeys];
+      });
 
       applyTransform();
     };
@@ -221,6 +248,14 @@ function MarqueeRow({
 
         if (offsetRef.current >= widthRef.current) {
           offsetRef.current %= widthRef.current;
+          setSegmentKeys((current) => {
+            if (current.length < 2) {
+              return current;
+            }
+
+            const [first, ...rest] = current;
+            return [...rest, first];
+          });
         }
 
         applyTransform();
@@ -240,9 +275,10 @@ function MarqueeRow({
       applyTransform();
     };
 
-    const resizeObserver = new ResizeObserver(updateWidth);
+    const resizeObserver = new ResizeObserver(updateMetrics);
+    resizeObserver.observe(container);
     resizeObserver.observe(segment);
-    updateWidth();
+    updateMetrics();
 
     mediaQuery.addEventListener("change", handleMotionChange);
     frameRef.current = window.requestAnimationFrame(animate);
@@ -262,13 +298,16 @@ function MarqueeRow({
   }
 
   return (
-    <div className={cn("overflow-hidden py-2 bg-transparent", rowClassName)}>
+    <div
+      ref={containerRef}
+      className={cn("overflow-hidden py-2 bg-transparent", rowClassName)}
+    >
       <div ref={trackRef} className="flex w-max will-change-transform">
-        {[0, 1].map((segmentIndex) => (
+        {segmentKeys.map((segmentKey, segmentIndex) => (
           <div
-            key={segmentIndex}
+            key={segmentKey}
             ref={segmentIndex === 0 ? segmentRef : undefined}
-            aria-hidden={segmentIndex === 1}
+            aria-hidden={segmentIndex > 0}
             className="flex shrink-0"
             style={{ gap: itemGap, paddingInline: edgePadding }}
           >

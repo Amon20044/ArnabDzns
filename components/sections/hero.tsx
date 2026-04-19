@@ -67,12 +67,15 @@ export const Hero = ({
   childrenClassName,
 }: HeroProps) => {
   const badges = content.badges ?? [];
+  const ctas = [content.cta, content.secondaryCta].filter(
+    (cta): cta is HeroCTAConfig => Boolean(cta),
+  );
   const titleLines = resolveTitleLines(content.title);
   const eyebrowStep = content.eyebrow ? 1 : 0;
   const titleStep = eyebrowStep + badges.length;
   const descriptionStep = titleStep + 1;
   const ctaStep = descriptionStep + (content.description ? 1 : 0);
-  const childrenStep = ctaStep + (content.cta ? 1 : 0);
+  const childrenStep = ctaStep + (ctas.length ? 1 : 0);
   const titleSpacingClassName = badges.length || content.eyebrow ? "mt-4" : undefined;
 
   return (
@@ -103,6 +106,7 @@ export const Hero = ({
               initial="hidden"
               animate="visible"
               variants={blurUp}
+              className={cn(badge.showInMobile === false && "hidden sm:block")}
             >
               <StatusBadge
                 tone={badge.tone}
@@ -149,21 +153,25 @@ export const Hero = ({
         </motion.div>
       ) : null}
 
-      {content.cta ? (
+      {ctas.length ? (
         <motion.div
           custom={ctaStep}
           initial="hidden"
           animate="visible"
           variants={blurUp}
-          className="mt-10"
+          className="mt-10 flex flex-wrap items-center justify-center gap-3"
         >
-          <PrimaryButton
-            label={content.cta.label}
-            href={content.cta.href}
-            external={content.cta.external}
-            Icon={resolveCTAIcon(content.cta)}
-            iconVisibility={content.cta.iconVisibility}
-          />
+          {ctas.map((cta) => (
+            <PrimaryButton
+              key={`${cta.label}-${cta.href}`}
+              label={cta.label}
+              href={cta.href}
+              external={cta.external}
+              Icon={resolveCTAIcon(cta)}
+              iconVisibility={cta.iconVisibility}
+              tone={cta.tone}
+            />
+          ))}
         </motion.div>
       ) : null}
 

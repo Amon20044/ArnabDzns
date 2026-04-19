@@ -3,6 +3,8 @@
 import { DotLottieReact } from "@lottiefiles/dotlottie-react";
 import { motion, type Variants } from "framer-motion";
 import { ArrowRight } from "lucide-react";
+import Image from "next/image";
+import { useEffect, useState } from "react";
 import { PrimaryButton } from "@/components/ui/primary-button";
 import { renderStatusBadgeLeading } from "@/components/ui/status-badge-leading";
 import { StatusBadge } from "@/components/ui/status-badge";
@@ -15,6 +17,8 @@ interface HomeLandingHeroProps {
 }
 
 const ease = [0.22, 1, 0.36, 1] as const;
+const MOBILE_HERO_LOTTIE_SRC = "/Mobile.lottie";
+const MOBILE_HERO_FALLBACK_SRC = "/Mobile.svg";
 
 const blurUp: Variants = {
   hidden: { opacity: 0, y: 28, filter: "blur(18px)" },
@@ -45,7 +49,62 @@ export function HomeLandingHero({
   className,
 }: HomeLandingHeroProps) {
   const badges = content.badges ?? [];
+  const ctas = [content.cta, content.secondaryCta].filter(
+    (cta): cta is HeroCTAConfig => Boolean(cta),
+  );
   const ctaStep = badges.length + 1;
+  const [isDesktop, setIsDesktop] = useState<boolean | null>(null);
+  const [hasMobileLottie, setHasMobileLottie] = useState(false);
+  const heroTitle =
+    typeof content.title === "string"
+      ? content.title
+      : content.title.join(" ").replace(/\s+/g, " ").trim();
+  const ctaSize = isDesktop ? "default" : "compact";
+
+  useEffect(() => {
+    const mediaQuery = window.matchMedia("(min-width: 640px)");
+
+    const updateViewport = () => {
+      setIsDesktop(mediaQuery.matches);
+    };
+
+    updateViewport();
+    mediaQuery.addEventListener("change", updateViewport);
+
+    return () => {
+      mediaQuery.removeEventListener("change", updateViewport);
+    };
+  }, []);
+
+  useEffect(() => {
+    if (isDesktop !== false) {
+      return;
+    }
+
+    let cancelled = false;
+
+    const checkMobileLottie = async () => {
+      try {
+        const response = await fetch(MOBILE_HERO_LOTTIE_SRC, {
+          method: "HEAD",
+        });
+
+        if (!cancelled) {
+          setHasMobileLottie(response.ok);
+        }
+      } catch {
+        if (!cancelled) {
+          setHasMobileLottie(false);
+        }
+      }
+    };
+
+    void checkMobileLottie();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [isDesktop]);
 
   return (
     <section
@@ -63,6 +122,7 @@ export function HomeLandingHero({
               initial="hidden"
               animate="visible"
               variants={blurUp}
+              className={cn(badge.showInMobile === false && "hidden sm:block")}
             >
               <StatusBadge
                 tone={badge.tone}
@@ -88,33 +148,71 @@ export function HomeLandingHero({
         className="mt-6 w-full sm:mt-8"
       >
         <div className="relative mx-auto w-full max-w-6xl">
-          <div className="relative mx-auto h-[clamp(11.5rem,32vw,26rem)] w-full">
-            <DotLottieReact
-              src="/HeroTitle.lottie"
-              autoplay
-              loop
-              renderConfig={{ autoResize: true }}
-              style={{ width: "100%", height: "100%" }}
+          {isDesktop === null ? (
+            <>
+              <div
+                aria-hidden
+                className="mx-auto aspect-[384/475] w-full max-w-[24rem] sm:hidden"
+              />
+              <div
+                aria-hidden
+                className="hidden aspect-[2432/512] w-full sm:block"
+              />
+            </>
+          ) : isDesktop ? (
+            <div className="relative mx-auto h-[clamp(11.5rem,32vw,26rem)] w-full">
+              <DotLottieReact
+                src="/HeroTitle.lottie"
+                autoplay
+                loop
+                renderConfig={{ autoResize: true }}
+                style={{ width: "100%", height: "100%" }}
+              />
+            </div>
+          ) : hasMobileLottie ? (
+            <div className="relative mx-auto h-[clamp(18rem,88vw,29.5rem)] w-full max-w-[24rem]">
+              <DotLottieReact
+                src={MOBILE_HERO_LOTTIE_SRC}
+                autoplay
+                loop
+                renderConfig={{ autoResize: true }}
+                style={{ width: "100%", height: "100%" }}
+              />
+            </div>
+          ) : (
+            <Image
+              src={MOBILE_HERO_FALLBACK_SRC}
+              alt={heroTitle}
+              width={384}
+              height={475}
+              preload
+              className="mx-auto h-auto w-full max-w-[24rem]"
             />
-          </div>
+          )}
         </div>
       </motion.div>
 
-      {content.cta ? (
+      {ctas.length ? (
         <motion.div
           custom={ctaStep}
           initial="hidden"
           animate="visible"
           variants={blurUp}
-          className="mt-4 sm:mt-6"
+          className="mt-4 flex flex-nowrap items-center justify-center gap-3 sm:mt-6"
         >
-          <PrimaryButton
-            label={content.cta.label}
-            href={content.cta.href}
-            external={content.cta.external}
-            Icon={resolveCTAIcon(content.cta)}
-            iconVisibility={content.cta.iconVisibility}
-          />
+          {ctas.map((cta) => (
+            <PrimaryButton
+              key={`${cta.label}-${cta.href}`}
+              label={cta.label}
+              href={cta.href}
+              external={cta.external}
+              Icon={resolveCTAIcon(cta)}
+              iconVisibility={cta.iconVisibility}
+              tone={cta.tone}
+              size={ctaSize}
+              className="shrink-0"
+            />
+          ))}
         </motion.div>
       ) : null}
 

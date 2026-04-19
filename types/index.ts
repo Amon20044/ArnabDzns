@@ -261,6 +261,8 @@ export type HeroBadgeIconId =
 export interface HeroBadgeConfig {
   id?: string;
   label: string;
+  /** Hide this badge below the `sm` breakpoint when set to false. */
+  showInMobile?: boolean;
   icon?: HeroBadgeIconId;
   tone?: string;
   textColor?: string;
@@ -272,6 +274,7 @@ export interface HeroBadgeConfig {
 
 export type HeroCTAIconId = "arrow-right" | "none";
 export type HeroCTAIconVisibility = "always" | "hover";
+export type HeroCTATone = "default" | "white" | "whatsapp";
 
 export interface HeroCTAConfig {
   label: string;
@@ -279,6 +282,7 @@ export interface HeroCTAConfig {
   external?: boolean;
   icon?: HeroCTAIconId;
   iconVisibility?: HeroCTAIconVisibility;
+  tone?: HeroCTATone;
 }
 
 export interface HeroSectionConfig {
@@ -287,6 +291,7 @@ export interface HeroSectionConfig {
   title: string | string[];
   description?: string;
   cta?: HeroCTAConfig | false;
+  secondaryCta?: HeroCTAConfig;
 }
 
 /* --------------------------------------------------------------------------
