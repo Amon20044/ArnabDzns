@@ -170,7 +170,7 @@ export function HomeLandingHero({
               />
             </div>
           ) : hasMobileLottie ? (
-            <div className="relative mx-auto aspect-[384/475] w-full sm:max-w-[24rem]">
+            <div className="relative mx-auto aspect-[380/400] w-full sm:max-w-[24rem]">
               <DotLottieReact
                 src={MOBILE_HERO_LOTTIE_SRC}
                 autoplay
