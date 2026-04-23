@@ -28,6 +28,9 @@ const softSurfaceGradient: CSSProperties = {
     "linear-gradient(180deg, rgba(255,255,255,0.96) 0%, rgba(248,247,252,0.88) 100%)",
 };
 
+const mobileFlatSectionClassName =
+  "max-md:!rounded-none max-md:!border-transparent max-md:!bg-none max-md:!shadow-none max-md:!backdrop-blur-none max-md:!p-0";
+
 function IntroBadgeRow({
   badges,
 }: {
@@ -287,8 +290,13 @@ export function AboutPage({
 }: AboutPageProps) {
   return (
     <div className="flex flex-1">
-      <main className="page-section-stack mx-auto flex w-full max-w-6xl flex-1 flex-col px-3 pb-32 pt-4 md:px-10 md:pb-40 md:pt-6">
-        <section className="page-section-frame page-surface page-reveal relative overflow-hidden">
+      <main className="page-section-stack mx-auto flex w-full max-w-6xl flex-1 flex-col px-2 pb-32 pt-4 md:px-10 md:pb-40">
+        <section
+          className={cn(
+            "page-section-frame page-surface page-reveal relative overflow-hidden",
+            mobileFlatSectionClassName,
+          )}
+        >
           <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(216,180,254,0.24),transparent_28%),radial-gradient(circle_at_right_center,rgba(255,255,255,0.48),transparent_30%)]" />
 
           <IntroBadgeRow badges={content.intro.badges} />
@@ -387,7 +395,12 @@ export function AboutPage({
           </div>
         </section>
 
-        <section className="page-section-frame page-surface page-reveal relative overflow-hidden">
+        <section
+          className={cn(
+            "page-section-frame page-surface page-reveal relative overflow-hidden",
+            mobileFlatSectionClassName,
+          )}
+        >
           <div className="grid gap-4 md:grid-cols-4">
             {content.availability.map((stat) => (
               <AvailabilityStatCard key={stat.id} stat={stat} />
@@ -395,7 +408,12 @@ export function AboutPage({
           </div>
         </section>
 
-        <section className="page-section-frame page-surface page-reveal relative overflow-hidden">
+        <section
+          className={cn(
+            "page-section-frame page-surface page-reveal relative overflow-hidden",
+            mobileFlatSectionClassName,
+          )}
+        >
           <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(168,85,247,0.12),transparent_42%)]" />
 
           <Hero
@@ -429,7 +447,12 @@ export function AboutPage({
           </Hero>
         </section>
 
-        <section className="page-section-frame page-surface page-reveal relative overflow-hidden">
+        <section
+          className={cn(
+            "page-section-frame page-surface page-reveal relative overflow-hidden",
+            mobileFlatSectionClassName,
+          )}
+        >
           <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(168,85,247,0.16),transparent_44%),radial-gradient(circle_at_bottom,rgba(255,255,255,0.4),transparent_36%)]" />
 
           <div className="relative mx-auto max-w-5xl text-center">
@@ -470,7 +493,12 @@ export function AboutPage({
           </div>
         </section>
 
-        <section className="page-section-frame page-surface page-reveal relative overflow-hidden">
+        <section
+          className={cn(
+            "page-section-frame page-surface page-reveal relative overflow-hidden",
+            mobileFlatSectionClassName,
+          )}
+        >
           <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(168,85,247,0.12),transparent_46%)]" />
 
           <Hero content={content.teamHero} className="min-h-0 py-0" childrenClassName="mt-12">
@@ -486,7 +514,12 @@ export function AboutPage({
           </Hero>
         </section>
 
-        <section className="page-section-frame page-surface page-reveal relative overflow-hidden">
+        <section
+          className={cn(
+            "page-section-frame page-surface page-reveal relative overflow-hidden",
+            mobileFlatSectionClassName,
+          )}
+        >
           <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(168,85,247,0.18),transparent_44%),radial-gradient(circle_at_bottom,rgba(255,255,255,0.4),transparent_34%)]" />
 
           <div className="relative mx-auto max-w-4xl text-center">
