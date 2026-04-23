@@ -1,5 +1,5 @@
 import localFont from "next/font/local";
-import { Poppins } from "next/font/google";
+import { Caveat, Poppins } from "next/font/google";
 
 export const aeonik = localFont({
   src: [
@@ -22,6 +22,12 @@ export const poppins = Poppins({
   subsets: ["latin"],
   weight: ["400", "500", "600", "700"],
   variable: "--font-poppins",
+  display: "swap",
+});
+
+export const caveat = Caveat({
+  subsets: ["latin"],
+  weight: ["700"],
   display: "swap",
 });
 

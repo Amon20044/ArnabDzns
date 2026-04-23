@@ -15,6 +15,7 @@ import {
   type AboutPageContent,
   type AboutTeamMember,
 } from "@/data/about";
+import { caveat } from "@/config/fonts";
 import { cn } from "@/lib/utils";
 import type { SiteConfig } from "@/types";
 import { siteConfig } from "@/data/site";
@@ -346,7 +347,12 @@ export function AboutPage({
                 </div>
 
                 <div className="mt-8 flex flex-wrap items-end justify-between gap-4 border-t border-dashed border-black/8 pt-6">
-                  <p className="font-secondary text-[clamp(2rem,5vw,3rem)] italic leading-none tracking-[-0.05em] text-accent-dark">
+                  <p
+                    className={cn(
+                      caveat.className,
+                      "text-[clamp(2rem,5vw,3rem)] leading-none tracking-[-0.05em] text-accent-dark",
+                    )}
+                  >
                     - {content.intro.signature}
                   </p>
                   <Text
@@ -359,19 +365,6 @@ export function AboutPage({
                 </div>
               </div>
             </article>
-          </div>
-        </section>
-
-        <section
-          className={cn(
-            "page-section-frame page-surface page-reveal relative overflow-hidden",
-            mobileFlatSectionClassName,
-          )}
-        >
-          <div className="grid gap-4 md:grid-cols-4">
-            {content.availability.map((stat) => (
-              <AvailabilityStatCard key={stat.id} stat={stat} />
-            ))}
           </div>
         </section>
 

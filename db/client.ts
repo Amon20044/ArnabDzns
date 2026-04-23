@@ -1,8 +1,9 @@
 import "server-only";
 
+import dns from "node:dns";
+dns.setServers(["1.1.1.1", "1.0.0.1", "8.8.8.8", "8.8.4.4"]);
+
 import mongoose from "mongoose";
-import dns from "dns";
-dns.setServers(["1.1.1.1", "8.8.8.8"]);
 
 const uri = process.env.MONGODB_URI ?? process.env.MONGO_URI;
 const dbName = process.env.MONGODB_DB ?? process.env.MONGO_DB;

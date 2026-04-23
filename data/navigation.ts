@@ -7,7 +7,7 @@ export const headerConfig: HeaderConfig = {
     name: siteConfig.name,
     role: siteConfig.brand.role,
     bio: siteConfig.brand.bio,
-    path: "/",
+    path: "/about",
     logoSrc: siteConfig.brand.logoSrc,
     logoAlt: siteConfig.brand.logoAlt,
   },
@@ -37,6 +37,12 @@ export const navigationConfig: NavigationConfig = {
       sectionId: "home",
     },
     {
+      id: "portfolio",
+      label: "Portfolio",
+      path: "/#portfolio",
+      sectionId: "portfolio",
+    },
+    {
       id: "testimonials",
       label: "Testimonials",
       path: "/#testimonials",
@@ -47,12 +53,6 @@ export const navigationConfig: NavigationConfig = {
       label: "Services",
       path: "/#services",
       sectionId: "services",
-    },
-    {
-      id: "portfolio",
-      label: "Portfolio",
-      path: "/#portfolio",
-      sectionId: "portfolio",
     },
     {
       id: "faq",
