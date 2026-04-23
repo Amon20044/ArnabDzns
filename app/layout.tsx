@@ -1,8 +1,7 @@
 import type { CSSProperties } from "react";
 import "locomotive-scroll/locomotive-scroll.css";
 import { IridescenceBackground } from "@/components/background/iridescence";
-import { SiteFooter } from "@/components/layout/site-footer";
-import { Header, Navigation } from "@/components/layout/navigation";
+import { RouteAwareSiteFrame } from "@/components/layout/route-aware-site-frame";
 import { ProfileBioContent } from "@/components/layout/navigation/profile-bio-content";
 import { LocomotiveScrollProvider } from "@/components/providers/locomotive-scroll-provider";
 import { StructuredData } from "@/components/site/structured-data";
@@ -19,6 +18,7 @@ import { cn } from "@/lib/utils";
 const geist = Geist({subsets:['latin'],variable:'--font-sans'});
 
 export const metadata = getRootMetadata();
+export const revalidate = 300;
 export const runtime = "nodejs";
 
 export default async function RootLayout({
@@ -41,15 +41,14 @@ export default async function RootLayout({
         <LiquidGlassDefs />
         <IridescenceBackground color={[0.93, 0.88, 0.99]} mouseReact amplitude={0.08} speed={0.9} />
         <LocomotiveScrollProvider>
-          <Header
-            content={content.header}
+          <RouteAwareSiteFrame
+            header={content.header}
+            navigation={content.navigation}
+            site={content.site}
             profileBioContent={<ProfileBioContent />}
-          />
-          <div className="flex flex-1 flex-col pt-24">
+          >
             {children}
-          </div>
-          <SiteFooter site={content.site} />
-          <Navigation content={content.navigation} />
+          </RouteAwareSiteFrame>
         </LocomotiveScrollProvider>
       </body>
     </html>

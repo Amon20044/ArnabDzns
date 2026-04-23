@@ -1,0 +1,1 @@
+export const SITE_REVALIDATE_SECONDS = 300;

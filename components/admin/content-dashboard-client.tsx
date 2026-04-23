@@ -127,6 +127,7 @@ export function ContentDashboardClient({
     () => blocks.find((block) => block.key === selectedKey) ?? blocks[0],
     [blocks, selectedKey],
   );
+  const selectedGroup = selectedBlock?.group;
 
   const [openGroups, setOpenGroups] = useState<Set<string>>(() => {
     const initialGroup = initialBlocks.find(
@@ -136,18 +137,18 @@ export function ContentDashboardClient({
   });
 
   useEffect(() => {
-    if (!selectedBlock) {
+    if (!selectedGroup) {
       return;
     }
     setOpenGroups((prev) => {
-      if (prev.has(selectedBlock.group)) {
+      if (prev.has(selectedGroup)) {
         return prev;
       }
       const next = new Set(prev);
-      next.add(selectedBlock.group);
+      next.add(selectedGroup);
       return next;
     });
-  }, [selectedBlock?.group]);
+  }, [selectedGroup]);
 
   function toggleGroup(group: string) {
     setOpenGroups((prev) => {

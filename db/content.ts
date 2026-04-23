@@ -42,9 +42,10 @@ import {
   type ContentBlockSeed,
   type ContentImage,
 } from "./models/content-block";
+import { SITE_REVALIDATE_SECONDS } from "@/lib/site-revalidate";
 
 const CONTENT_REVALIDATE_SECONDS = Number(
-  process.env.CONTENT_REVALIDATE_SECONDS ?? 300,
+  process.env.CONTENT_REVALIDATE_SECONDS ?? SITE_REVALIDATE_SECONDS,
 );
 
 export type ContentBlockRecord = ContentBlockSeed & {
