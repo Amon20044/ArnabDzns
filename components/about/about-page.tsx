@@ -321,22 +321,13 @@ export function AboutPage({
               <div className="pointer-events-none absolute inset-0 max-md:hidden bg-[radial-gradient(circle_at_top_left,rgba(255,255,255,0.65),transparent_28%),radial-gradient(circle_at_bottom_right,rgba(216,180,254,0.18),transparent_32%)]" />
 
               <div className="relative z-[1]">
-                <StatusBadge
-                  interactive={false}
-                  tone="#2f1544"
-                  textColor="#faf5ff"
-                  iconColor="#faf5ff"
-                >
-                  {content.intro.shortVersionLabel}
-                </StatusBadge>
-
-                <Heading variant="h2" as="h1" className="mt-6 max-w-[13ch]">
+                <Heading variant="h3" as="h2" className="mt-6 max-w-[13ch]">
                   {content.intro.title}
                 </Heading>
 
                 <div className="mt-6 space-y-5">
                   {content.intro.paragraphs.map((paragraph) => (
-                    <Text key={paragraph} variant="p1" className="max-w-2xl text-pretty">
+                    <Text key={paragraph} variant="p2" className="max-w-2xl text-pretty">
                       {paragraph}
                     </Text>
                   ))}

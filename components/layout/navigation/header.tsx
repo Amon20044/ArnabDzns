@@ -4,6 +4,7 @@ import Image from "next/image";
 import { AnimatePresence, motion } from "framer-motion";
 import { X } from "lucide-react";
 import {
+  type MouseEvent as ReactMouseEvent,
   type ReactNode,
   startTransition,
   useEffect,
@@ -35,6 +36,12 @@ export const Header = ({ profileBioContent, content = headerConfig }: HeaderProp
 
   const setProfileDialog = (nextOpen: boolean) => {
     startTransition(() => setProfileDialogOpen(nextOpen));
+  };
+
+  const handleProfileDialogOpen = (event: ReactMouseEvent<HTMLButtonElement>) => {
+    event.preventDefault();
+    event.stopPropagation();
+    setProfileDialog(true);
   };
 
   const handleScroll = useEffectEvent(() => {
@@ -206,7 +213,7 @@ export const Header = ({ profileBioContent, content = headerConfig }: HeaderProp
             onMouseLeave={() => setBrandHovered(false)}
             onFocus={() => setBrandHovered(true)}
             onBlur={() => setBrandHovered(false)}
-            onClick={() => setProfileDialog(true)}
+            onClick={handleProfileDialogOpen}
           >
             <motion.div
               className="relative size-11 shrink-0 overflow-hidden rounded-full
@@ -240,7 +247,7 @@ export const Header = ({ profileBioContent, content = headerConfig }: HeaderProp
                     {brand.role}
                   </span>
                   <span className="truncate text-[12.5px] leading-[18px] text-accent">
-                    Open full bio
+                    Open bio
                   </span>
                 </motion.div>
               </div>
