@@ -11,7 +11,7 @@ function isProtectedPath(pathname: string) {
 }
 
 export async function proxy(request: NextRequest) {
-  const { pathname } = request.nextUrl;
+  const { pathname, search } = request.nextUrl;
   const nextPath = getSafeRedirectPath(request.nextUrl.searchParams.get("next"));
   const session = await verifySessionToken(
     request.cookies.get(AUTH_COOKIE_NAME)?.value,
@@ -23,7 +23,7 @@ export async function proxy(request: NextRequest) {
 
   if (isProtectedPath(pathname) && !session) {
     const url = new URL("/login", request.url);
-    url.searchParams.set("next", pathname);
+    url.searchParams.set("next", `${pathname}${search}`);
 
     return NextResponse.redirect(url);
   }
