@@ -32,8 +32,8 @@ function getBasePageEntity(pageKey: SitePageKey): JsonLd {
   };
 }
 
-function getBreadcrumbEntity(pageKey: "contact"): JsonLd {
-  const currentPage = sitePages[pageKey];
+function getBreadcrumbEntity(pageKey: "about" | "contact"): JsonLd {
+  const currentPage = getSitePage(pageKey);
 
   return {
     "@type": "BreadcrumbList",
@@ -98,6 +98,10 @@ export function getPageJsonLd(pageKey: SitePageKey): JsonLd {
       availableLanguage: [siteConfig.seo.language],
       areaServed: "Worldwide",
     });
+  }
+
+  if (pageKey === "about") {
+    graph.push(getBreadcrumbEntity("about"));
   }
 
   if (pageKey === "home") {

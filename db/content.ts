@@ -86,7 +86,7 @@ export function pathsForContentKey(key: ContentBlockKey) {
   switch (key) {
     case "site":
     case "navigation":
-      return ["/", "/contact"];
+      return ["/", "/about", "/contact"];
     case "contact_page":
       return ["/contact"];
     default:

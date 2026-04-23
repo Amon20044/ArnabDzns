@@ -22,6 +22,28 @@ export const sitePages: SitePagesConfig = {
       priority: 1,
     },
   },
+  about: {
+    path: "/about",
+    navLabel: "About",
+    seo: {
+      title: "About Arnab",
+      description:
+        "Learn about Arnab's design approach, work history across esports and brand systems, collaborators, and current availability.",
+      keywords: [
+        "about Arnab",
+        "Arnab designer biography",
+        "visual systems designer",
+        "brand designer Bengaluru",
+        "creative collaborator",
+      ],
+      pageType: "AboutPage",
+      openGraphType: "website",
+    },
+    sitemap: {
+      changeFrequency: "monthly",
+      priority: 0.9,
+    },
+  },
   contact: {
     path: "/contact",
     navLabel: "Contact",
