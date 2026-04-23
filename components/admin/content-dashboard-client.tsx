@@ -10,14 +10,23 @@ import {
   HomeIcon,
   LayoutPanelTopIcon,
   MailIcon,
+  MenuIcon,
   RefreshCcwIcon,
   SaveIcon,
   SearchIcon,
   ShieldCheckIcon,
   Trash2Icon,
+  XIcon,
   type LucideIcon,
 } from "lucide-react";
-import { useDeferredValue, useEffect, useMemo, useState, useTransition } from "react";
+import {
+  useDeferredValue,
+  useEffect,
+  useMemo,
+  useState,
+  useTransition,
+  type ReactNode,
+} from "react";
 import { useRouter } from "next/navigation";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -106,6 +115,162 @@ function safeSerializeDraft(
   }
 }
 
+function SectionsNavigationPanel({
+  blockCount,
+  search,
+  onSearchChange,
+  groupedBlocks,
+  deferredSearch,
+  openGroups,
+  selectedKey,
+  onToggleGroup,
+  onSelectBlock,
+  className,
+  headerAction,
+}: {
+  blockCount: number;
+  search: string;
+  onSearchChange: (value: string) => void;
+  groupedBlocks: Array<[string, ContentBlockRecord[]]>;
+  deferredSearch: string;
+  openGroups: Set<string>;
+  selectedKey: ContentBlockKey;
+  onToggleGroup: (group: string) => void;
+  onSelectBlock: (block: ContentBlockRecord) => void;
+  className?: string;
+  headerAction?: ReactNode;
+}) {
+  return (
+    <Card className={cn("rounded-2xl bg-white/84", className)}>
+      <CardHeader className="border-b border-border/70 pb-3">
+        <div className="flex items-center justify-between gap-2">
+          <div className="flex items-center gap-2">
+            <LayoutPanelTopIcon className="size-4 text-muted-foreground" />
+            <CardTitle>Sections</CardTitle>
+          </div>
+          <div className="flex items-center gap-2">
+            <Badge variant="outline">{blockCount}</Badge>
+            {headerAction}
+          </div>
+        </div>
+      </CardHeader>
+      <CardContent className="flex min-h-0 flex-1 flex-col gap-3 pt-3">
+        <div className="relative">
+          <SearchIcon className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
+          <Input
+            value={search}
+            onChange={(event) => onSearchChange(event.target.value)}
+            placeholder="Search sections..."
+            className="pl-9"
+          />
+        </div>
+
+        <div className="-mx-1 grid gap-2 overflow-y-auto px-1 pb-2">
+          {groupedBlocks.length ? (
+            groupedBlocks.map(([group, groupBlocks]) => {
+              const isOpen = deferredSearch.length > 0 || openGroups.has(group);
+              const GroupIcon = GROUP_ICONS[group] ?? FolderIcon;
+              const hasSelected = groupBlocks.some(
+                (block) => block.key === selectedKey,
+              );
+
+              return (
+                <div
+                  key={group}
+                  className={cn(
+                    "overflow-hidden rounded-xl border bg-white/70 transition",
+                    hasSelected
+                      ? "border-foreground/15 shadow-[0_4px_14px_rgba(15,23,42,0.05)]"
+                      : "border-border/70",
+                  )}
+                >
+                  <button
+                    type="button"
+                    onClick={() => onToggleGroup(group)}
+                    aria-expanded={isOpen ? "true" : "false"}
+                    className="flex w-full items-center justify-between gap-2 px-3 py-2.5 text-left transition hover:bg-background/80"
+                  >
+                    <div className="flex min-w-0 items-center gap-2">
+                      <GroupIcon className="size-4 shrink-0 text-muted-foreground" />
+                      <span className="truncate text-sm font-semibold text-foreground">
+                        {GROUP_LABELS[group] ?? group}
+                      </span>
+                      <Badge variant="outline" className="shrink-0">
+                        {groupBlocks.length}
+                      </Badge>
+                    </div>
+                    <ChevronDownIcon
+                      className={cn(
+                        "size-4 shrink-0 text-muted-foreground transition-transform duration-200",
+                        isOpen && "rotate-180",
+                      )}
+                    />
+                  </button>
+
+                  {isOpen ? (
+                    <div className="grid gap-1 border-t border-border/60 bg-background/40 p-1.5">
+                      {groupBlocks.map((block) => {
+                        const definition = getSectionDefinition(block.key);
+                        const isSelected = block.key === selectedKey;
+
+                        return (
+                          <button
+                            key={block.key}
+                            type="button"
+                            onClick={() => onSelectBlock(block)}
+                            className={cn(
+                              "group flex items-start gap-2.5 rounded-lg px-2.5 py-2 text-left transition",
+                              isSelected
+                                ? "bg-foreground text-background shadow-sm"
+                                : "hover:bg-white",
+                            )}
+                          >
+                            <div className="min-w-0 flex-1">
+                              <div className="flex items-center gap-1.5">
+                                <p className="truncate text-sm font-medium">
+                                  {definition.label}
+                                </p>
+                              </div>
+                              <p
+                                className={cn(
+                                  "mt-0.5 line-clamp-1 text-xs leading-5",
+                                  isSelected
+                                    ? "text-background/70"
+                                    : "text-muted-foreground",
+                                )}
+                              >
+                                {definition.description}
+                              </p>
+                            </div>
+                            <span
+                              className={cn(
+                                "mt-0.5 inline-flex h-5 min-w-5 shrink-0 items-center justify-center rounded-full px-1.5 text-[10px] font-semibold",
+                                isSelected
+                                  ? "bg-background/20 text-background"
+                                  : "bg-muted text-muted-foreground",
+                              )}
+                            >
+                              {countBlockItems(block)}
+                            </span>
+                          </button>
+                        );
+                      })}
+                    </div>
+                  ) : null}
+                </div>
+              );
+            })
+          ) : (
+            <div className="rounded-2xl border border-dashed border-border px-4 py-8 text-sm text-muted-foreground">
+              No sections match this search yet.
+            </div>
+          )}
+        </div>
+      </CardContent>
+    </Card>
+  );
+}
+
 export function ContentDashboardClient({
   initialBlocks,
   initialSelectedKey,
@@ -129,6 +294,7 @@ export function ContentDashboardClient({
   const deferredSearch = useDeferredValue(search.trim().toLowerCase());
   const [notice, setNotice] = useState<DashboardNotice>(null);
   const [isPending, startTransition] = useTransition();
+  const [isMobileSectionsOpen, setIsMobileSectionsOpen] = useState(false);
 
   const selectedBlock = useMemo(
     () => blocks.find((block) => block.key === selectedKey) ?? blocks[0],
@@ -243,7 +409,38 @@ export function ContentDashboardClient({
     setSelectedKey(block.key);
     setDraft(createStructuredContentDraft(block));
     setNotice(null);
+    setIsMobileSectionsOpen(false);
   }
+
+  useEffect(() => {
+    if (!isMobileSectionsOpen) {
+      return;
+    }
+
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        setIsMobileSectionsOpen(false);
+      }
+    };
+
+    const handleResize = () => {
+      if (window.innerWidth >= 1280) {
+        setIsMobileSectionsOpen(false);
+      }
+    };
+
+    document.addEventListener("keydown", handleKeyDown);
+    window.addEventListener("resize", handleResize);
+
+    return () => {
+      document.body.style.overflow = previousOverflow;
+      document.removeEventListener("keydown", handleKeyDown);
+      window.removeEventListener("resize", handleResize);
+    };
+  }, [isMobileSectionsOpen]);
 
   async function refreshBlocks(nextSelectedKey = selectedKey) {
     const nextBlocks = await requestBlocks();
@@ -423,132 +620,86 @@ export function ContentDashboardClient({
 
   return (
     <section className="grid gap-5 xl:grid-cols-[20rem_minmax(0,1fr)]">
-      <Card className="rounded-2xl bg-white/84 xl:sticky xl:top-6 xl:h-[calc(100vh-10rem)]">
-        <CardHeader className="border-b border-border/70 pb-3">
-          <div className="flex items-center justify-between gap-2">
-            <div className="flex items-center gap-2">
-              <LayoutPanelTopIcon className="size-4 text-muted-foreground" />
-              <CardTitle>Sections</CardTitle>
-            </div>
-            <Badge variant="outline">{blocks.length}</Badge>
-          </div>
-        </CardHeader>
-        <CardContent className="flex min-h-0 flex-1 flex-col gap-3 pt-3">
-          <div className="relative">
-            <SearchIcon className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
-            <Input
-              value={search}
-              onChange={(event) => setSearch(event.target.value)}
-              placeholder="Search sections..."
-              className="pl-9"
+      {isMobileSectionsOpen ? (
+        <div className="fixed inset-0 z-50 xl:hidden">
+          <button
+            type="button"
+            aria-label="Close sections menu"
+            className="absolute inset-0 bg-black/35 backdrop-blur-[6px]"
+            onClick={() => setIsMobileSectionsOpen(false)}
+          />
+          <div
+            id="dashboard-sections-menu"
+            role="dialog"
+            aria-modal="true"
+            aria-label="Dashboard sections"
+            className="absolute inset-y-3 right-3 w-[min(calc(100vw-1.5rem),22rem)]"
+          >
+            <SectionsNavigationPanel
+              blockCount={blocks.length}
+              search={search}
+              onSearchChange={setSearch}
+              groupedBlocks={groupedBlocks}
+              deferredSearch={deferredSearch}
+              openGroups={openGroups}
+              selectedKey={selectedKey}
+              onToggleGroup={toggleGroup}
+              onSelectBlock={selectBlock}
+              className="h-full rounded-[1.6rem] bg-white/96 shadow-[0_28px_90px_rgba(15,23,42,0.18)]"
+              headerAction={
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="icon-sm"
+                  aria-label="Close sections menu"
+                  onClick={() => setIsMobileSectionsOpen(false)}
+                >
+                  <XIcon />
+                </Button>
+              }
             />
           </div>
+        </div>
+      ) : null}
 
-          <div className="-mx-1 grid gap-2 overflow-y-auto px-1 pb-2">
-            {groupedBlocks.length ? (
-              groupedBlocks.map(([group, groupBlocks]) => {
-                const isOpen = deferredSearch.length > 0 || openGroups.has(group);
-                const GroupIcon = GROUP_ICONS[group] ?? FolderIcon;
-                const hasSelected = groupBlocks.some(
-                  (block) => block.key === selectedKey,
-                );
-
-                return (
-                  <div
-                    key={group}
-                    className={cn(
-                      "overflow-hidden rounded-xl border bg-white/70 transition",
-                      hasSelected
-                        ? "border-foreground/15 shadow-[0_4px_14px_rgba(15,23,42,0.05)]"
-                        : "border-border/70",
-                    )}
-                  >
-                    <button
-                      type="button"
-                      onClick={() => toggleGroup(group)}
-                      aria-expanded={isOpen ? "true" : "false"}
-                      className="flex w-full items-center justify-between gap-2 px-3 py-2.5 text-left transition hover:bg-background/80"
-                    >
-                      <div className="flex min-w-0 items-center gap-2">
-                        <GroupIcon className="size-4 shrink-0 text-muted-foreground" />
-                        <span className="truncate text-sm font-semibold text-foreground">
-                          {GROUP_LABELS[group] ?? group}
-                        </span>
-                        <Badge variant="outline" className="shrink-0">
-                          {groupBlocks.length}
-                        </Badge>
-                      </div>
-                      <ChevronDownIcon
-                        className={cn(
-                          "size-4 shrink-0 text-muted-foreground transition-transform duration-200",
-                          isOpen && "rotate-180",
-                        )}
-                      />
-                    </button>
-
-                    {isOpen ? (
-                      <div className="grid gap-1 border-t border-border/60 bg-background/40 p-1.5">
-                        {groupBlocks.map((block) => {
-                          const definition = getSectionDefinition(block.key);
-                          const isSelected = block.key === selectedKey;
-
-                          return (
-                            <button
-                              key={block.key}
-                              type="button"
-                              onClick={() => selectBlock(block)}
-                              className={cn(
-                                "group flex items-start gap-2.5 rounded-lg px-2.5 py-2 text-left transition",
-                                isSelected
-                                  ? "bg-foreground text-background shadow-sm"
-                                  : "hover:bg-white",
-                              )}
-                            >
-                              <div className="min-w-0 flex-1">
-                                <div className="flex items-center gap-1.5">
-                                  <p className="truncate text-sm font-medium">
-                                    {definition.label}
-                                  </p>
-                                </div>
-                                <p
-                                  className={cn(
-                                    "mt-0.5 line-clamp-1 text-xs leading-5",
-                                    isSelected
-                                      ? "text-background/70"
-                                      : "text-muted-foreground",
-                                  )}
-                                >
-                                  {definition.description}
-                                </p>
-                              </div>
-                              <span
-                                className={cn(
-                                  "mt-0.5 inline-flex h-5 min-w-5 shrink-0 items-center justify-center rounded-full px-1.5 text-[10px] font-semibold",
-                                  isSelected
-                                    ? "bg-background/20 text-background"
-                                    : "bg-muted text-muted-foreground",
-                                )}
-                              >
-                                {countBlockItems(block)}
-                              </span>
-                            </button>
-                          );
-                        })}
-                      </div>
-                    ) : null}
-                  </div>
-                );
-              })
-            ) : (
-              <div className="rounded-2xl border border-dashed border-border px-4 py-8 text-sm text-muted-foreground">
-                No sections match this search yet.
-              </div>
-            )}
-          </div>
-        </CardContent>
-      </Card>
+      <SectionsNavigationPanel
+        blockCount={blocks.length}
+        search={search}
+        onSearchChange={setSearch}
+        groupedBlocks={groupedBlocks}
+        deferredSearch={deferredSearch}
+        openGroups={openGroups}
+        selectedKey={selectedKey}
+        onToggleGroup={toggleGroup}
+        onSelectBlock={selectBlock}
+        className="hidden xl:sticky xl:top-6 xl:flex xl:h-[calc(100vh-10rem)]"
+      />
 
       <div className="grid gap-4">
+        <div className="xl:hidden">
+          <div className="flex items-center justify-between gap-3 rounded-[1.35rem] border border-border/70 bg-white/88 px-4 py-3 shadow-[0_12px_30px_rgba(15,23,42,0.06)] backdrop-blur-sm">
+            <div className="min-w-0">
+              <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
+                Sections
+              </p>
+              <p className="truncate text-sm font-semibold text-foreground">
+                {selectedDefinition.label}
+              </p>
+            </div>
+            <Button
+              type="button"
+              variant="outline"
+              size="icon"
+              aria-label="Open sections menu"
+              aria-expanded={isMobileSectionsOpen}
+              aria-controls="dashboard-sections-menu"
+              onClick={() => setIsMobileSectionsOpen(true)}
+              className="shrink-0 rounded-full"
+            >
+              <MenuIcon />
+            </Button>
+          </div>
+        </div>
         <Card className="rounded-2xl bg-white/88">
           <CardHeader className="border-b border-border/70">
             <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">

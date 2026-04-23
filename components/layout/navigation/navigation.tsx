@@ -1,6 +1,6 @@
 "use client";
 
-import { motion } from "framer-motion";
+import { AnimatePresence, motion } from "framer-motion";
 import { PhoneCall } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -39,10 +39,12 @@ function resolveCTAIcon(config: CTAConfig) {
 export const Navigation = ({ content = navigationConfig }: NavigationProps) => {
   const pathname = usePathname();
   const navbarRef = useRef<HTMLElement>(null);
+  const mobileTooltipTimeoutRef = useRef<number | null>(null);
   const [hovered, setHovered] = useState(false);
   const [mouseX, setMouseX] = useState<number | null>(null);
   const [itemCenters, setItemCenters] = useState<Record<string, number>>({});
   const [activeSectionId, setActiveSectionId] = useState("home");
+  const [mobileTooltipId, setMobileTooltipId] = useState<string | null>(null);
 
   const { items } = content;
   const ctas = content.ctas.map((cta) => ({
@@ -104,6 +106,16 @@ export const Navigation = ({ content = navigationConfig }: NavigationProps) => {
 
   const handleNavClick = useCallback(
     (event: ReactMouseEvent<HTMLAnchorElement>, item: NavItemConfig) => {
+      if (mobileTooltipTimeoutRef.current !== null) {
+        window.clearTimeout(mobileTooltipTimeoutRef.current);
+      }
+
+      setMobileTooltipId(item.id);
+      mobileTooltipTimeoutRef.current = window.setTimeout(() => {
+        setMobileTooltipId((current) => (current === item.id ? null : current));
+        mobileTooltipTimeoutRef.current = null;
+      }, 2000);
+
       if (!isHomePage || !item.sectionId) {
         return;
       }
@@ -114,6 +126,14 @@ export const Navigation = ({ content = navigationConfig }: NavigationProps) => {
     },
     [isHomePage, scrollToSection],
   );
+
+  useEffect(() => {
+    return () => {
+      if (mobileTooltipTimeoutRef.current !== null) {
+        window.clearTimeout(mobileTooltipTimeoutRef.current);
+      }
+    };
+  }, []);
 
   const syncItemCenters = useCallback(() => {
     const navbar = navbarRef.current;
@@ -343,40 +363,50 @@ export const Navigation = ({ content = navigationConfig }: NavigationProps) => {
                       itemIsActive ? "text-text-primary" : "hover:text-text-primary",
                     )}
                   >
-                    {itemIsActive ? (
-                      <motion.span
-                        layoutId="mobile-nav-active-pill"
-                        className={cn(
-                          "pointer-events-none absolute bottom-full z-[3] mb-3 inline-flex min-h-10 items-center justify-center rounded-full px-4 py-2",
-                          index === 0
-                            ? "left-0"
-                            : index === items.length - 1
-                              ? "right-0"
-                              : "left-1/2 -translate-x-1/2",
-                        )}
-                        transition={{ type: "spring", stiffness: 380, damping: 30 }}
-                      >
-                        <span className="absolute inset-0 rounded-full border border-accent/16 bg-white/94 shadow-[0_12px_28px_rgba(88,28,135,0.08)] backdrop-blur-md" />
-                        <span
-                          aria-hidden
-                          className="absolute inset-px rounded-full bg-[linear-gradient(180deg,rgba(255,255,255,0.96)_0%,rgba(255,255,255,0.82)_100%)]"
-                        />
-                        <span
-                          aria-hidden
+                    <AnimatePresence>
+                      {mobileTooltipId === item.id ? (
+                        <motion.span
+                          layoutId="mobile-nav-active-pill"
+                          initial={{ opacity: 0, y: 8, scale: 0.96 }}
+                          animate={{ opacity: 1, y: 0, scale: 1 }}
+                          exit={{
+                            opacity: 0,
+                            y: -6,
+                            scale: 0.97,
+                            transition: { duration: 0.22, ease: "easeOut" },
+                          }}
                           className={cn(
-                            "absolute -bottom-1.5 h-3.5 w-3.5 rotate-45 rounded-[4px] border-r border-b border-accent/16 bg-white/92",
+                            "pointer-events-none absolute bottom-full z-[3] mb-3 inline-flex min-h-10 items-center justify-center rounded-full px-4 py-2",
                             index === 0
-                              ? "left-7"
+                              ? "left-0"
                               : index === items.length - 1
-                                ? "right-7"
+                                ? "right-0"
                                 : "left-1/2 -translate-x-1/2",
                           )}
-                        />
-                        <span className="relative z-[1] whitespace-nowrap text-[13px] font-semibold tracking-tight text-text-primary">
-                          {item.label}
-                        </span>
-                      </motion.span>
-                    ) : null}
+                          transition={{ type: "spring", stiffness: 380, damping: 30 }}
+                        >
+                          <span className="absolute inset-0 rounded-full border border-accent/16 bg-white/94 shadow-[0_12px_28px_rgba(88,28,135,0.08)] backdrop-blur-md" />
+                          <span
+                            aria-hidden
+                            className="absolute inset-px rounded-full bg-[linear-gradient(180deg,rgba(255,255,255,0.96)_0%,rgba(255,255,255,0.82)_100%)]"
+                          />
+                          <span
+                            aria-hidden
+                            className={cn(
+                              "absolute -bottom-1.5 h-3.5 w-3.5 rotate-45 rounded-[4px] border-r border-b border-accent/16 bg-white/92",
+                              index === 0
+                                ? "left-7"
+                                : index === items.length - 1
+                                  ? "right-7"
+                                  : "left-1/2 -translate-x-1/2",
+                            )}
+                          />
+                          <span className="relative z-[1] whitespace-nowrap text-[13px] font-semibold tracking-tight text-text-primary">
+                            {item.label}
+                          </span>
+                        </motion.span>
+                      ) : null}
+                    </AnimatePresence>
 
                     <motion.span
                       className={cn(
