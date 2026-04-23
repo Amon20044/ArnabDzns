@@ -5,7 +5,7 @@ import { getPageMetadata } from "@/lib/seo";
 import { getPageJsonLd } from "@/lib/structured-data";
 
 export const metadata = getPageMetadata("contact");
-export const revalidate = 3600;
+export const revalidate = 300;
 export const runtime = "nodejs";
 
 export default async function ContactPage() {

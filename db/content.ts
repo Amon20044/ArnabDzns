@@ -44,7 +44,7 @@ import {
 } from "./models/content-block";
 
 const CONTENT_REVALIDATE_SECONDS = Number(
-  process.env.CONTENT_REVALIDATE_SECONDS ?? 3600,
+  process.env.CONTENT_REVALIDATE_SECONDS ?? 300,
 );
 
 export type ContentBlockRecord = ContentBlockSeed & {

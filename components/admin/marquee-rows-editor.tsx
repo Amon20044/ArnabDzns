@@ -322,66 +322,89 @@ function MarqueeImageTile({
   onMoveDown: () => void;
   onRemove: () => void;
 }) {
-  return (
-    <div
-      className={cn(
-        "w-full max-w-[13.5rem] shrink-0 rounded-[1.55rem] border border-black/6 bg-white/90 p-3 shadow-[0_14px_34px_rgba(15,23,42,0.06)]",
-        type === "clients" ? "md:max-w-[12rem]" : "md:max-w-[13.5rem]",
-      )}
-    >
-      <MarqueeAssetPreview item={item} type={type} />
+  const label = resolveItemLabel(item, `Image ${index + 1}`);
+  const subtitle = resolveItemSubtitle(item);
+  const ClientIcon =
+    item.icon && !item.src ? CLIENT_ICON_REGISTRY[item.icon] : undefined;
+  const aspectClass = type === "clients" ? "aspect-[4/3]" : "aspect-[16/9]";
 
-      <div className="mt-3 grid gap-2">
-        <div className="flex items-start justify-between gap-2">
-          <div className="min-w-0">
-            <p className="truncate text-sm font-semibold text-foreground">
-              {resolveItemLabel(item, `Image ${index + 1}`)}
-            </p>
-            <p className="line-clamp-2 text-xs leading-5 text-muted-foreground">
-              {resolveItemSubtitle(item)}
-            </p>
+  return (
+    <div className="group relative flex flex-col overflow-hidden rounded-2xl border border-black/10 bg-white shadow-[0_6px_18px_rgba(15,23,42,0.05)] transition hover:shadow-[0_10px_28px_rgba(15,23,42,0.08)]">
+      <div className={cn("relative w-full overflow-hidden bg-slate-100", aspectClass)}>
+        {item.src ? (
+          <Image
+            src={item.src}
+            alt={item.alt ?? label}
+            fill
+            sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 220px"
+            className={type === "clients" ? "object-contain p-4" : "object-cover"}
+          />
+        ) : ClientIcon ? (
+          <div className="flex h-full w-full items-center justify-center p-5">
+            <ClientIcon
+              className="h-3/4 w-3/4"
+              style={{ color: item.iconColor ?? "currentColor" }}
+            />
           </div>
-          <Badge variant={item.alt ? "success" : "warning"}>
+        ) : (
+          <div className="flex h-full w-full items-center justify-center px-3 text-center text-xs font-semibold uppercase tracking-[0.14em] text-slate-500">
+            {label}
+          </div>
+        )}
+
+        <div className="pointer-events-none absolute left-2 top-2">
+          <Badge
+            variant={item.alt ? "success" : "warning"}
+            className="pointer-events-auto shadow-sm"
+          >
             {item.alt ? "Alt ready" : "Add alt"}
           </Badge>
         </div>
 
-        <div className="flex flex-wrap gap-2">
-          <Button type="button" size="sm" variant="outline" onClick={onEdit}>
-            <PencilLineIcon />
-            Edit
-          </Button>
-          <Button type="button" size="sm" variant="outline" onClick={onReplace}>
-            <ImagePlusIcon />
-            Replace
-          </Button>
-          <Button
-            type="button"
-            size="icon-sm"
-            variant="outline"
-            disabled={!canMoveUp}
-            onClick={onMoveUp}
-          >
-            <ArrowUpIcon />
-          </Button>
-          <Button
-            type="button"
-            size="icon-sm"
-            variant="outline"
-            disabled={!canMoveDown}
-            onClick={onMoveDown}
-          >
-            <ArrowDownIcon />
-          </Button>
-          <Button
-            type="button"
-            size="icon-sm"
-            variant="destructive"
-            onClick={onRemove}
-          >
-            <Trash2Icon />
-          </Button>
+        <div className="pointer-events-none absolute inset-x-0 bottom-0 flex items-end justify-center bg-gradient-to-t from-black/65 via-black/25 to-transparent p-2 opacity-0 transition-opacity duration-150 group-hover:opacity-100 group-focus-within:opacity-100">
+          <div className="pointer-events-auto flex flex-wrap items-center justify-center gap-1.5">
+            <Button type="button" size="icon-sm" variant="secondary" onClick={onEdit} title="Edit SEO">
+              <PencilLineIcon />
+            </Button>
+            <Button type="button" size="icon-sm" variant="secondary" onClick={onReplace} title="Replace">
+              <ImagePlusIcon />
+            </Button>
+            <Button
+              type="button"
+              size="icon-sm"
+              variant="secondary"
+              disabled={!canMoveUp}
+              onClick={onMoveUp}
+              title="Move up"
+            >
+              <ArrowUpIcon />
+            </Button>
+            <Button
+              type="button"
+              size="icon-sm"
+              variant="secondary"
+              disabled={!canMoveDown}
+              onClick={onMoveDown}
+              title="Move down"
+            >
+              <ArrowDownIcon />
+            </Button>
+            <Button
+              type="button"
+              size="icon-sm"
+              variant="destructive"
+              onClick={onRemove}
+              title="Remove"
+            >
+              <Trash2Icon />
+            </Button>
+          </div>
         </div>
+      </div>
+
+      <div className="grid gap-0.5 px-3 py-2">
+        <p className="truncate text-sm font-semibold text-foreground">{label}</p>
+        <p className="truncate text-xs leading-5 text-muted-foreground">{subtitle}</p>
       </div>
     </div>
   );
@@ -776,7 +799,7 @@ export function MarqueeRowsEditor({
                       </div>
                     </div>
 
-                    <div className="flex flex-wrap gap-3">
+                    <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
                       {row.images.map((item, itemIndex) => (
                         <MarqueeImageTile
                           key={item.id ?? `${rowIndex}-${itemIndex}`}
@@ -816,17 +839,24 @@ export function MarqueeRowsEditor({
                       <button
                         type="button"
                         onClick={() => openPicker(rowIndex)}
-                        className="flex min-h-[17rem] w-full max-w-[13.5rem] shrink-0 flex-col items-center justify-center gap-3 rounded-[1.6rem] border border-dashed border-black/15 bg-[linear-gradient(180deg,rgba(255,255,255,0.72)_0%,rgba(241,245,249,0.92)_100%)] px-5 text-center text-sm transition hover:border-foreground/20 hover:bg-white md:max-w-[13.5rem]"
+                        className="group flex flex-col overflow-hidden rounded-2xl border-2 border-dashed border-black/15 bg-white/60 text-left transition hover:border-foreground/40 hover:bg-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-foreground/30"
                       >
-                        <div className="flex size-12 items-center justify-center rounded-full bg-black text-white">
-                          <PlusIcon className="size-5" />
+                        <div
+                          className={cn(
+                            "flex w-full items-center justify-center bg-slate-50 transition group-hover:bg-slate-100",
+                            type === "clients" ? "aspect-[4/3]" : "aspect-[16/9]",
+                          )}
+                        >
+                          <div className="flex size-11 items-center justify-center rounded-full bg-black text-white shadow-sm transition group-hover:scale-105">
+                            <PlusIcon className="size-5" />
+                          </div>
                         </div>
-                        <div className="grid gap-1">
-                          <p className="font-semibold text-foreground">
+                        <div className="grid gap-0.5 px-3 py-2">
+                          <p className="truncate text-sm font-semibold text-foreground">
                             {type === "clients" ? "Add logo" : "Add image"}
                           </p>
-                          <p className="text-muted-foreground">
-                            Upload to ImgBB or reuse an existing marquee asset.
+                          <p className="truncate text-xs leading-5 text-muted-foreground">
+                            Upload to ImgBB or reuse from library.
                           </p>
                         </div>
                       </button>

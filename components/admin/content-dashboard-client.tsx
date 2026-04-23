@@ -2,15 +2,22 @@
 
 import {
   AlertCircleIcon,
+  ChevronDownIcon,
+  CompassIcon,
   DatabaseIcon,
+  FolderIcon,
+  GlobeIcon,
+  HomeIcon,
   LayoutPanelTopIcon,
+  MailIcon,
   RefreshCcwIcon,
   SaveIcon,
   SearchIcon,
   ShieldCheckIcon,
   Trash2Icon,
+  type LucideIcon,
 } from "lucide-react";
-import { useDeferredValue, useMemo, useState, useTransition } from "react";
+import { useDeferredValue, useEffect, useMemo, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -36,6 +43,13 @@ const GROUP_LABELS: Record<string, string> = {
   navigation: "Navigation",
   home: "Home",
   contact: "Contact",
+};
+
+const GROUP_ICONS: Record<string, LucideIcon> = {
+  site: GlobeIcon,
+  navigation: CompassIcon,
+  home: HomeIcon,
+  contact: MailIcon,
 };
 
 type DashboardNotice =
@@ -113,6 +127,39 @@ export function ContentDashboardClient({
     () => blocks.find((block) => block.key === selectedKey) ?? blocks[0],
     [blocks, selectedKey],
   );
+
+  const [openGroups, setOpenGroups] = useState<Set<string>>(() => {
+    const initialGroup = initialBlocks.find(
+      (block) => block.key === getInitialSelectedKey(initialBlocks, initialSelectedKey),
+    )?.group;
+    return new Set(initialGroup ? [initialGroup] : []);
+  });
+
+  useEffect(() => {
+    if (!selectedBlock) {
+      return;
+    }
+    setOpenGroups((prev) => {
+      if (prev.has(selectedBlock.group)) {
+        return prev;
+      }
+      const next = new Set(prev);
+      next.add(selectedBlock.group);
+      return next;
+    });
+  }, [selectedBlock?.group]);
+
+  function toggleGroup(group: string) {
+    setOpenGroups((prev) => {
+      const next = new Set(prev);
+      if (next.has(group)) {
+        next.delete(group);
+      } else {
+        next.add(group);
+      }
+      return next;
+    });
+  }
 
   const filteredBlocks = useMemo(() => {
     if (!deferredSearch) {
@@ -325,16 +372,16 @@ export function ContentDashboardClient({
   return (
     <section className="grid gap-5 xl:grid-cols-[20rem_minmax(0,1fr)]">
       <Card className="rounded-2xl bg-white/84 xl:sticky xl:top-6 xl:h-[calc(100vh-10rem)]">
-        <CardHeader className="border-b border-border/70">
-          <div className="flex items-center gap-2">
-            <LayoutPanelTopIcon className="size-4 text-muted-foreground" />
-            <CardTitle>Sections</CardTitle>
+        <CardHeader className="border-b border-border/70 pb-3">
+          <div className="flex items-center justify-between gap-2">
+            <div className="flex items-center gap-2">
+              <LayoutPanelTopIcon className="size-4 text-muted-foreground" />
+              <CardTitle>Sections</CardTitle>
+            </div>
+            <Badge variant="outline">{blocks.length}</Badge>
           </div>
-          <p className="text-sm text-muted-foreground">
-            Search by section, group, or label and jump straight into editing.
-          </p>
         </CardHeader>
-        <CardContent className="flex h-full flex-col gap-4 pt-4">
+        <CardContent className="flex min-h-0 flex-1 flex-col gap-3 pt-3">
           <div className="relative">
             <SearchIcon className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
             <Input
@@ -345,62 +392,101 @@ export function ContentDashboardClient({
             />
           </div>
 
-          <div className="grid gap-4 overflow-y-auto pr-1">
+          <div className="-mx-1 grid gap-2 overflow-y-auto px-1 pb-2">
             {groupedBlocks.length ? (
-              groupedBlocks.map(([group, groupBlocks]) => (
-                <div key={group} className="grid gap-2">
-                  <div className="flex items-center justify-between">
-                    <p className="text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground">
-                      {GROUP_LABELS[group] ?? group}
-                    </p>
-                    <Badge variant="outline">{groupBlocks.length}</Badge>
-                  </div>
-                  {groupBlocks.map((block) => {
-                    const definition = getSectionDefinition(block.key);
-                    const isSelected = block.key === selectedKey;
+              groupedBlocks.map(([group, groupBlocks]) => {
+                const isOpen = deferredSearch.length > 0 || openGroups.has(group);
+                const GroupIcon = GROUP_ICONS[group] ?? FolderIcon;
+                const hasSelected = groupBlocks.some(
+                  (block) => block.key === selectedKey,
+                );
 
-                    return (
-                      <button
-                        key={block.key}
-                        type="button"
-                        onClick={() => selectBlock(block)}
+                return (
+                  <div
+                    key={group}
+                    className={cn(
+                      "overflow-hidden rounded-xl border bg-white/70 transition",
+                      hasSelected
+                        ? "border-foreground/15 shadow-[0_4px_14px_rgba(15,23,42,0.05)]"
+                        : "border-border/70",
+                    )}
+                  >
+                    <button
+                      type="button"
+                      onClick={() => toggleGroup(group)}
+                      aria-expanded={isOpen ? "true" : "false"}
+                      className="flex w-full items-center justify-between gap-2 px-3 py-2.5 text-left transition hover:bg-background/80"
+                    >
+                      <div className="flex min-w-0 items-center gap-2">
+                        <GroupIcon className="size-4 shrink-0 text-muted-foreground" />
+                        <span className="truncate text-sm font-semibold text-foreground">
+                          {GROUP_LABELS[group] ?? group}
+                        </span>
+                        <Badge variant="outline" className="shrink-0">
+                          {groupBlocks.length}
+                        </Badge>
+                      </div>
+                      <ChevronDownIcon
                         className={cn(
-                          "rounded-2xl border px-3 py-3 text-left transition",
-                          isSelected
-                            ? "border-primary bg-primary text-primary-foreground shadow-lg shadow-black/10"
-                            : "border-border bg-background/70 hover:border-foreground/15 hover:bg-background",
+                          "size-4 shrink-0 text-muted-foreground transition-transform duration-200",
+                          isOpen && "rotate-180",
                         )}
-                      >
-                        <div className="flex items-start justify-between gap-3">
-                          <div>
-                            <p className="text-sm font-semibold">{definition.label}</p>
-                            <p
+                      />
+                    </button>
+
+                    {isOpen ? (
+                      <div className="grid gap-1 border-t border-border/60 bg-background/40 p-1.5">
+                        {groupBlocks.map((block) => {
+                          const definition = getSectionDefinition(block.key);
+                          const isSelected = block.key === selectedKey;
+
+                          return (
+                            <button
+                              key={block.key}
+                              type="button"
+                              onClick={() => selectBlock(block)}
                               className={cn(
-                                "mt-1 text-xs leading-5",
-                                isSelected ? "text-primary-foreground/75" : "text-muted-foreground",
+                                "group flex items-start gap-2.5 rounded-lg px-2.5 py-2 text-left transition",
+                                isSelected
+                                  ? "bg-foreground text-background shadow-sm"
+                                  : "hover:bg-white",
                               )}
                             >
-                              {definition.description}
-                            </p>
-                          </div>
-                          <Badge variant={isSelected ? "secondary" : "outline"}>
-                            {countBlockItems(block)}
-                          </Badge>
-                        </div>
-                        <div
-                          className={cn(
-                            "mt-3 flex flex-wrap gap-2 text-[11px] uppercase tracking-[0.12em]",
-                            isSelected ? "text-primary-foreground/75" : "text-muted-foreground",
-                          )}
-                        >
-                          <span>{block.kind}</span>
-                          <span>{block.source}</span>
-                        </div>
-                      </button>
-                    );
-                  })}
-                </div>
-              ))
+                              <div className="min-w-0 flex-1">
+                                <div className="flex items-center gap-1.5">
+                                  <p className="truncate text-sm font-medium">
+                                    {definition.label}
+                                  </p>
+                                </div>
+                                <p
+                                  className={cn(
+                                    "mt-0.5 line-clamp-1 text-xs leading-5",
+                                    isSelected
+                                      ? "text-background/70"
+                                      : "text-muted-foreground",
+                                  )}
+                                >
+                                  {definition.description}
+                                </p>
+                              </div>
+                              <span
+                                className={cn(
+                                  "mt-0.5 inline-flex h-5 min-w-5 shrink-0 items-center justify-center rounded-full px-1.5 text-[10px] font-semibold",
+                                  isSelected
+                                    ? "bg-background/20 text-background"
+                                    : "bg-muted text-muted-foreground",
+                                )}
+                              >
+                                {countBlockItems(block)}
+                              </span>
+                            </button>
+                          );
+                        })}
+                      </div>
+                    ) : null}
+                  </div>
+                );
+              })
             ) : (
               <div className="rounded-2xl border border-dashed border-border px-4 py-8 text-sm text-muted-foreground">
                 No sections match this search yet.
