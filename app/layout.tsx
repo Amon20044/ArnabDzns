@@ -2,7 +2,6 @@ import type { CSSProperties } from "react";
 import "locomotive-scroll/locomotive-scroll.css";
 import { IridescenceBackground } from "@/components/background/iridescence";
 import { RouteAwareSiteFrame } from "@/components/layout/route-aware-site-frame";
-import { ProfileBioContent } from "@/components/layout/navigation/profile-bio-content";
 import { LocomotiveScrollProvider } from "@/components/providers/locomotive-scroll-provider";
 import { StructuredData } from "@/components/site/structured-data";
 import { LiquidGlassDefs } from "@/components/ui/liquid-glass-defs";
@@ -45,7 +44,6 @@ export default async function RootLayout({
             header={content.header}
             navigation={content.navigation}
             site={content.site}
-            profileBioContent={<ProfileBioContent />}
           >
             {children}
           </RouteAwareSiteFrame>

@@ -306,9 +306,21 @@ export function AboutPage({
                 designation={content.intro.role}
                 status="available"
                 rows={[
-                  { label: ["Upcoming", "Projects"], value: "02" },
-                  { label: ["Ongoing", "Projects"], value: "02" },
-                  { label: ["Shipped", "Projects"], value: "02" },
+                  {
+                    label: ["Upcoming", "Projects"],
+                    value: "02",
+                    labelHighlightColor: "#fef9c3",
+                  },
+                  {
+                    label: ["Ongoing", "Projects"],
+                    value: "02",
+                    labelHighlightColor: "#fce7f3",
+                  },
+                  {
+                    label: ["Shipped", "Projects"],
+                    value: "02",
+                    labelHighlightColor: "#dcfce7",
+                  },
                 ]}
                 className="w-full max-w-[22rem] sm:max-w-[24rem]"
               />

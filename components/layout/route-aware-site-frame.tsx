@@ -12,22 +12,18 @@ export function RouteAwareSiteFrame({
   header,
   navigation,
   site,
-  profileBioContent,
 }: Readonly<{
   children: React.ReactNode;
   header: HeaderConfig;
   navigation: NavigationConfig;
   site: SiteConfig;
-  profileBioContent: React.ReactNode;
 }>) {
   const pathname = usePathname();
   const hideChrome = shouldHideSiteChrome(pathname);
 
   return (
     <>
-      {hideChrome ? null : (
-        <Header content={header} profileBioContent={profileBioContent} />
-      )}
+      {hideChrome ? null : <Header content={header} />}
       <div className={cn("flex flex-1 flex-col", hideChrome ? "" : "pt-24")}>
         {children}
       </div>
