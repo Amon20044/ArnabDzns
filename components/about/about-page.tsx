@@ -5,6 +5,7 @@ import { ArrowUpRight, CalendarClock, Mail } from "lucide-react";
 import { Hero } from "@/components/sections/hero";
 import { PrimaryButton } from "@/components/ui/primary-button";
 import { Icon } from "@/components/ui/icon";
+import { ProfileCard } from "@/components/ui/profile-card";
 import { StatusBadge } from "@/components/ui/status-badge";
 import { Heading, Text } from "@/components/ui/typography";
 import {
@@ -17,11 +18,6 @@ import {
 import { cn } from "@/lib/utils";
 import type { SiteConfig } from "@/types";
 import { siteConfig } from "@/data/site";
-
-const introStripedBackground: CSSProperties = {
-  backgroundImage:
-    "repeating-linear-gradient(135deg, rgba(168,85,247,0.08) 0px, rgba(168,85,247,0.08) 12px, rgba(255,255,255,0.62) 12px, rgba(255,255,255,0.62) 28px)",
-};
 
 const softSurfaceGradient: CSSProperties = {
   background:
@@ -301,53 +297,21 @@ export function AboutPage({
 
           <IntroBadgeRow badges={content.intro.badges} />
 
-          <div className="mt-8 grid gap-6 xl:grid-cols-[minmax(0,0.95fr)_minmax(0,1.18fr)]">
-            <div className="relative flex min-h-[26rem] flex-col overflow-hidden rounded-[2rem] border border-white/80 p-4 shadow-[0_24px_64px_rgba(168,85,247,0.10)] sm:p-6">
-              <div
-                aria-hidden
-                className="absolute inset-0 opacity-95"
-                style={introStripedBackground}
+          <div className="mt-8 grid gap-6 xl:grid-cols-[minmax(0,0.95fr)_minmax(0,1.18fr)] xl:items-center">
+            <div className="flex justify-center xl:justify-start">
+              <ProfileCard
+                imageSrc="/Arnab.svg"
+                imageAlt={`Illustration of ${content.intro.name}`}
+                name={content.intro.name}
+                designation={content.intro.role}
+                status="available"
+                rows={[
+                  { label: ["Upcoming", "Projects"], value: "02" },
+                  { label: ["Ongoing", "Projects"], value: "02" },
+                  { label: ["Shipped", "Projects"], value: "02" },
+                ]}
+                className="w-full max-w-[22rem] sm:max-w-[24rem]"
               />
-              <div className="pointer-events-none absolute inset-0 max-md:hidden bg-[radial-gradient(circle_at_30%_20%,rgba(255,255,255,0.55),transparent_22%),radial-gradient(circle_at_70%_70%,rgba(168,85,247,0.14),transparent_24%)]" />
-
-              <div className="relative z-[1]">
-                <span className="inline-flex rounded-full border border-white/70 bg-white/85 px-4 py-2 text-[11px] font-semibold uppercase tracking-[0.18em] text-accent-dark shadow-[0_10px_26px_rgba(168,85,247,0.08)]">
-                  {content.intro.portraitEyebrow}
-                </span>
-              </div>
-
-              <div className="relative z-[1] flex flex-1 items-center justify-center py-8">
-                <div className="absolute size-[78%] rounded-full border border-dashed border-accent/20" />
-                <div className="relative flex size-[clamp(12rem,30vw,16rem)] items-center justify-center rounded-full bg-[radial-gradient(circle_at_30%_24%,rgba(255,255,255,0.92)_0%,rgba(233,213,255,0.96)_34%,rgba(192,132,252,0.92)_68%,rgba(168,85,247,0.92)_100%)] shadow-[0_32px_70px_rgba(168,85,247,0.28)]">
-                  <span className="font-secondary text-[clamp(2.7rem,8vw,4.4rem)] italic leading-none tracking-[-0.06em] text-accent-dark">
-                    hi!
-                  </span>
-                </div>
-              </div>
-
-              <div
-                className="relative z-[1] rounded-[1.6rem] border border-white/80 bg-white/92 px-5 py-5 shadow-[0_20px_50px_rgba(88,28,135,0.10)] sm:px-6"
-                style={softSurfaceGradient}
-              >
-                <div className="flex flex-wrap items-end justify-between gap-4">
-                  <div>
-                    <Heading variant="h4" as="h2">
-                      {content.intro.name}
-                    </Heading>
-                    <Text variant="p3" className="mt-1">
-                      {content.intro.role} | {content.intro.location}
-                    </Text>
-                  </div>
-
-                  <Text
-                    as="span"
-                    variant="p3"
-                    className="uppercase tracking-[0.16em] text-text-secondary/78"
-                  >
-                    {content.intro.sinceLabel}
-                  </Text>
-                </div>
-              </div>
             </div>
 
             <article
