@@ -1,17 +1,11 @@
 import type { ImageMarqueeRow } from "@/components/ui/image-marquee";
-import {
-  contactPageContent,
-  defaultContentBlockMap,
-  defaultHomeContent,
-  defaultLayoutContent,
-  type ContactPageContent,
-} from "@/db/content-defaults";
 import type { ContentBlockRecord, ContentBlockUpdate } from "@/db/content";
 import type {
   ContentBlockKey,
   ContentBlockSeed,
   ContentImage,
 } from "@/db/models/content-block";
+import type { ContactPageContent } from "@/data/contact-page";
 import type {
   BookCallSectionConfig,
   CTAConfig,
@@ -113,51 +107,8 @@ function cloneJson<T>(value: T): T {
   return JSON.parse(JSON.stringify(value)) as T;
 }
 
-function isPlainObject(value: unknown): value is Record<string, unknown> {
-  return Boolean(value) && typeof value === "object" && !Array.isArray(value);
-}
-
-function mergeWithDefaults<T>(fallback: T, value: unknown): T {
-  if (value === undefined) {
-    return cloneJson(fallback);
-  }
-
-  if (Array.isArray(fallback)) {
-    return Array.isArray(value) ? cloneJson(value as T) : cloneJson(fallback);
-  }
-
-  if (isPlainObject(fallback)) {
-    if (!isPlainObject(value)) {
-      return cloneJson(fallback);
-    }
-
-    const result: Record<string, unknown> = {};
-    const fallbackObject = fallback as Record<string, unknown>;
-    const keys = new Set([
-      ...Object.keys(fallbackObject),
-      ...Object.keys(value),
-    ]);
-
-    for (const key of keys) {
-      if (key in value) {
-        result[key] = mergeWithDefaults(
-          fallbackObject[key],
-          (value as Record<string, unknown>)[key],
-        );
-      } else {
-        result[key] = cloneJson(fallbackObject[key]);
-      }
-    }
-
-    return result as T;
-  }
-
-  return cloneJson((value ?? fallback) as T);
-}
-
 function getDefaultTitle(key: ContentBlockKey) {
-  const value = defaultContentBlockMap[key].title;
-  return typeof value === "string" ? value : CONTENT_SECTION_DEFINITIONS[key].label;
+  return CONTENT_SECTION_DEFINITIONS[key].label;
 }
 
 function firstBadgeTone(hero: HeroSectionConfig | undefined) {
@@ -419,42 +370,51 @@ function serializeContactPageBlock(
   };
 }
 
-function getFallbackData(key: ContentBlockKey) {
-  switch (key) {
-    case "site":
-      return defaultLayoutContent.site;
-    case "navigation":
-      return {
-        header: defaultLayoutContent.header,
-        navigation: defaultLayoutContent.navigation,
-      } satisfies NavigationEditorData;
-    case "home_hero":
-      return defaultHomeContent.homeHero;
-    case "clients_marquee":
-      return defaultHomeContent.clientsMarquee;
-    case "showcase_marquee":
-      return defaultHomeContent.showcaseMarquee;
-    case "portfolio":
-      return defaultHomeContent.portfolio;
-    case "portfolio_marquee":
-      return defaultHomeContent.portfolioMarquee;
-    case "testimonials":
-      return defaultHomeContent.testimonials;
-    case "impact":
-      return defaultHomeContent.impact;
-    case "services":
-      return defaultHomeContent.services;
-    case "process_roadmap":
-      return defaultHomeContent.processRoadmap;
-    case "faq":
-      return defaultHomeContent.faq;
-    case "book_call":
-      return defaultHomeContent.bookCall;
-    case "contact_page":
-      return contactPageContent;
-  }
+function imagesToMarqueeRows(images: ContentImage[]) {
+  const rows = new Map<
+    string,
+    {
+      id: string;
+      order: number;
+      images: ImageMarqueeRow["images"];
+    }
+  >();
 
-  throw new Error("Unsupported content key.");
+  const sortedImages = [...images].sort(
+    (left, right) => (left.order ?? 0) - (right.order ?? 0),
+  );
+
+  sortedImages.forEach((image, index) => {
+    const rowOrder =
+      typeof image.rowOrder === "number" && Number.isFinite(image.rowOrder)
+        ? image.rowOrder
+        : 0;
+    const rowId =
+      typeof image.rowId === "string" && image.rowId.trim()
+        ? image.rowId
+        : `row-${rowOrder + 1}`;
+    const currentRow = rows.get(rowId) ?? {
+      id: rowId,
+      order: rowOrder,
+      images: [],
+    };
+    const cleanImage = { ...image };
+
+    delete cleanImage.order;
+    delete cleanImage.rowId;
+    delete cleanImage.rowOrder;
+    delete cleanImage.desc;
+
+    currentRow.images.push({
+      ...(cleanImage as ImageMarqueeRow["images"][number]),
+      id: cleanImage.id ?? `${rowId}-image-${index + 1}`,
+    });
+    rows.set(rowId, currentRow);
+  });
+
+  return [...rows.values()]
+    .sort((left, right) => left.order - right.order)
+    .map(({ order: _order, ...row }) => row);
 }
 
 export function createStructuredContentDraft(
@@ -463,7 +423,12 @@ export function createStructuredContentDraft(
   return {
     order: String(block.order ?? 0),
     active: block.active !== false,
-    data: mergeWithDefaults(getFallbackData(block.key), block.data),
+    data:
+      block.data !== undefined && block.data !== null
+        ? cloneJson(block.data)
+        : block.kind === "marquee"
+          ? imagesToMarqueeRows(block.images ?? [])
+          : null,
   };
 }
 
@@ -485,7 +450,6 @@ export function buildContentUpdateFromDraft(
     order: parseDraftOrder(draft.order),
     active: draft.active,
   };
-  const fallbackColor = defaultContentBlockMap[key].color;
 
   switch (key) {
     case "site":
@@ -502,7 +466,7 @@ export function buildContentUpdateFromDraft(
     case "portfolio":
       return {
         ...meta,
-        ...serializeHeroBlock(draft.data as HeroSectionConfig, fallbackColor),
+        ...serializeHeroBlock(draft.data as HeroSectionConfig),
       };
     case "clients_marquee":
     case "showcase_marquee":
@@ -518,52 +482,37 @@ export function buildContentUpdateFromDraft(
     case "services":
       return {
         ...meta,
-        ...serializeServicesBlock(
-          draft.data as ServicesSectionConfig,
-          fallbackColor,
-        ),
+        ...serializeServicesBlock(draft.data as ServicesSectionConfig),
       };
     case "process_roadmap":
       return {
         ...meta,
-        ...serializeRoadmapBlock(
-          draft.data as RoadmapSectionConfig,
-          fallbackColor,
-        ),
+        ...serializeRoadmapBlock(draft.data as RoadmapSectionConfig),
       };
     case "faq":
       return {
         ...meta,
-        ...serializeFaqBlock(draft.data as FAQSectionConfig, fallbackColor),
+        ...serializeFaqBlock(draft.data as FAQSectionConfig),
       };
     case "testimonials":
       return {
         ...meta,
-        ...serializeTestimonialsBlock(
-          draft.data as TestimonialsSectionConfig,
-          fallbackColor,
-        ),
+        ...serializeTestimonialsBlock(draft.data as TestimonialsSectionConfig),
       };
     case "impact":
       return {
         ...meta,
-        ...serializeImpactBlock(draft.data as ImpactSectionConfig, fallbackColor),
+        ...serializeImpactBlock(draft.data as ImpactSectionConfig),
       };
     case "book_call":
       return {
         ...meta,
-        ...serializeBookCallBlock(
-          draft.data as BookCallSectionConfig,
-          fallbackColor,
-        ),
+        ...serializeBookCallBlock(draft.data as BookCallSectionConfig),
       };
     case "contact_page":
       return {
         ...meta,
-        ...serializeContactPageBlock(
-          draft.data as ContactPageContent,
-          fallbackColor,
-        ),
+        ...serializeContactPageBlock(draft.data as ContactPageContent),
       };
     default:
       return meta;

@@ -1,6 +1,5 @@
 import { NextResponse, type NextRequest } from "next/server";
 import {
-  deleteContentBlock,
   getContentBlock,
   isContentBlockKey,
   revalidateContentKey,
@@ -143,33 +142,4 @@ export async function PATCH(request: NextRequest, context: ContentRouteContext) 
 
 export async function PUT(request: NextRequest, context: ContentRouteContext) {
   return PATCH(request, context);
-}
-
-export async function DELETE(request: NextRequest, context: ContentRouteContext) {
-  if (!(await isAdminRequestAuthorized(request))) {
-    return badRequest("Unauthorized.", 401);
-  }
-
-  const { key } = await context.params;
-
-  if (!isContentBlockKey(key)) {
-    return badRequest(`Unknown content key: ${key}`, 404);
-  }
-
-  try {
-    await deleteContentBlock(key);
-    revalidateContentKey(key);
-
-    return NextResponse.json({
-      deleted: true,
-      revalidated: true,
-    });
-  } catch (error) {
-    return badRequest(
-      error instanceof Error
-        ? error.message
-        : "Default content could not be restored in MongoDB.",
-      500,
-    );
-  }
 }

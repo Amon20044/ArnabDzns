@@ -15,7 +15,6 @@ import {
   SaveIcon,
   SearchIcon,
   ShieldCheckIcon,
-  Trash2Icon,
   XIcon,
   type LucideIcon,
 } from "lucide-react";
@@ -115,6 +114,10 @@ function safeSerializeDraft(
   }
 }
 
+function hasPersistableStructuredData(value: unknown) {
+  return value !== null && value !== undefined;
+}
+
 function SectionsNavigationPanel({
   blockCount,
   search,
@@ -154,7 +157,7 @@ function SectionsNavigationPanel({
           </div>
         </div>
       </CardHeader>
-      <CardContent className="flex min-h-0 flex-1 flex-col gap-3 pt-3">
+      <CardContent className="flex min-h-0 flex-1 flex-col gap-3 overflow-hidden pt-3">
         <div className="relative">
           <SearchIcon className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
           <Input
@@ -165,7 +168,7 @@ function SectionsNavigationPanel({
           />
         </div>
 
-        <div className="-mx-1 grid gap-2 overflow-y-auto px-1 pb-2">
+        <div className="-mx-1 flex min-h-0 flex-1 flex-col gap-2 overflow-y-auto px-1 pb-2">
           {groupedBlocks.length ? (
             groupedBlocks.map(([group, groupBlocks]) => {
               const isOpen = deferredSearch.length > 0 || openGroups.has(group);
@@ -379,8 +382,6 @@ export function ContentDashboardClient({
     );
   }, [draft, selectedBlock]);
 
-  const canRestore = Boolean(selectedBlock);
-
   async function requestBlocks() {
     const response = await fetch("/api/content", {
       cache: "no-store",
@@ -536,54 +537,21 @@ export function ContentDashboardClient({
       return;
     }
 
+    if (!hasPersistableStructuredData(draft.data)) {
+      setNotice({
+        kind: "error",
+        message:
+          "This section has no structured Mongo payload yet. Seed or save the section in Mongo before editing it here.",
+      });
+      return;
+    }
+
     startTransition(() => {
       void persistDraft(draft, {
         pendingMessage: "Saving changes...",
         successMessage: "Section saved successfully.",
         errorMessage: "Content could not be saved.",
       });
-    });
-  }
-
-  function restoreSelectedBlock() {
-    if (!selectedBlock) {
-      return;
-    }
-
-    startTransition(async () => {
-      try {
-        setNotice({ kind: "info", message: "Restoring default content..." });
-
-        const response = await fetch(`/api/content/${selectedBlock.key}`, {
-          method: "DELETE",
-          credentials: "same-origin",
-        });
-        const result = (await response.json()) as { error?: string };
-
-        if (response.status === 401) {
-          router.replace("/login");
-          router.refresh();
-          throw new Error("Your admin session expired. Please sign in again.");
-        }
-
-        if (!response.ok) {
-          throw new Error(result.error ?? "Default content could not be restored.");
-        }
-
-        await refreshBlocks(selectedBlock.key);
-        setNotice({
-          kind: "success",
-          message: "Default content restored for this section.",
-        });
-      } catch (error) {
-        setNotice({
-          kind: "error",
-          message:
-            error instanceof Error
-              ? error.message
-              : "Default content could not be restored.",
-        });
-      }
     });
   }
 
@@ -617,6 +585,7 @@ export function ContentDashboardClient({
   }
 
   const selectedDefinition = CONTENT_SECTION_DEFINITIONS[selectedBlock.key];
+  const hasStructuredData = hasPersistableStructuredData(draft.data);
 
   return (
     <section className="grid gap-5 xl:grid-cols-[20rem_minmax(0,1fr)]">
@@ -731,16 +700,7 @@ export function ContentDashboardClient({
                 </Button>
                 <Button
                   type="button"
-                  variant="outline"
-                  disabled={isPending || !canRestore}
-                  onClick={restoreSelectedBlock}
-                >
-                  <Trash2Icon />
-                  Restore
-                </Button>
-                <Button
-                  type="button"
-                  disabled={isPending || !hasChanges}
+                  disabled={isPending || !hasChanges || !hasStructuredData}
                   onClick={saveSelectedBlock}
                 >
                   <SaveIcon />
@@ -827,12 +787,22 @@ export function ContentDashboardClient({
           </div>
         </EditorSection>
 
-        <StructuredSectionEditor
-          blockKey={selectedBlock.key}
-          value={draft.data}
-          onChange={updateDraftData}
-          onPersist={persistDraftData}
-        />
+        {hasStructuredData ? (
+          <StructuredSectionEditor
+            blockKey={selectedBlock.key}
+            value={draft.data}
+            onChange={updateDraftData}
+            onPersist={persistDraftData}
+          />
+        ) : (
+          <Card className="rounded-2xl border-amber-200 bg-amber-50/90">
+            <CardContent className="pt-6 text-sm text-amber-900">
+              This section does not currently have structured content in MongoDB.
+              The dashboard will not pull local fallback data anymore. Seed this
+              section in Mongo, then reload the editor.
+            </CardContent>
+          </Card>
+        )}
       </div>
     </section>
   );

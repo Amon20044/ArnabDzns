@@ -25,15 +25,10 @@ import {
   tagForSection,
 } from "./cache-tags";
 import { connectMongo, hasMongoConfig } from "./client";
-import {
-  contactPageContent,
-  defaultContentBlockMap,
-  defaultHomeContent,
-  defaultLayoutContent,
-  getDefaultBlockData,
-  type ContactPageContent,
-  type HomeContent,
-  type LayoutContent,
+import type {
+  ContactPageContent,
+  HomeContent,
+  LayoutContent,
 } from "./content-defaults";
 import {
   CONTENT_BLOCK_KEYS,
@@ -99,6 +94,14 @@ export function pathsForContentKey(key: ContentBlockKey) {
   }
 }
 
+function cloneJson<T>(value: T): T {
+  if (value === undefined || value === null) {
+    return value;
+  }
+
+  return JSON.parse(JSON.stringify(value)) as T;
+}
+
 function serializeBlock(block: unknown): ContentBlockRecord | null {
   if (!block || typeof block !== "object") {
     return null;
@@ -125,55 +128,17 @@ function requireMongoContentStore() {
   }
 }
 
-async function ensureContentBlocksInMongo(keys: readonly ContentBlockKey[]) {
+async function readContentBlockNoCache(key: ContentBlockKey) {
   requireMongoContentStore();
   await connectMongo();
-
-  const existingBlocks = await ContentBlockModel.find(
-    { key: { $in: [...keys] } },
-    { key: 1 },
-  )
-    .lean()
-    .exec();
-  const existingKeys = new Set(
-    existingBlocks.map((block) => String(block.key) as ContentBlockKey),
-  );
-  const missingKeys = keys.filter((key) => !existingKeys.has(key));
-
-  if (!missingKeys.length) {
-    return;
-  }
-
-  await Promise.all(
-    missingKeys.map(async (missingKey) => {
-      try {
-        await ContentBlockModel.create({
-          ...defaultContentBlockMap[missingKey],
-          schemaVersion: 1,
-        });
-      } catch (error) {
-        const isDuplicateKeyError =
-          error !== null &&
-          typeof error === "object" &&
-          "code" in error &&
-          (error as { code?: number }).code === 11000;
-
-        if (!isDuplicateKeyError) {
-          throw error;
-        }
-      }
-    }),
-  );
-}
-
-async function readContentBlockNoCache(key: ContentBlockKey) {
-  await ensureContentBlocksInMongo([key]);
 
   const block = await ContentBlockModel.findOne({ key }).lean().exec();
   const serializedBlock = serializeBlock(block);
 
   if (!serializedBlock) {
-    throw new Error(`Content block "${key}" was not found in MongoDB.`);
+    throw new Error(
+      `Content block "${key}" was not found in MongoDB. MongoDB is now the only content source.`,
+    );
   }
 
   return serializedBlock;
@@ -191,7 +156,8 @@ export async function getContentBlock(key: ContentBlockKey) {
 }
 
 export async function listContentBlocks() {
-  await ensureContentBlocksInMongo(CONTENT_BLOCK_KEYS);
+  requireMongoContentStore();
+  await connectMongo();
 
   const blocks = await ContentBlockModel.find({})
     .sort({ group: 1, order: 1, key: 1 })
@@ -227,7 +193,6 @@ export async function upsertContentBlock(
 ) {
   requireMongoContentStore();
 
-  const fallback = defaultContentBlockMap[key];
   const update = normalizeBlockUpdate(input);
 
   try {
@@ -236,23 +201,20 @@ export async function upsertContentBlock(
     const block = await ContentBlockModel.findOneAndUpdate(
       { key },
       {
-        $set: {
-          ...update,
-          key,
-          group: fallback.group,
-          kind: fallback.kind,
-        },
-        $setOnInsert: {
-          schemaVersion: 1,
-        },
+        $set: update,
       },
       {
         new: true,
-        upsert: true,
         runValidators: true,
         lean: true,
       },
     ).exec();
+
+    if (!block) {
+      throw new Error(
+        `Content block "${key}" does not exist in MongoDB. Seed Mongo first, then update it.`,
+      );
+    }
 
     return serializeBlock(block);
   } catch (error) {
@@ -260,34 +222,6 @@ export async function upsertContentBlock(
       error instanceof Error
         ? error.message
         : `Failed to persist content block "${key}" to MongoDB.`,
-    );
-  }
-}
-
-export async function deleteContentBlock(key: ContentBlockKey) {
-  requireMongoContentStore();
-  const fallback = defaultContentBlockMap[key];
-
-  try {
-    await connectMongo();
-    await ContentBlockModel.findOneAndReplace(
-      { key },
-      {
-        ...fallback,
-        schemaVersion: 1,
-      },
-      {
-        new: true,
-        upsert: true,
-        runValidators: true,
-        lean: true,
-      },
-    ).exec();
-  } catch (error) {
-    throw new Error(
-      error instanceof Error
-        ? error.message
-        : `Failed to restore content block "${key}" in MongoDB.`,
     );
   }
 }
@@ -302,8 +236,14 @@ export function revalidateContentKey(key: ContentBlockKey) {
   }
 }
 
-function getBlockData<T>(block: ContentBlockSeed, fallback: T) {
-  return (block.data as T | undefined) ?? getDefaultBlockData(block.key, fallback);
+function requireBlockData<T>(block: ContentBlockSeed) {
+  if (block.data === undefined || block.data === null) {
+    throw new Error(
+      `Content block "${block.key}" is missing structured MongoDB data.`,
+    );
+  }
+
+  return cloneJson(block.data as T);
 }
 
 function applyHeroOverrides(
@@ -335,9 +275,10 @@ function applyHeroOverrides(
 
 function blockImagesToMarqueeRows(
   block: ContentBlockSeed,
-  fallback: ImageMarqueeRow[],
 ) {
-  const dataRows = getBlockData<ImageMarqueeRow[]>(block, fallback);
+  if (Array.isArray(block.data)) {
+    return cloneJson(block.data as ImageMarqueeRow[]);
+  }
 
   if (block.images?.length && !block.data) {
     const images = [...block.images].sort(
@@ -357,21 +298,17 @@ function blockImagesToMarqueeRows(
     ] satisfies ImageMarqueeRow[];
   }
 
-  return dataRows;
+  return [];
 }
 
 function resolveHeroBlock(
   block: ContentBlockSeed,
-  fallback: HeroSectionConfig,
 ) {
-  return applyHeroOverrides(getBlockData(block, fallback), block);
+  return applyHeroOverrides(requireBlockData<HeroSectionConfig>(block), block);
 }
 
 function resolveServicesBlock(block: ContentBlockSeed) {
-  const data = getBlockData<ServicesSectionConfig>(
-    block,
-    defaultHomeContent.services,
-  );
+  const data = requireBlockData<ServicesSectionConfig>(block);
 
   const services = block.items?.length
     ? block.items.map((item, index) => {
@@ -394,10 +331,7 @@ function resolveServicesBlock(block: ContentBlockSeed) {
 }
 
 function resolveRoadmapBlock(block: ContentBlockSeed) {
-  const data = getBlockData<RoadmapSectionConfig>(
-    block,
-    defaultHomeContent.processRoadmap,
-  );
+  const data = requireBlockData<RoadmapSectionConfig>(block);
 
   const items = block.items?.length
     ? block.items.map((item, index): RoadmapStepConfig => {
@@ -421,7 +355,7 @@ function resolveRoadmapBlock(block: ContentBlockSeed) {
 }
 
 function resolveFaqBlock(block: ContentBlockSeed) {
-  const data = getBlockData<FAQSectionConfig>(block, defaultHomeContent.faq);
+  const data = requireBlockData<FAQSectionConfig>(block);
 
   const items = block.items?.length
     ? block.items.map((item, index): FAQItem => {
@@ -445,10 +379,7 @@ function resolveFaqBlock(block: ContentBlockSeed) {
 }
 
 function resolveImpactBlock(block: ContentBlockSeed) {
-  const data = getBlockData<ImpactSectionConfig>(
-    block,
-    defaultHomeContent.impact,
-  );
+  const data = requireBlockData<ImpactSectionConfig>(block);
 
   const exactCards = block.items?.filter((item): item is ImpactCardConfig => {
     const value = item as Partial<ImpactCardConfig>;
@@ -463,10 +394,7 @@ function resolveImpactBlock(block: ContentBlockSeed) {
 }
 
 function resolveTestimonialsBlock(block: ContentBlockSeed) {
-  const data = getBlockData<TestimonialsSectionConfig>(
-    block,
-    defaultHomeContent.testimonials,
-  );
+  const data = requireBlockData<TestimonialsSectionConfig>(block);
 
   return {
     ...data,
@@ -477,10 +405,7 @@ function resolveTestimonialsBlock(block: ContentBlockSeed) {
 }
 
 function resolveBookCallBlock(block: ContentBlockSeed) {
-  const data = getBlockData<BookCallSectionConfig>(
-    block,
-    defaultHomeContent.bookCall,
-  );
+  const data = requireBlockData<BookCallSectionConfig>(block);
 
   return {
     ...data,
@@ -489,7 +414,7 @@ function resolveBookCallBlock(block: ContentBlockSeed) {
 }
 
 function resolveSiteBlock(block: ContentBlockSeed) {
-  const data = getBlockData<SiteConfig>(block, defaultLayoutContent.site);
+  const data = requireBlockData<SiteConfig>(block);
   const brandImage = block.images?.[0];
 
   return {
@@ -510,13 +435,10 @@ function resolveNavigationBlock(
   block: ContentBlockSeed,
   site: SiteConfig,
 ): Pick<LayoutContent, "header" | "navigation"> {
-  const data = getBlockData<{
+  const data = requireBlockData<{
     header: HeaderConfig;
     navigation: NavigationConfig;
-  }>(block, {
-    header: defaultLayoutContent.header,
-    navigation: defaultLayoutContent.navigation,
-  });
+  }>(block);
 
   const brandImage = block.images?.[0];
   const header: HeaderConfig = {
@@ -581,20 +503,11 @@ export async function getHomeContent(): Promise<HomeContent> {
   ]);
 
   return {
-    homeHero: resolveHeroBlock(homeHeroBlock, defaultHomeContent.homeHero),
-    clientsMarquee: blockImagesToMarqueeRows(
-      clientsMarqueeBlock,
-      defaultHomeContent.clientsMarquee,
-    ),
-    showcaseMarquee: blockImagesToMarqueeRows(
-      showcaseMarqueeBlock,
-      defaultHomeContent.showcaseMarquee,
-    ),
-    portfolio: resolveHeroBlock(portfolioBlock, defaultHomeContent.portfolio),
-    portfolioMarquee: blockImagesToMarqueeRows(
-      portfolioMarqueeBlock,
-      defaultHomeContent.portfolioMarquee,
-    ),
+    homeHero: resolveHeroBlock(homeHeroBlock),
+    clientsMarquee: blockImagesToMarqueeRows(clientsMarqueeBlock),
+    showcaseMarquee: blockImagesToMarqueeRows(showcaseMarqueeBlock),
+    portfolio: resolveHeroBlock(portfolioBlock),
+    portfolioMarquee: blockImagesToMarqueeRows(portfolioMarqueeBlock),
     testimonials: resolveTestimonialsBlock(testimonialsBlock),
     impact: resolveImpactBlock(impactBlock),
     services: resolveServicesBlock(servicesBlock),
@@ -606,7 +519,7 @@ export async function getHomeContent(): Promise<HomeContent> {
 
 export async function getContactPageContent(): Promise<ContactPageContent> {
   const block = await getContentBlock("contact_page");
-  const data = getBlockData<ContactPageContent>(block, contactPageContent);
+  const data = requireBlockData<ContactPageContent>(block);
 
   return {
     ...data,
