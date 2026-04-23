@@ -1,46 +1,48 @@
-"use client"
+"use client";
 
-import Link from "next/link"
-import { useRouter } from "next/navigation"
-import { useState, useTransition } from "react"
-import { DEFAULT_AUTH_REDIRECT_PATH, getSafeRedirectPath } from "@/lib/auth/redirect"
-import { cn } from "@/lib/utils"
-import { Button } from "@/components/ui/button"
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useState, useTransition } from "react";
+import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card"
+} from "@/components/ui/card";
 import {
   Field,
   FieldDescription,
   FieldGroup,
   FieldLabel,
-  // FieldSeparator,
-} from "@/components/ui/field"
-import { Input } from "@/components/ui/input"
+} from "@/components/ui/field";
+import { Input } from "@/components/ui/input";
+import {
+  DEFAULT_AUTH_REDIRECT_PATH,
+  getSafeRedirectPath,
+} from "@/lib/auth/redirect";
+import { cn } from "@/lib/utils";
 
 export function LoginForm({
   className,
   nextPath,
   ...props
 }: React.ComponentProps<"div"> & {
-  nextPath?: string | null
+  nextPath?: string | null;
 }) {
-  const router = useRouter()
-  const [message, setMessage] = useState("")
-  const [isPending, startTransition] = useTransition()
-  const safeNextPath = getSafeRedirectPath(nextPath)
-  const isChangePasswordFlow = safeNextPath === "/change-password"
+  const router = useRouter();
+  const [message, setMessage] = useState("");
+  const [isPending, startTransition] = useTransition();
+  const safeNextPath = getSafeRedirectPath(nextPath);
+  const isChangePasswordFlow = safeNextPath === "/change-password";
 
   function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
-    event.preventDefault()
-    const formData = new FormData(event.currentTarget)
+    event.preventDefault();
+    const formData = new FormData(event.currentTarget);
 
     startTransition(async () => {
-      setMessage("")
+      setMessage("");
 
       const response = await fetch("/api/auth/login", {
         method: "POST",
@@ -52,20 +54,20 @@ export function LoginForm({
           password: formData.get("password"),
           next: safeNextPath,
         }),
-      })
+      });
       const result = (await response.json()) as {
-        message?: string
-        redirectTo?: string
-      }
+        message?: string;
+        redirectTo?: string;
+      };
 
       if (!response.ok) {
-        setMessage(result.message ?? "Login failed.")
-        return
+        setMessage(result.message ?? "Login failed.");
+        return;
       }
 
-      router.replace(result.redirectTo ?? DEFAULT_AUTH_REDIRECT_PATH)
-      router.refresh()
-    })
+      router.replace(result.redirectTo ?? DEFAULT_AUTH_REDIRECT_PATH);
+      router.refresh();
+    });
   }
 
   return (
@@ -75,7 +77,7 @@ export function LoginForm({
           <CardTitle className="text-xl">Admin login</CardTitle>
           <CardDescription>
             {isChangePasswordFlow
-              ? "Sign in first, then we’ll take you to change your password."
+              ? "Sign in first, then we'll take you to change your password."
               : "Sign in to manage portfolio content."}
           </CardDescription>
         </CardHeader>
@@ -126,5 +128,5 @@ export function LoginForm({
         </CardContent>
       </Card>
     </div>
-  )
+  );
 }
