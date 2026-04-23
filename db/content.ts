@@ -58,16 +58,8 @@ export type ContentBlockRecord = ContentBlockSeed & {
   createdAt?: string;
   updatedAt?: string;
   schemaVersion?: number;
-  source?: "default" | "database" | "memory";
+  source?: "database";
 };
-
-const globalForContent = globalThis as typeof globalThis & {
-  __arnab_content_overrides__?: Partial<Record<ContentBlockKey, ContentBlockRecord>>;
-};
-
-const memoryContentOverrides =
-  globalForContent.__arnab_content_overrides__ ??
-  (globalForContent.__arnab_content_overrides__ = {});
 
 export type ContentBlockUpdate = Partial<
   Omit<ContentBlockSeed, "key" | "group" | "kind">
@@ -125,44 +117,66 @@ function serializeBlock(block: unknown): ContentBlockRecord | null {
   };
 }
 
-function logContentFallback(error: unknown) {
-  if (process.env.NODE_ENV === "production") {
+function requireMongoContentStore() {
+  if (!hasMongoConfig()) {
+    throw new Error(
+      "MongoDB is required for content storage. Set MONGODB_URI and MONGODB_DB.",
+    );
+  }
+}
+
+async function ensureContentBlocksInMongo(keys: readonly ContentBlockKey[]) {
+  requireMongoContentStore();
+  await connectMongo();
+
+  const existingBlocks = await ContentBlockModel.find(
+    { key: { $in: [...keys] } },
+    { key: 1 },
+  )
+    .lean()
+    .exec();
+  const existingKeys = new Set(
+    existingBlocks.map((block) => String(block.key) as ContentBlockKey),
+  );
+  const missingKeys = keys.filter((key) => !existingKeys.has(key));
+
+  if (!missingKeys.length) {
     return;
   }
 
-  console.warn("[content] Falling back to static content:", error);
-}
+  await Promise.all(
+    missingKeys.map(async (missingKey) => {
+      try {
+        await ContentBlockModel.create({
+          ...defaultContentBlockMap[missingKey],
+          schemaVersion: 1,
+        });
+      } catch (error) {
+        const isDuplicateKeyError =
+          error !== null &&
+          typeof error === "object" &&
+          "code" in error &&
+          (error as { code?: number }).code === 11000;
 
-function cloneBlock(block: ContentBlockSeed): ContentBlockRecord {
-  return JSON.parse(JSON.stringify(block)) as ContentBlockRecord;
-}
-
-function getFallbackBlock(key: ContentBlockKey) {
-  return memoryContentOverrides[key] ?? defaultContentBlockMap[key];
+        if (!isDuplicateKeyError) {
+          throw error;
+        }
+      }
+    }),
+  );
 }
 
 async function readContentBlockNoCache(key: ContentBlockKey) {
-  const fallback = getFallbackBlock(key);
+  await ensureContentBlocksInMongo([key]);
 
-  if (!hasMongoConfig()) {
-    return fallback;
+  const block = await ContentBlockModel.findOne({ key }).lean().exec();
+  const serializedBlock = serializeBlock(block);
+
+  if (!serializedBlock) {
+    throw new Error(`Content block "${key}" was not found in MongoDB.`);
   }
 
-  try {
-    await connectMongo();
-
-    const block = await ContentBlockModel.findOne({
-      key,
-      active: { $ne: false },
-    })
-      .lean()
-      .exec();
-
-    return serializeBlock(block) ?? fallback;
-  } catch (error) {
-    logContentFallback(error);
-    return fallback;
-  }
+  return serializedBlock;
 }
 
 export async function getContentBlock(key: ContentBlockKey) {
@@ -177,60 +191,17 @@ export async function getContentBlock(key: ContentBlockKey) {
 }
 
 export async function listContentBlocks() {
-  const fallbackBlocks: ContentBlockRecord[] = [...Object.values(defaultContentBlockMap)].map(
-    (block) =>
-      ({
-        ...cloneBlock(block),
-        source: "default",
-      }) satisfies ContentBlockRecord,
-  );
+  await ensureContentBlocksInMongo(CONTENT_BLOCK_KEYS);
 
-  for (const override of Object.values(memoryContentOverrides)) {
-    if (!override) {
-      continue;
-    }
+  const blocks = await ContentBlockModel.find({})
+    .sort({ group: 1, order: 1, key: 1 })
+    .lean()
+    .exec();
 
-    const index = fallbackBlocks.findIndex((block) => block.key === override.key);
-
-    if (index !== -1) {
-      fallbackBlocks[index] = override;
-    }
-  }
-
-  if (!hasMongoConfig()) {
-    return fallbackBlocks.sort((left, right) => (left.order ?? 0) - (right.order ?? 0));
-  }
-
-  try {
-    await connectMongo();
-    const blocks = await ContentBlockModel.find({})
-      .sort({ group: 1, order: 1, key: 1 })
-      .lean()
-      .exec();
-
-    const databaseBlocks = blocks
-      .map(serializeBlock)
-      .filter((block): block is ContentBlockRecord => Boolean(block));
-    const mergedBlocks = new Map<ContentBlockKey, ContentBlockRecord>();
-
-    for (const block of fallbackBlocks) {
-      mergedBlocks.set(block.key, block);
-    }
-
-    for (const block of databaseBlocks) {
-      mergedBlocks.set(block.key, {
-        ...defaultContentBlockMap[block.key],
-        ...block,
-      });
-    }
-
-    return [...mergedBlocks.values()].sort(
-      (left, right) => (left.order ?? 0) - (right.order ?? 0),
-    );
-  } catch (error) {
-    logContentFallback(error);
-    return fallbackBlocks.sort((left, right) => (left.order ?? 0) - (right.order ?? 0));
-  }
+  return blocks
+    .map(serializeBlock)
+    .filter((block): block is ContentBlockRecord => Boolean(block))
+    .sort((left, right) => (left.order ?? 0) - (right.order ?? 0));
 }
 
 function normalizeBlockUpdate(input: ContentBlockUpdate) {
@@ -250,36 +221,11 @@ function normalizeBlockUpdate(input: ContentBlockUpdate) {
   return update;
 }
 
-function upsertMemoryContentBlock(
-  key: ContentBlockKey,
-  input: ContentBlockUpdate,
-) {
-  const fallback = cloneBlock(defaultContentBlockMap[key]);
-  const update = normalizeBlockUpdate(input);
-  const block = {
-    ...fallback,
-    ...update,
-    key,
-    group: fallback.group,
-    kind: fallback.kind,
-    source: "memory",
-    updatedAt: new Date().toISOString(),
-    schemaVersion: 1,
-  } satisfies ContentBlockRecord;
-
-  memoryContentOverrides[key] = block;
-  return block;
-}
-
 export async function upsertContentBlock(
   key: ContentBlockKey,
   input: ContentBlockUpdate,
 ) {
-  if (!hasMongoConfig()) {
-    throw new Error(
-      "MongoDB is not configured. Set MONGODB_URI to persist content updates.",
-    );
-  }
+  requireMongoContentStore();
 
   const fallback = defaultContentBlockMap[key];
   const update = normalizeBlockUpdate(input);
@@ -310,29 +256,40 @@ export async function upsertContentBlock(
 
     return serializeBlock(block);
   } catch (error) {
-    logContentFallback(error);
     throw new Error(
-      `Failed to persist content block \"${key}\" to MongoDB.`,
+      error instanceof Error
+        ? error.message
+        : `Failed to persist content block "${key}" to MongoDB.`,
     );
   }
 }
 
 export async function deleteContentBlock(key: ContentBlockKey) {
-  if (!hasMongoConfig()) {
-    throw new Error(
-      "MongoDB is not configured. Set MONGODB_URI to persist content updates.",
-    );
-  }
+  requireMongoContentStore();
+  const fallback = defaultContentBlockMap[key];
 
   try {
     await connectMongo();
-    await ContentBlockModel.deleteOne({ key }).exec();
+    await ContentBlockModel.findOneAndReplace(
+      { key },
+      {
+        ...fallback,
+        schemaVersion: 1,
+      },
+      {
+        new: true,
+        upsert: true,
+        runValidators: true,
+        lean: true,
+      },
+    ).exec();
   } catch (error) {
-    logContentFallback(error);
-    throw new Error(`Failed to delete content block \"${key}\" from MongoDB.`);
+    throw new Error(
+      error instanceof Error
+        ? error.message
+        : `Failed to restore content block "${key}" in MongoDB.`,
+    );
   }
-
-  delete memoryContentOverrides[key];
 }
 
 export function revalidateContentKey(key: ContentBlockKey) {

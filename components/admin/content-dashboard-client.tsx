@@ -206,7 +206,7 @@ export function ContentDashboardClient({
     );
   }, [draft, selectedBlock]);
 
-  const canRestore = selectedBlock?.source === "database" || selectedBlock?.source === "memory";
+  const canRestore = Boolean(selectedBlock);
 
   async function requestBlocks() {
     const response = await fetch("/api/content", {
@@ -319,7 +319,7 @@ export function ContentDashboardClient({
         }
 
         if (!response.ok) {
-          throw new Error(result.error ?? "Content override could not be deleted.");
+          throw new Error(result.error ?? "Default content could not be restored.");
         }
 
         await refreshBlocks(selectedBlock.key);
@@ -333,7 +333,7 @@ export function ContentDashboardClient({
           message:
             error instanceof Error
               ? error.message
-              : "Content override could not be deleted.",
+              : "Default content could not be restored.",
         });
       }
     });

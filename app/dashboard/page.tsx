@@ -30,9 +30,7 @@ export default async function DashboardPage() {
   ]);
 
   const activeBlocks = blocks.filter((block) => block.active !== false);
-  const overriddenBlocks = blocks.filter(
-    (block) => block.source === "database" || block.source === "memory",
-  );
+  const mongoBackedBlocks = blocks.filter((block) => block.source === "database");
   const totalEntries = blocks.reduce(
     (total, block) => total + countBlockItems(block),
     0,
@@ -86,10 +84,10 @@ export default async function DashboardPage() {
             </div>
             <div className="rounded-2xl border border-border/70 bg-background/70 p-4">
               <p className="text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground">
-                Overrides
+                Mongo-backed
               </p>
               <p className="mt-2 text-2xl font-semibold text-foreground">
-                {overriddenBlocks.length}
+                {mongoBackedBlocks.length}
               </p>
             </div>
             <div className="rounded-2xl border border-border/70 bg-background/70 p-4">

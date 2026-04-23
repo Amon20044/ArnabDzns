@@ -168,7 +168,7 @@ export async function DELETE(request: NextRequest, context: ContentRouteContext)
     return badRequest(
       error instanceof Error
         ? error.message
-        : "Content could not be deleted from backend.",
+        : "Default content could not be restored in MongoDB.",
       500,
     );
   }
