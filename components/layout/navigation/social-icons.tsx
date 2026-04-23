@@ -1,11 +1,7 @@
-import type { ComponentType, SVGProps } from "react";
-import { FaDiscord, FaGithub, FaInstagram, FaLinkedin } from "react-icons/fa6";
+import type { IconComponent } from "@/lib/icons";
+import { socialIconRegistry as sharedSocialIconRegistry } from "@/lib/icons";
 
-type SocialIconComponent = ComponentType<SVGProps<SVGSVGElement>>;
+export type SocialIconComponent = IconComponent;
 
-export const socialIconRegistry: Record<string, SocialIconComponent> = {
-  discord: FaDiscord,
-  github: FaGithub,
-  instagram: FaInstagram,
-  linkedin: FaLinkedin,
-};
+export const socialIconRegistry: Record<string, SocialIconComponent> =
+  sharedSocialIconRegistry;

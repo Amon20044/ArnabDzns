@@ -23,6 +23,7 @@ export interface CTAConfig {
   variant: CTAVariant;
   path?: string;
   href?: string;
+  icon?: "phone-call" | string;
   Icon?: LucideIcon;
 }
 

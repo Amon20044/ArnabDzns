@@ -14,16 +14,18 @@ import {
 import { headerConfig } from "@/data/navigation";
 import { LiquidGlassBackdrop } from "@/components/ui/liquid-glass-backdrop";
 import { StatusBadge } from "@/components/ui/status-badge";
+import type { HeaderConfig } from "@/types";
 import { socialIconRegistry } from "./social-icons";
 
 interface HeaderProps {
   profileBioContent: ReactNode;
+  content?: HeaderConfig;
 }
 
 const MODAL_SCROLL_LOCK_EVENT = "app:modal-scroll-lock";
 
-export const Header = ({ profileBioContent }: HeaderProps) => {
-  const { availabilityLabel, brand, socials } = headerConfig;
+export const Header = ({ profileBioContent, content = headerConfig }: HeaderProps) => {
+  const { availabilityLabel, brand, socials } = content;
   const [isVisible, setIsVisible] = useState(true);
   const [brandHovered, setBrandHovered] = useState(false);
   const [profileDialogOpen, setProfileDialogOpen] = useState(false);

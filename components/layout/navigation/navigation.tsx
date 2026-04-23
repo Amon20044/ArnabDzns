@@ -1,6 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
+import { PhoneCall } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
@@ -13,13 +14,29 @@ import {
 import { PrimaryButton } from "@/components/ui/primary-button";
 import { cn } from "@/lib/utils";
 import { navigationConfig } from "@/data/navigation";
-import type { NavItemConfig } from "@/types";
+import type { CTAConfig, NavigationConfig, NavItemConfig } from "@/types";
 import { LiquidGlassBackdrop } from "@/components/ui/liquid-glass-backdrop";
 import { CTAButton } from "./cta-button";
 import { iconRegistry } from "./icon-registry";
 import { NavItem } from "./nav-item";
 
-export const Navigation = () => {
+interface NavigationProps {
+  content?: NavigationConfig;
+}
+
+function resolveCTAIcon(config: CTAConfig) {
+  if (config.Icon) {
+    return config.Icon;
+  }
+
+  switch (config.icon) {
+    case "phone-call":
+    default:
+      return PhoneCall;
+  }
+}
+
+export const Navigation = ({ content = navigationConfig }: NavigationProps) => {
   const pathname = usePathname();
   const navbarRef = useRef<HTMLElement>(null);
   const [hovered, setHovered] = useState(false);
@@ -27,7 +44,11 @@ export const Navigation = () => {
   const [itemCenters, setItemCenters] = useState<Record<string, number>>({});
   const [activeSectionId, setActiveSectionId] = useState("home");
 
-  const { items, ctas } = navigationConfig;
+  const { items } = content;
+  const ctas = content.ctas.map((cta) => ({
+    ...cta,
+    Icon: resolveCTAIcon(cta),
+  }));
   const isHomePage = pathname === "/";
 
   const isActive = useCallback(

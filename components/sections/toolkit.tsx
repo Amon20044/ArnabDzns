@@ -2,30 +2,12 @@
 
 import { motion, useScroll, useTransform } from "framer-motion";
 import { useRef } from "react";
-import Image from "next/image";
-import {
-  Camera,
-  Clapperboard,
-  MonitorSmartphone,
-  Package2,
-  PenTool,
-  Shapes,
-  type LucideIcon,
-} from "lucide-react";
 import { Hero } from "@/components/sections/hero";
+import { Icon } from "@/components/ui/icon";
 import { Heading, Text } from "@/components/ui/typography";
 import { servicesSection } from "@/data/services";
 import { cn } from "@/lib/utils";
 import type { ServiceCardItem, ServicesSectionConfig } from "@/types";
-
-const serviceIconRegistry: Record<string, LucideIcon> = {
-  "pen-tool": PenTool,
-  shapes: Shapes,
-  "package-2": Package2,
-  "monitor-smartphone": MonitorSmartphone,
-  camera: Camera,
-  clapperboard: Clapperboard,
-};
 
 function ServiceCard({
   item,
@@ -45,11 +27,6 @@ function ServiceCard({
   const opacity = useTransform(scrollYProgress, [0, 0.4], [0, 1]);
   const scale = useTransform(scrollYProgress, [0, 1], [0.92, 1]);
 
-  const lucideIconKey = item.icon.startsWith("lucide:") ? item.icon.slice(7) : null;
-  const OverlayIcon = lucideIconKey ? serviceIconRegistry[lucideIconKey] : null;
-  const isExternal = item.icon.startsWith("http");
-  const isAssetIcon = !OverlayIcon && !isExternal;
-
   return (
     <motion.article
       ref={cardRef}
@@ -60,29 +37,11 @@ function ServiceCard({
       <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(216,180,254,0.46),transparent_34%)]" />
       <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(255,255,255,0.62),transparent_24%)]" />
 
-      {OverlayIcon ? (
-        <OverlayIcon
-          aria-hidden
-          strokeWidth={1.6}
-          className="pointer-events-none absolute right-[-1.25rem] top-[-1rem] z-0 size-40 text-[rgba(88,28,135,0.18)] transition-transform duration-500 ease-out group-hover:scale-105 group-hover:-rotate-3 sm:size-44"
-        />
-      ) : isExternal ? (
-        <Image
-          src={item.icon}
-          alt=""
-          width={176}
-          height={176}
-          className="pointer-events-none absolute right-[-1.25rem] top-[-1rem] z-0 size-40 object-contain opacity-[0.14] transition-transform duration-500 ease-out group-hover:scale-105 group-hover:-rotate-3 sm:size-44"
-          unoptimized
-        />
-      ) : isAssetIcon ? (
-        // eslint-disable-next-line @next/next/no-img-element
-        <img
-          src={item.icon}
-          alt=""
-          className="pointer-events-none absolute right-[-1.25rem] top-[-1rem] z-0 size-40 object-contain opacity-[0.14] transition-transform duration-500 ease-out group-hover:scale-105 group-hover:-rotate-3 sm:size-44"
-        />
-      ) : null}
+      <Icon
+        name={item.icon}
+        strokeWidth={1.6}
+        className="pointer-events-none absolute right-[-1.25rem] top-[-1rem] z-0 size-40 text-[rgba(88,28,135)] transition-transform duration-500 ease-out group-hover:scale-105 group-hover:-rotate-3 sm:size-44"
+      />
 
       <div className="relative z-[1] mt-auto pt-28 text-left sm:pt-32">
         <Heading variant="h4" as="h3" className="text-left text-text-primary">

@@ -59,6 +59,7 @@ export function buildWhatsAppMessage({
       : `We want to discuss *${safeInquiryType || "a project"}* with you.`,
     safeName ? `*Contact:* ${safeName}` : "",
     safeBrand ? `*Project / Brand:* ${safeBrand}` : "",
+    `*Source:* ${sourceLabel}`,
     "",
     "*Brief*",
     safeMessage || "We would like to discuss a project with you.",

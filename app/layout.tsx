@@ -8,23 +8,30 @@ import { LocomotiveScrollProvider } from "@/components/providers/locomotive-scro
 import { StructuredData } from "@/components/site/structured-data";
 import { LiquidGlassDefs } from "@/components/ui/liquid-glass-defs";
 import { aeonik, poppins } from "@/config/fonts";
-import { siteConfig } from "@/data/site";
+import { getLayoutContent } from "@/db/content";
 import { getRootMetadata } from "@/lib/seo";
 import { getSiteJsonLd } from "@/lib/structured-data";
 import { liquidGlassCssVariables } from "@/lib/liquid-glass";
 import "./globals.css";
+import { Geist } from "next/font/google";
+import { cn } from "@/lib/utils";
+
+const geist = Geist({subsets:['latin'],variable:'--font-sans'});
 
 export const metadata = getRootMetadata();
+export const runtime = "nodejs";
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const content = await getLayoutContent();
+
   return (
     <html
-      lang={siteConfig.seo.language}
-      className={`h-full antialiased ${aeonik.variable} ${poppins.variable}`}
+      lang={content.site.seo.language}
+      className={cn("h-full", "antialiased", aeonik.variable, poppins.variable, "font-sans", geist.variable)}
     >
       <body
         className="min-h-full flex flex-col overflow-x-hidden bg-transparent text-foreground"
@@ -34,12 +41,15 @@ export default function RootLayout({
         <LiquidGlassDefs />
         <IridescenceBackground color={[0.93, 0.88, 0.99]} mouseReact amplitude={0.08} speed={0.9} />
         <LocomotiveScrollProvider>
-          <Header profileBioContent={<ProfileBioContent />} />
+          <Header
+            content={content.header}
+            profileBioContent={<ProfileBioContent />}
+          />
           <div className="flex flex-1 flex-col pt-24">
             {children}
           </div>
-          <SiteFooter />
-          <Navigation />
+          <SiteFooter site={content.site} />
+          <Navigation content={content.navigation} />
         </LocomotiveScrollProvider>
       </body>
     </html>

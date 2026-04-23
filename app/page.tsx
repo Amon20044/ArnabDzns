@@ -8,37 +8,33 @@ import { ProcessRoadmap } from "@/components/sections/process-roadmap";
 import { StructuredData } from "@/components/site/structured-data";
 import { Testimonials } from "@/components/sections/testimonials";
 import { Toolkit } from "@/components/sections/toolkit";
-import { bookCallSection } from "@/data/book-call";
-import { homeHeroSection } from "@/data/home-hero";
-import { portfolioSection } from "@/data/portfolio-section";
-import { processRoadmapSection } from "@/data/process-roadmap";
 import { ImageMarquee } from "@/components/ui/image-marquee";
-import { ServiceMarquee } from "@/components/ui/service-marquee";
-import { clientMarqueeRows } from "@/data/clients";
-import { servicesMarquee } from "@/data/services-marquee";
-import { demoImageMarquee, demoImageMarquee2 } from "@/data/demo-image-marquee";
+import { getHomeContent } from "@/db/content";
 import { getPageMetadata } from "@/lib/seo";
 import { getPageJsonLd } from "@/lib/structured-data";
-import { impactSection } from "@/data/impact";
 
 export const metadata = getPageMetadata("home");
+export const revalidate = 3600;
+export const runtime = "nodejs";
+
 const homeHeroToClientsGapStyle = {
   "--page-section-gap": "clamp(0.75rem, 2vw, 1.1rem)",
 } as CSSProperties;
 
-export default function Home() {
+export default async function Home() {
+  const content = await getHomeContent();
+
   return (
     <div className="flex">
       <div className="page-section-stack mx-auto flex w-full max-w-6xl flex-1 flex-col px-2 pb-32 pt-4 md:px-10 md:pb-40">
         <StructuredData data={getPageJsonLd("home") ?? {}} />
         <div id="home" data-nav-section="home" className="scroll-target">
-          {/* <ServiceMarquee services={servicesMarquee} /> */}
-          <HomeLandingHero content={homeHeroSection} />
+          <HomeLandingHero content={content.homeHero} />
         </div>
 
         <section className="page-reveal" style={homeHeroToClientsGapStyle}>
           <ImageMarquee
-            rows={clientMarqueeRows}
+            rows={content.clientsMarquee}
             type="clients"
             height="3rem"
             rowGap=".25rem"
@@ -50,7 +46,7 @@ export default function Home() {
 
         <section className="page-reveal" style={homeHeroToClientsGapStyle}>
           <ImageMarquee
-            rows={demoImageMarquee2}
+            rows={content.showcaseMarquee}
             height="clamp(14.5rem, 26vw, 20rem)"
             rowGap=".2rem"
             itemGap="1rem"
@@ -58,10 +54,10 @@ export default function Home() {
           />
         </section>
         <div id="portfolio" data-nav-section="portfolio" className="scroll-target">
-          <Hero content={portfolioSection} />
+          <Hero content={content.portfolio} />
           <section className="page-reveal">
             <ImageMarquee
-              rows={demoImageMarquee}
+              rows={content.portfolioMarquee}
               height="clamp(8.5rem, 18vw, 13rem)"
               rowGap=".2rem"
               itemGap="1rem"
@@ -74,30 +70,30 @@ export default function Home() {
           data-nav-section="testimonials"
           className="scroll-target"
         >
-          <Testimonials />
+          <Testimonials content={content.testimonials} />
         </div>
         <div id="impact" className="scroll-target">
-          <ImpactSection content={impactSection} />
+          <ImpactSection content={content.impact} />
         </div>
 
 
         <div id="services" data-nav-section="services" className="scroll-target">
-          <Toolkit />
+          <Toolkit content={content.services} />
         </div>
 
 
 
         <ProcessRoadmap
-          hero={processRoadmapSection.hero}
-          items={processRoadmapSection.items}
-          startFrom={processRoadmapSection.startFrom}
+          hero={content.processRoadmap.hero}
+          items={content.processRoadmap.items}
+          startFrom={content.processRoadmap.startFrom}
         />
 
         <div id="faq" data-nav-section="faq" className="scroll-target">
-          <FAQ />
+          <FAQ content={content.faq} />
         </div>
 
-        <BookCallSection content={bookCallSection} />
+        <BookCallSection content={content.bookCall} />
       </div>
     </div>
   );

@@ -10,36 +10,19 @@ import { renderStatusBadgeLeading } from "@/components/ui/status-badge-leading";
 import { StatusBadge } from "@/components/ui/status-badge";
 import { PrimaryButton } from "@/components/ui/primary-button";
 import { Heading, Text } from "@/components/ui/typography";
+import { contactPageContent, type ContactPageContent } from "@/data/contact-page";
 import { siteConfig } from "@/data/site";
-import type { HeroSectionConfig } from "@/types";
+import type { SiteConfig } from "@/types";
 
-const heroContent: HeroSectionConfig = {
-  badges: [
-    {
-      id: "contact-primary",
-      label: "Contact",
-      icon: "mail",
-      tone: "#18181b",
-      textColor: "#fafafa",
-      iconColor: "#fafafa",
-    },
-    {
-      id: "contact-response",
-      label: "Replies within 1 business day",
-      icon: "clock",
-      tone: "#059669",
-      textColor: "#ecfdf5",
-      iconColor: "#bbf7d0",
-    },
-  ],
-  title: ["Tell us what you are building."],
-  description:
-    "Share the scope, context, and goal. If WhatsApp is faster, jump straight into chat.",
-  cta: false,
-};
+interface ContactPageExperienceProps {
+  content?: ContactPageContent;
+  site?: SiteConfig;
+}
 
-
-export function ContactPageExperience() {
+export function ContactPageExperience({
+  content = contactPageContent,
+  site = siteConfig,
+}: ContactPageExperienceProps) {
   return (
     <div className="flex flex-1">
       <main className="page-section-stack mx-auto flex w-full max-w-6xl flex-1 flex-col px-3 pb-32 pt-16 md:px-10 md:pb-40 md:pt-24">
@@ -47,7 +30,7 @@ export function ContactPageExperience() {
           <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(168,85,247,0.18),transparent_42%),radial-gradient(circle_at_left_center,rgba(255,255,255,0.42),transparent_30%)] max-md:hidden" />
 
           <Hero
-            content={heroContent}
+            content={content.hero}
             className="min-h-0 py-2 sm:py-4"
             childrenClassName="mt-12"
           >
@@ -64,28 +47,27 @@ export function ContactPageExperience() {
                       iconColor="#f5e1ff"
                       leading={renderStatusBadgeLeading("message")}
                     >
-                      WhatsApp direct
+                      {content.direct.badgeLabel}
                     </StatusBadge>
                     <Heading variant="h5" as="h2" className="mt-4">
-                      Need a faster route?
+                      {content.direct.title}
                     </Heading>
                     <Text variant="p2" className="mt-2 max-w-xl">
-                      Message us directly on WhatsApp for the fastest route. For fuller project
-                      context, use the form below.
+                      {content.direct.desc}
                     </Text>
                   </div>
 
                   <div className="flex flex-col items-start gap-3 md:items-end [&>*]:w-full [&>*]:min-w-[14.5rem]">
                     <PrimaryButton
-                      label="Email directly"
-                      href={`mailto:${siteConfig.contact.emailAddress}`}
+                      label={content.direct.emailLabel}
+                      href={`mailto:${site.contact.emailAddress}`}
                       Icon={Mail}
                       tone="white"
                       fullWidth
                     />
                     <PrimaryButton
-                      label={siteConfig.contact.whatsappLabel}
-                      href={siteConfig.contact.whatsappUrl}
+                      label={site.contact.whatsappLabel}
+                      href={site.contact.whatsappUrl}
                       external
                       Icon={MessageCircleMore}
                       tone="whatsapp"

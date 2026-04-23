@@ -8,15 +8,9 @@ import {
   useTransform,
   type MotionValue,
 } from "framer-motion";
-import {
-  PackageCheck,
-  Target,
-  type LucideIcon,
-  WalletCards,
-  WandSparkles,
-} from "lucide-react";
 import { useRef } from "react";
 import { Hero } from "@/components/sections/hero";
+import { Icon } from "@/components/ui/icon";
 import { Heading, Text } from "@/components/ui/typography";
 import { processRoadmapSection } from "@/data/process-roadmap";
 import { cn } from "@/lib/utils";
@@ -33,12 +27,6 @@ interface ProcessRoadmapProps {
   className?: string;
 }
 
-const stepIconRegistry: Record<string, LucideIcon> = {
-  target: Target,
-  wallet: WalletCards,
-  wand: WandSparkles,
-  "package-check": PackageCheck,
-};
 const timelineSpeedMultiplier = 2;
 
 function resolveStepSide(startFrom: RoadmapStartSide, index: number) {
@@ -48,10 +36,6 @@ function resolveStepSide(startFrom: RoadmapStartSide, index: number) {
   }
 
   return isEven ? "right" : "left";
-}
-
-function resolveStepLabel(item: RoadmapStepConfig, index: number) {
-  return item.label ?? `Step #${index + 1}`;
 }
 
 function resolveStepNumber(index: number) {
@@ -103,7 +87,6 @@ function ProcessStepRow({
       : "0 0 0 8px rgba(255,255,255,0.92), 0 10px 22px rgba(161,161,170,0.16)",
   );
 
-  const OverlayIcon = item.icon ? stepIconRegistry[item.icon] : null;
   const stepNumber = resolveStepNumber(index);
 
   return (
@@ -135,13 +118,14 @@ function ProcessStepRow({
             {stepNumber}
           </motion.span>
 
-          {OverlayIcon ? (
+          {item.icon ? (
             <motion.div
               aria-hidden
               style={shouldReduceMotion ? undefined : { y: iconY, rotate: iconRotate }}
               className="pointer-events-none absolute right-[-1.2rem] top-[-0.9rem] z-0 transition-transform duration-500 ease-out group-hover:scale-105 group-hover:-rotate-3"
             >
-              <OverlayIcon
+              <Icon
+                name={item.icon}
                 strokeWidth={1.6}
                 className="size-36 text-[rgba(88,28,135,0.18)] sm:size-40"
               />
