@@ -7,7 +7,9 @@
       "Bash(git checkout:*)",
       "Bash(npx tsc *)",
       "Bash(npm audit *)",
-      "Bash(npm install *)"
+      "Bash(npm install *)",
+      "PowerShell(Resolve-DnsName -Type SRV -Name \"_mongodb._tcp.portfolio.iul9q8z.mongodb.net\" -Server 1.1.1.1 -ErrorAction SilentlyContinue)",
+      "PowerShell(Resolve-DnsName -Type SRV -Name \"_mongodb._tcp.portfolio.iul9q8z.mongodb.net\" -ErrorAction Continue)"
     ]
   }
 }

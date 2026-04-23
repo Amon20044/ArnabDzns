@@ -56,36 +56,34 @@ export function ProfileCard({
       )}
       style={style}
     >
-      <div className="grid grid-cols-[minmax(0,1.15fr)_minmax(0,1fr)]">
-        <div className="relative aspect-[5/7] w-full overflow-hidden">
-          <Image
-            src={imageSrc}
-            alt={imageAlt}
-            fill
-            sizes="(max-width: 640px) 55vw, 260px"
-            className="select-none object-cover object-bottom"
-            priority={false}
-            draggable={false}
-          />
-        </div>
+      <div className="relative w-full aspect-[340/373]">
+        <Image
+          src={imageSrc}
+          alt={imageAlt}
+          fill
+          sizes="(max-width: 640px) 90vw, 340px"
+          className="select-none object-cover"
+          priority={false}
+          draggable={false}
+        />
 
-        <ul className="flex flex-col justify-center px-[clamp(0.85rem,0.7rem+0.6vw,1.15rem)] py-[clamp(0.75rem,0.6rem+0.5vw,1rem)]">
+        <ul className="absolute right-4 top-11 flex flex-col">
           {rows.map((row, index) => {
             const lines = toLabelLines(row.label);
             return (
               <li
                 key={`${row.value}-${index}`}
-                className="flex items-center justify-between gap-2 border-t border-black/12 py-[clamp(0.6rem,0.45rem+0.55vw,0.95rem)] first:border-t-0 first:pt-0 last:pb-0"
+                className="flex items-center justify-end gap-4 border-t border-black/15 py-[clamp(0.55rem,0.4rem+0.5vw,0.85rem)] first:border-t-0 first:pt-0 last:pb-0"
               >
-                <div className="min-w-0 text-[clamp(0.68rem,0.6rem+0.2vw,0.78rem)] font-medium leading-[1.15] tracking-[-0.01em] text-black/75">
+                <div className="text-left text-[clamp(0.68rem,0.6rem+0.2vw,0.78rem)] font-medium leading-[1.15] tracking-[-0.01em] text-black/75">
                   {lines.map((line, lineIndex) => (
-                    <span key={`${line}-${lineIndex}`} className="block truncate">
+                    <span key={`${line}-${lineIndex}`} className="block">
                       {line}
                     </span>
                   ))}
                 </div>
                 <span
-                  className="shrink-0 font-bold leading-none tracking-[-0.04em] text-[clamp(1.35rem,1.1rem+0.8vw,1.85rem)]"
+                  className="font-bold leading-none tracking-[-0.04em] text-[clamp(1.45rem,1.15rem+0.9vw,1.9rem)]"
                   style={{ color: row.valueColor ?? "#000000" }}
                 >
                   {row.value}
@@ -95,8 +93,6 @@ export function ProfileCard({
           })}
         </ul>
       </div>
-
-      <div aria-hidden className="h-px w-full bg-black/15" />
 
       <div className="flex items-center justify-between gap-3 px-[clamp(0.95rem,0.8rem+0.6vw,1.25rem)] py-[clamp(0.8rem,0.65rem+0.55vw,1.1rem)]">
         <div className="min-w-0">
