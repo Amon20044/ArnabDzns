@@ -32,6 +32,8 @@ export interface ImageMarqueeItem {
   id?: string;
   src?: string;
   alt?: string;
+  title?: string;
+  desc?: string;
   width?: number;
   height?: number;
   aspectRatio?: number;
@@ -88,7 +90,7 @@ const DEFAULT_HEIGHT = "clamp(8.25rem, 18vw, 13rem)";
 const DEFAULT_GAP = "1rem";
 const DEFAULT_SPEED = 52;
 const DEFAULT_IMAGE_SIZES = "(max-width: 640px) 72vw, (max-width: 1024px) 40vw, 24vw";
-const CLIENT_ICON_REGISTRY: Record<ClientMarqueeIconId, IconType> = {
+export const CLIENT_ICON_REGISTRY: Record<ClientMarqueeIconId, IconType> = {
   apple: SiApple,
   discord: SiDiscord,
   github: SiGithub,

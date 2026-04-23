@@ -1,5 +1,6 @@
 "use client";
 
+import { MarqueeRowsEditor } from "@/components/admin/marquee-rows-editor";
 import type { ImageMarqueeRow } from "@/components/ui/image-marquee";
 import {
   CollectionEditor,
@@ -46,7 +47,6 @@ type NavigationEditorData = {
   navigation: NavigationConfig;
 };
 
-type MarqueeItem = ImageMarqueeRow["images"][number];
 type SiteSocialLink = SiteConfig["social"][number];
 type HeaderSocialLink = HeaderConfig["socials"][number];
 
@@ -69,11 +69,6 @@ const HERO_ICON_VISIBILITY_OPTIONS = [
 const CTA_VARIANT_OPTIONS = [
   { label: "Primary", value: "primary" },
   { label: "Secondary", value: "secondary" },
-];
-
-const MARQUEE_DIRECTION_OPTIONS = [
-  { label: "Left", value: "left" },
-  { label: "Right", value: "right" },
 ];
 
 const ROADMAP_SIDE_OPTIONS = [
@@ -202,32 +197,6 @@ function createNavCta(): CTAConfig {
     path: "",
     href: "",
     icon: "phone-call",
-  };
-}
-
-function createMarqueeItem(): MarqueeItem {
-  return {
-    id: "",
-    src: "",
-    alt: "",
-    client: "",
-    link: "",
-    icon: undefined,
-    iconColor: "",
-    width: 160,
-    height: 100,
-    aspectRatio: 1.6,
-    priority: false,
-  };
-}
-
-function createMarqueeRow(): ImageMarqueeRow {
-  return {
-    id: "",
-    direction: "left",
-    speed: 40,
-    height: "12rem",
-    images: [createMarqueeItem()],
   };
 }
 
@@ -813,153 +782,6 @@ function NavigationCtasEditor({
               onChange={(icon) => onItemChange({ ...item, icon })}
             />
           </SectionGrid>
-        </div>
-      )}
-    />
-  );
-}
-
-function MarqueeImagesEditor({
-  items,
-  onChange,
-}: {
-  items: MarqueeItem[];
-  onChange: (items: MarqueeItem[]) => void;
-}) {
-  return (
-    <CollectionEditor
-      title="Row Images"
-      description="Images or icon-only client entries inside this marquee row."
-      items={items}
-      onChange={onChange}
-      createItem={createMarqueeItem}
-      addLabel="Add image"
-      emptyText="This row has no images yet."
-      getItemLabel={(item, index) =>
-        item.client || item.alt || item.id || `Image ${index + 1}`
-      }
-      renderItem={(item, _index, onItemChange) => (
-        <div className="grid gap-4">
-          <SectionGrid>
-            <TextField
-              label="ID"
-              value={item.id}
-              onChange={(id) => onItemChange({ ...item, id })}
-            />
-            <TextField
-              label="Source"
-              value={item.src}
-              onChange={(src) => onItemChange({ ...item, src })}
-            />
-            <TextField
-              label="Alt text"
-              value={item.alt}
-              onChange={(alt) => onItemChange({ ...item, alt })}
-            />
-            <TextField
-              label="Client"
-              value={item.client}
-              onChange={(client) => onItemChange({ ...item, client })}
-            />
-            <TextField
-              label="Link"
-              value={item.link}
-              onChange={(link) => onItemChange({ ...item, link })}
-            />
-            <TextField
-              label="Icon"
-              value={item.icon}
-              onChange={(icon) =>
-                onItemChange({
-                  ...item,
-                  icon: (icon || undefined) as MarqueeItem["icon"],
-                })
-              }
-              description='Examples: "google", "spotify", or a custom icon id.'
-            />
-            <TextField
-              label="Icon color"
-              value={item.iconColor}
-              onChange={(iconColor) => onItemChange({ ...item, iconColor })}
-            />
-            <NumberField
-              label="Width"
-              value={item.width}
-              onChange={(width) => onItemChange({ ...item, width })}
-            />
-            <NumberField
-              label="Height"
-              value={item.height}
-              onChange={(height) => onItemChange({ ...item, height })}
-            />
-            <NumberField
-              label="Aspect ratio"
-              value={item.aspectRatio}
-              onChange={(aspectRatio) => onItemChange({ ...item, aspectRatio })}
-            />
-          </SectionGrid>
-          <ToggleField
-            label="Priority image"
-            checked={Boolean(item.priority)}
-            onCheckedChange={(priority) => onItemChange({ ...item, priority })}
-          />
-        </div>
-      )}
-    />
-  );
-}
-
-function MarqueeRowsEditor({
-  rows,
-  onChange,
-}: {
-  rows: ImageMarqueeRow[];
-  onChange: (rows: ImageMarqueeRow[]) => void;
-}) {
-  return (
-    <CollectionEditor
-      title="Marquee Rows"
-      description="Each row controls its own direction, speed, height, and entries."
-      items={rows}
-      onChange={onChange}
-      createItem={createMarqueeRow}
-      addLabel="Add marquee row"
-      emptyText="No marquee rows yet."
-      getItemLabel={(row, index) => row.id || `Row ${index + 1}`}
-      renderItem={(row, _index, onItemChange) => (
-        <div className="grid gap-4">
-          <SectionGrid>
-            <TextField
-              label="Row ID"
-              value={row.id}
-              onChange={(id) => onItemChange({ ...row, id })}
-            />
-            <SelectField
-              label="Direction"
-              value={row.direction}
-              onChange={(direction) =>
-                onItemChange({
-                  ...row,
-                  direction: direction as ImageMarqueeRow["direction"],
-                })
-              }
-              options={MARQUEE_DIRECTION_OPTIONS}
-            />
-            <NumberField
-              label="Speed"
-              value={row.speed}
-              onChange={(speed) => onItemChange({ ...row, speed })}
-            />
-            <TextField
-              label="Height"
-              value={typeof row.height === "number" ? String(row.height) : row.height}
-              onChange={(height) => onItemChange({ ...row, height })}
-            />
-          </SectionGrid>
-          <MarqueeImagesEditor
-            items={row.images}
-            onChange={(images) => onItemChange({ ...row, images })}
-          />
         </div>
       )}
     />
@@ -2792,11 +2614,19 @@ export function StructuredSectionEditor({
         />
       );
     case "clients_marquee":
+      return (
+        <MarqueeRowsEditor
+          rows={value as ImageMarqueeRow[]}
+          type="clients"
+          onChange={(nextValue) => onChange(nextValue)}
+        />
+      );
     case "showcase_marquee":
     case "portfolio_marquee":
       return (
         <MarqueeRowsEditor
           rows={value as ImageMarqueeRow[]}
+          type="gallery"
           onChange={(nextValue) => onChange(nextValue)}
         />
       );
