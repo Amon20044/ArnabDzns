@@ -44,9 +44,15 @@ import {
 } from "./models/content-block";
 import { SITE_REVALIDATE_SECONDS } from "@/lib/site-revalidate";
 
-const CONTENT_REVALIDATE_SECONDS = Number(
+const parsedContentRevalidateSeconds = Number(
   process.env.CONTENT_REVALIDATE_SECONDS ?? SITE_REVALIDATE_SECONDS,
 );
+
+const CONTENT_REVALIDATE_SECONDS =
+  Number.isFinite(parsedContentRevalidateSeconds) &&
+  parsedContentRevalidateSeconds > 0
+    ? parsedContentRevalidateSeconds
+    : SITE_REVALIDATE_SECONDS;
 
 export type ContentBlockRecord = ContentBlockSeed & {
   createdAt?: string;
@@ -270,7 +276,9 @@ export async function upsertContentBlock(
   input: ContentBlockUpdate,
 ) {
   if (!hasMongoConfig()) {
-    return upsertMemoryContentBlock(key, input);
+    throw new Error(
+      "MongoDB is not configured. Set MONGODB_URI to persist content updates.",
+    );
   }
 
   const fallback = defaultContentBlockMap[key];
@@ -303,14 +311,17 @@ export async function upsertContentBlock(
     return serializeBlock(block);
   } catch (error) {
     logContentFallback(error);
-    return upsertMemoryContentBlock(key, input);
+    throw new Error(
+      `Failed to persist content block \"${key}\" to MongoDB.`,
+    );
   }
 }
 
 export async function deleteContentBlock(key: ContentBlockKey) {
   if (!hasMongoConfig()) {
-    delete memoryContentOverrides[key];
-    return;
+    throw new Error(
+      "MongoDB is not configured. Set MONGODB_URI to persist content updates.",
+    );
   }
 
   try {
@@ -318,6 +329,7 @@ export async function deleteContentBlock(key: ContentBlockKey) {
     await ContentBlockModel.deleteOne({ key }).exec();
   } catch (error) {
     logContentFallback(error);
+    throw new Error(`Failed to delete content block \"${key}\" from MongoDB.`);
   }
 
   delete memoryContentOverrides[key];

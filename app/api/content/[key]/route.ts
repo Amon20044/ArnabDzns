@@ -123,13 +123,22 @@ export async function PATCH(request: NextRequest, context: ContentRouteContext) 
     return badRequest(error instanceof Error ? error.message : "Invalid JSON.");
   }
 
-  const block = await upsertContentBlock(key, update);
-  revalidateContentKey(key);
+  try {
+    const block = await upsertContentBlock(key, update);
+    revalidateContentKey(key);
 
-  return NextResponse.json({
-    block,
-    revalidated: true,
-  });
+    return NextResponse.json({
+      block,
+      revalidated: true,
+    });
+  } catch (error) {
+    return badRequest(
+      error instanceof Error
+        ? error.message
+        : "Content could not be saved to backend.",
+      500,
+    );
+  }
 }
 
 export async function PUT(request: NextRequest, context: ContentRouteContext) {
@@ -147,11 +156,20 @@ export async function DELETE(request: NextRequest, context: ContentRouteContext)
     return badRequest(`Unknown content key: ${key}`, 404);
   }
 
-  await deleteContentBlock(key);
-  revalidateContentKey(key);
+  try {
+    await deleteContentBlock(key);
+    revalidateContentKey(key);
 
-  return NextResponse.json({
-    deleted: true,
-    revalidated: true,
-  });
+    return NextResponse.json({
+      deleted: true,
+      revalidated: true,
+    });
+  } catch (error) {
+    return badRequest(
+      error instanceof Error
+        ? error.message
+        : "Content could not be deleted from backend.",
+      500,
+    );
+  }
 }
