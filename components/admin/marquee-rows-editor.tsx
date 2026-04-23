@@ -55,6 +55,7 @@ import { cn } from "@/lib/utils";
 type MarqueeRowsEditorProps = {
   rows: ImageMarqueeRow[];
   onChange: (rows: ImageMarqueeRow[]) => void;
+  onPersistRows?: (rows: ImageMarqueeRow[]) => Promise<boolean>;
   type?: "clients" | "gallery";
 };
 
@@ -413,6 +414,7 @@ function MarqueeImageTile({
 export function MarqueeRowsEditor({
   rows,
   onChange,
+  onPersistRows,
   type = "gallery",
 }: MarqueeRowsEditorProps) {
   const router = useRouter();
@@ -424,6 +426,7 @@ export function MarqueeRowsEditor({
   const [recentFirst, setRecentFirst] = useState(true);
   const [uploadError, setUploadError] = useState("");
   const [isUploading, startUploadTransition] = useTransition();
+  const [isPersistingRows, setIsPersistingRows] = useState(false);
 
   const pickerRow = pickerState ? rows[pickerState.rowIndex] : undefined;
   const seoItem = seoState
@@ -501,17 +504,23 @@ export function MarqueeRowsEditor({
     onChange(updateArrayItem(rows, rowIndex, nextRow));
   }
 
-  function updateRowImages(rowIndex: number, nextImages: ImageMarqueeItem[]) {
+  function replaceRowImages(rowIndex: number, nextImages: ImageMarqueeItem[]) {
     const row = rows[rowIndex];
 
     if (!row) {
-      return;
+      return null;
     }
 
-    updateRow(rowIndex, {
+    const nextRows = updateArrayItem(rows, rowIndex, {
       ...row,
       images: nextImages,
     });
+    onChange(nextRows);
+    return nextRows;
+  }
+
+  function updateRowImages(rowIndex: number, nextImages: ImageMarqueeItem[]) {
+    replaceRowImages(rowIndex, nextImages);
   }
 
   function insertAssetsIntoTarget(
@@ -519,13 +528,19 @@ export function MarqueeRowsEditor({
     assets: ImageMarqueeItem[],
   ) {
     if (!assets.length) {
-      return null;
+      return {
+        nextRows: null,
+        firstInsertedIndex: null,
+      };
     }
 
     const row = rows[target.rowIndex];
 
     if (!row) {
-      return null;
+      return {
+        nextRows: null,
+        firstInsertedIndex: null,
+      };
     }
 
     const nextAssets = assets.map((item) => cloneMarqueeItem(item));
@@ -551,9 +566,10 @@ export function MarqueeRowsEditor({
       nextImages = [...nextImages, ...nextAssets];
     }
 
-    updateRowImages(target.rowIndex, nextImages);
-
-    return firstInsertedIndex;
+    return {
+      nextRows: replaceRowImages(target.rowIndex, nextImages),
+      firstInsertedIndex,
+    };
   }
 
   function openPicker(rowIndex: number, replaceIndex?: number) {
@@ -567,17 +583,31 @@ export function MarqueeRowsEditor({
       return;
     }
 
-    const nextIndex = insertAssetsIntoTarget(pickerState, [entry.item]);
+    const { nextRows, firstInsertedIndex } = insertAssetsIntoTarget(pickerState, [entry.item]);
     const targetRowIndex = pickerState.rowIndex;
+    const finishSelection = async () => {
+      if (nextRows && onPersistRows) {
+        setIsPersistingRows(true);
+        const saved = await onPersistRows(nextRows);
+        setIsPersistingRows(false);
 
-    setPickerState(null);
+        if (!saved) {
+          setUploadError("Media was added to the draft, but MongoDB did not save it yet.");
+          return;
+        }
+      }
 
-    if (typeof nextIndex === "number") {
-      setSeoState({
-        rowIndex: targetRowIndex,
-        itemIndex: nextIndex,
-      });
-    }
+      setPickerState(null);
+
+      if (typeof firstInsertedIndex === "number") {
+        setSeoState({
+          rowIndex: targetRowIndex,
+          itemIndex: firstInsertedIndex,
+        });
+      }
+    };
+
+    void finishSelection();
   }
 
   function handleFileSelection(fileList: FileList | null) {
@@ -625,13 +655,25 @@ export function MarqueeRowsEditor({
           );
         }
 
-        const nextIndex = insertAssetsIntoTarget(target, uploadedAssets);
+        const { nextRows, firstInsertedIndex } = insertAssetsIntoTarget(target, uploadedAssets);
+
+        if (nextRows && onPersistRows) {
+          setIsPersistingRows(true);
+          const saved = await onPersistRows(nextRows);
+          setIsPersistingRows(false);
+
+          if (!saved) {
+            setUploadError("Images uploaded, but MongoDB did not save the row yet.");
+            return;
+          }
+        }
+
         setPickerState(null);
 
-        if (typeof nextIndex === "number") {
+        if (typeof firstInsertedIndex === "number") {
           setSeoState({
             rowIndex: target.rowIndex,
-            itemIndex: nextIndex,
+            itemIndex: firstInsertedIndex,
           });
         }
       } catch (error) {
@@ -948,11 +990,15 @@ export function MarqueeRowsEditor({
               <div className="mt-5 grid gap-3">
                 <Button
                   type="button"
-                  disabled={isUploading}
+                  disabled={isUploading || isPersistingRows}
                   onClick={() => fileInputRef.current?.click()}
                 >
                   <UploadCloudIcon />
-                  {isUploading ? "Uploading..." : "Choose images"}
+                  {isUploading
+                    ? "Uploading..."
+                    : isPersistingRows
+                      ? "Saving to Mongo..."
+                      : "Choose images"}
                 </Button>
                 <p className="text-xs leading-5 text-muted-foreground">
                   PNG, JPG, JPEG, WebP, or SVG work best here.

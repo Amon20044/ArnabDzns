@@ -59,6 +59,13 @@ type DashboardNotice =
     }
   | null;
 
+type PersistDraftOptions = {
+  pendingMessage?: string;
+  successMessage?: string;
+  errorMessage?: string;
+  skipSuccessNotice?: boolean;
+};
+
 function getInitialSelectedKey(
   blocks: ContentBlockRecord[],
   initialSelectedKey?: ContentBlockKey,
@@ -255,45 +262,89 @@ export function ContentDashboardClient({
     setDraft((current) => (current ? { ...current, data: nextData } : current));
   }
 
+  async function persistDraft(
+    nextDraft: StructuredContentDraft,
+    options: PersistDraftOptions = {},
+  ) {
+    if (!selectedBlock) {
+      return false;
+    }
+
+    const {
+      pendingMessage = "Saving changes...",
+      successMessage = "Section saved successfully.",
+      errorMessage = "Content could not be saved.",
+      skipSuccessNotice = false,
+    } = options;
+
+    try {
+      setNotice({ kind: "info", message: pendingMessage });
+
+      const payload = buildContentUpdateFromDraft(selectedBlock.key, nextDraft);
+      const response = await fetch(`/api/content/${selectedBlock.key}`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        credentials: "same-origin",
+        body: JSON.stringify(payload),
+      });
+      const result = (await response.json()) as { error?: string };
+
+      if (response.status === 401) {
+        router.replace("/login");
+        router.refresh();
+        throw new Error("Your admin session expired. Please sign in again.");
+      }
+
+      if (!response.ok) {
+        throw new Error(result.error ?? errorMessage);
+      }
+
+      await refreshBlocks(selectedBlock.key);
+
+      if (!skipSuccessNotice) {
+        setNotice({ kind: "success", message: successMessage });
+      }
+
+      return true;
+    } catch (error) {
+      setNotice({
+        kind: "error",
+        message: error instanceof Error ? error.message : errorMessage,
+      });
+      return false;
+    }
+  }
+
+  async function persistDraftData(
+    nextData: unknown,
+    options?: PersistDraftOptions,
+  ) {
+    if (!draft) {
+      return false;
+    }
+
+    return persistDraft(
+      {
+        ...draft,
+        data: nextData,
+      },
+      options,
+    );
+  }
+
   function saveSelectedBlock() {
     if (!selectedBlock || !draft) {
       return;
     }
 
-    startTransition(async () => {
-      try {
-        setNotice({ kind: "info", message: "Saving changes..." });
-
-        const payload = buildContentUpdateFromDraft(selectedBlock.key, draft);
-        const response = await fetch(`/api/content/${selectedBlock.key}`, {
-          method: "PATCH",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          credentials: "same-origin",
-          body: JSON.stringify(payload),
-        });
-        const result = (await response.json()) as { error?: string };
-
-        if (response.status === 401) {
-          router.replace("/login");
-          router.refresh();
-          throw new Error("Your admin session expired. Please sign in again.");
-        }
-
-        if (!response.ok) {
-          throw new Error(result.error ?? "Content could not be saved.");
-        }
-
-        await refreshBlocks(selectedBlock.key);
-        setNotice({ kind: "success", message: "Section saved successfully." });
-      } catch (error) {
-        setNotice({
-          kind: "error",
-          message:
-            error instanceof Error ? error.message : "Content could not be saved.",
-        });
-      }
+    startTransition(() => {
+      void persistDraft(draft, {
+        pendingMessage: "Saving changes...",
+        successMessage: "Section saved successfully.",
+        errorMessage: "Content could not be saved.",
+      });
     });
   }
 
@@ -629,6 +680,7 @@ export function ContentDashboardClient({
           blockKey={selectedBlock.key}
           value={draft.data}
           onChange={updateDraftData}
+          onPersist={persistDraftData}
         />
       </div>
     </section>

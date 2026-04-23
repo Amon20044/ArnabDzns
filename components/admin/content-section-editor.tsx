@@ -2585,10 +2585,12 @@ export function StructuredSectionEditor({
   blockKey,
   value,
   onChange,
+  onPersist,
 }: {
   blockKey: ContentBlockKey;
   value: unknown;
   onChange: (value: unknown) => void;
+  onPersist?: (value: unknown) => Promise<boolean>;
 }) {
   switch (blockKey) {
     case "site":
@@ -2619,6 +2621,7 @@ export function StructuredSectionEditor({
           rows={value as ImageMarqueeRow[]}
           type="clients"
           onChange={(nextValue) => onChange(nextValue)}
+          onPersistRows={(nextValue) => onPersist?.(nextValue) ?? Promise.resolve(true)}
         />
       );
     case "showcase_marquee":
@@ -2628,6 +2631,7 @@ export function StructuredSectionEditor({
           rows={value as ImageMarqueeRow[]}
           type="gallery"
           onChange={(nextValue) => onChange(nextValue)}
+          onPersistRows={(nextValue) => onPersist?.(nextValue) ?? Promise.resolve(true)}
         />
       );
     case "services":
