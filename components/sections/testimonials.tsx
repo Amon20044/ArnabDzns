@@ -1,7 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
-import Image from "next/image";
+import { useEffect, useMemo, useState } from "react";
 import { AnimatePresence, motion, type PanInfo } from "framer-motion";
 import { Quote, Star } from "lucide-react";
 import { Hero } from "@/components/sections/hero";
@@ -77,6 +76,10 @@ function Avatar({
 }) {
   const [errored, setErrored] = useState(false);
 
+  useEffect(() => {
+    setErrored(false);
+  }, [avatar.src]);
+
   if (errored || !avatar.src) {
     return (
       <span
@@ -100,12 +103,11 @@ function Avatar({
       )}
       style={{ width: size, height: size }}
     >
-      <Image
+      <img
         src={avatar.src}
         alt={avatar.alt}
-        fill
-        sizes={`${size}px`}
-        className="object-cover"
+        className="h-full w-full object-cover"
+        loading="lazy"
         onError={() => setErrored(true)}
       />
     </span>

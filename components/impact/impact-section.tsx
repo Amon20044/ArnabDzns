@@ -1,15 +1,13 @@
 "use client";
 
-import { LayoutGroup, motion } from "framer-motion";
-import { useState } from "react";
+import { motion } from "framer-motion";
 import { renderStatusBadgeLeading } from "@/components/ui/status-badge-leading";
 import { StatusBadge } from "@/components/ui/status-badge";
 import { Heading, Text } from "@/components/ui/typography";
 import { impactSection } from "@/data/impact";
-import type { ImpactCardConfig, ImpactSectionConfig } from "@/types";
+import type { ImpactSectionConfig } from "@/types";
 import { cn } from "@/lib/utils";
 import { ImpactCard } from "./impact-card";
-import { ImpactExpandedModal } from "./impact-expanded-modal";
 
 interface ImpactSectionProps {
   content?: ImpactSectionConfig;
@@ -20,8 +18,6 @@ export function ImpactSection({
   content = impactSection,
   className,
 }: ImpactSectionProps) {
-  const [selectedCard, setSelectedCard] = useState<ImpactCardConfig | null>(null);
-
   const cards = [...content.cards]
     .filter((card) => card.active !== false)
     .sort((left, right) => (right.priority ?? 0) - (left.priority ?? 0));
@@ -34,14 +30,13 @@ export function ImpactSection({
         .filter(Boolean);
 
   return (
-    <LayoutGroup id="impact-showcase">
-      <section
-        className={cn(
-          "page-reveal relative overflow-hidden rounded-[2.25rem] border border-border-accent/45 bg-[linear-gradient(180deg,rgba(255,255,255,0.92)_0%,rgba(248,247,252,0.96)_100%)] text-text-primary shadow-[0_34px_110px_rgba(88,28,135,0.12)]",
-          "max-md:!rounded-none max-md:!border-transparent max-md:!bg-none max-md:!shadow-none",
-          className,
-        )}
-      >
+    <section
+      className={cn(
+        "page-reveal relative overflow-hidden rounded-[2.25rem] border border-border-accent/45 bg-[linear-gradient(180deg,rgba(255,255,255,0.92)_0%,rgba(248,247,252,0.96)_100%)] text-text-primary shadow-[0_34px_110px_rgba(88,28,135,0.12)]",
+        "max-md:!rounded-none max-md:!border-transparent max-md:!bg-none max-md:!shadow-none",
+        className,
+      )}
+    >
         <div
           aria-hidden
           className="pointer-events-none absolute inset-0 opacity-95 max-md:hidden"
@@ -105,35 +100,14 @@ export function ImpactSection({
 
           </header>
 
-          <motion.div
-            animate={
-              selectedCard
-                ? { scale: 0.985, opacity: 0.42, filter: "blur(6px)" }
-                : { scale: 1, opacity: 1, filter: "blur(0px)" }
-            }
-            transition={{ duration: 0.32, ease: [0.22, 1, 0.36, 1] }}
-            className="mt-8"
-            aria-hidden={selectedCard ? true : undefined}
-          >
+          <motion.div className="mt-8">
             <div className="grid auto-flow-dense grid-cols-2 gap-4 sm:grid-cols-6 md:auto-rows-[minmax(12rem,1fr)] md:grid-cols-6 lg:auto-rows-[minmax(12.5rem,1fr)] lg:grid-cols-6">
               {cards.map((card) => (
-                <ImpactCard
-                  key={card.id}
-                  card={card}
-                  onSelect={setSelectedCard}
-                  hidden={selectedCard?.id === card.id}
-                />
+                <ImpactCard key={card.id} card={card} />
               ))}
             </div>
           </motion.div>
         </div>
       </section>
-
-      <ImpactExpandedModal
-        card={selectedCard}
-        cta={content.modalCTA}
-        onClose={() => setSelectedCard(null)}
-      />
-    </LayoutGroup>
   );
 }

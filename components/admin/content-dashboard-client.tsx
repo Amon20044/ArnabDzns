@@ -144,8 +144,8 @@ function SectionsNavigationPanel({
   headerAction?: ReactNode;
 }) {
   return (
-    <Card className={cn("rounded-2xl bg-white/84", className)}>
-      <CardHeader className="border-b border-border/70 pb-3">
+    <Card className={cn("min-h-0 rounded-2xl bg-white/84", className)}>
+      <CardHeader className="shrink-0 border-b border-border/70 pb-3">
         <div className="flex items-center justify-between gap-2">
           <div className="flex items-center gap-2">
             <LayoutPanelTopIcon className="size-4 text-muted-foreground" />
@@ -168,7 +168,10 @@ function SectionsNavigationPanel({
           />
         </div>
 
-        <div className="-mx-1 flex min-h-0 flex-1 flex-col gap-2 overflow-y-auto px-1 pb-2">
+        <div
+          className="-mx-1 flex min-h-0 flex-1 flex-col gap-2 overflow-y-auto overscroll-contain px-1 pb-6 pr-1 touch-pan-y"
+          style={{ WebkitOverflowScrolling: "touch" }}
+        >
           {groupedBlocks.length ? (
             groupedBlocks.map(([group, groupBlocks]) => {
               const isOpen = deferredSearch.length > 0 || openGroups.has(group);
@@ -211,7 +214,10 @@ function SectionsNavigationPanel({
                   </button>
 
                   {isOpen ? (
-                    <div className="grid gap-1 border-t border-border/60 bg-background/40 p-1.5">
+                    <div
+                      className="grid max-h-[min(48dvh,26rem)] gap-1 overflow-y-auto overscroll-contain border-t border-border/60 bg-background/40 p-1.5 touch-pan-y xl:max-h-none xl:overflow-visible"
+                      style={{ WebkitOverflowScrolling: "touch" }}
+                    >
                       {groupBlocks.map((block) => {
                         const definition = getSectionDefinition(block.key);
                         const isSelected = block.key === selectedKey;
@@ -602,7 +608,7 @@ export function ContentDashboardClient({
             role="dialog"
             aria-modal="true"
             aria-label="Dashboard sections"
-            className="absolute inset-y-3 right-3 w-[min(calc(100vw-1.5rem),22rem)]"
+            className="absolute inset-y-3 right-3 flex min-h-0 w-[min(calc(100vw-1.5rem),22rem)] flex-col"
           >
             <SectionsNavigationPanel
               blockCount={blocks.length}
@@ -614,7 +620,7 @@ export function ContentDashboardClient({
               selectedKey={selectedKey}
               onToggleGroup={toggleGroup}
               onSelectBlock={selectBlock}
-              className="h-full rounded-[1.6rem] bg-white/96 shadow-[0_28px_90px_rgba(15,23,42,0.18)]"
+              className="min-h-0 flex-1 rounded-[1.6rem] bg-white/96 shadow-[0_28px_90px_rgba(15,23,42,0.18)]"
               headerAction={
                 <Button
                   type="button"
@@ -645,16 +651,8 @@ export function ContentDashboardClient({
       />
 
       <div className="grid gap-4">
-        <div className="xl:hidden">
-          <div className="flex items-center justify-between gap-3 rounded-[1.35rem] border border-border/70 bg-white/88 px-4 py-3 shadow-[0_12px_30px_rgba(15,23,42,0.06)] backdrop-blur-sm">
-            <div className="min-w-0">
-              <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
-                Sections
-              </p>
-              <p className="truncate text-sm font-semibold text-foreground">
-                {selectedDefinition.label}
-              </p>
-            </div>
+        {!isMobileSectionsOpen ? (
+          <div className="sticky top-4 z-30 -mb-1 flex justify-end xl:hidden">
             <Button
               type="button"
               variant="outline"
@@ -663,12 +661,12 @@ export function ContentDashboardClient({
               aria-expanded={isMobileSectionsOpen}
               aria-controls="dashboard-sections-menu"
               onClick={() => setIsMobileSectionsOpen(true)}
-              className="shrink-0 rounded-full"
+              className="size-11 rounded-full border-white/70 bg-white/94 shadow-[0_16px_36px_rgba(15,23,42,0.12)] backdrop-blur-sm"
             >
-              <MenuIcon />
+              <MenuIcon className="size-5" />
             </Button>
           </div>
-        </div>
+        ) : null}
         <Card className="rounded-2xl bg-white/88">
           <CardHeader className="border-b border-border/70">
             <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">

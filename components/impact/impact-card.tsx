@@ -27,36 +27,27 @@ export const sizeSpanClass: Record<ImpactCardSize, string> = {
 
 interface ImpactCardProps {
   card: ImpactCardConfig;
-  onSelect: (card: ImpactCardConfig) => void;
-  hidden?: boolean;
 }
 
-export function ImpactCard({ card, onSelect, hidden = false }: ImpactCardProps) {
-  const rootRef = useRef<HTMLButtonElement | null>(null);
+export function ImpactCard({ card }: ImpactCardProps) {
+  const rootRef = useRef<HTMLDivElement | null>(null);
   const inView = useInView(rootRef, viewport);
   const tokens = resolveImpactAccent(card.accent);
 
   return (
-    <motion.button
+    <motion.div
       ref={rootRef}
-      type="button"
-      layoutId={`impact-card-${card.id}`}
-      onClick={() => onSelect(card)}
-      aria-label={`Expand impact card: ${card.shortLabel ?? card.title}`}
       initial={{ opacity: 0, y: 24, filter: "blur(10px)" }}
       whileInView={{ opacity: 1, y: 0, filter: "blur(0px)" }}
       viewport={viewport}
       transition={{ duration: 0.55, ease }}
       whileHover={{ y: -4, scale: 1.01 }}
-      whileTap={{ scale: 0.985 }}
-      style={{ visibility: hidden ? "hidden" : "visible" }}
       className={cn(
         "group relative flex min-h-[11rem] flex-col overflow-hidden rounded-[1.75rem] text-left",
         "bg-[linear-gradient(180deg,rgba(255,255,255,0.94)_0%,rgba(248,247,252,0.98)_100%)]",
         "border border-border-accent/55",
         "shadow-[0_24px_60px_rgba(88,28,135,0.10),0_4px_12px_rgba(15,23,42,0.06)]",
         "max-md:!shadow-none",
-        "focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/22",
         sizeSpanClass[card.size],
       )}
     >
@@ -88,7 +79,7 @@ export function ImpactCard({ card, onSelect, hidden = false }: ImpactCardProps) 
           <CardBody card={card} inView={inView} />
         </div>
       </div>
-    </motion.button>
+    </motion.div>
   );
 }
 

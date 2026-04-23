@@ -1,10 +1,27 @@
 "use client";
 
+import {
+  ImagePlusIcon,
+  Link2Icon,
+  LoaderCircleIcon,
+  Trash2Icon,
+  UploadCloudIcon,
+} from "lucide-react";
+import {
+  useEffect,
+  useRef,
+  useState,
+  type ChangeEvent,
+} from "react";
+import { EditorModal } from "@/components/admin/editor-modal";
 import { MarqueeRowsEditor } from "@/components/admin/marquee-rows-editor";
 import type { ImageMarqueeRow } from "@/components/ui/image-marquee";
+import { Button } from "@/components/ui/button";
 import {
+  ColorField,
   CollectionEditor,
   EditorSection,
+  IconField,
   LongTextField,
   NumberField,
   SectionGrid,
@@ -15,6 +32,13 @@ import {
 } from "@/components/admin/content-editor-fields";
 import type { ContactPageContent } from "@/db/content-defaults";
 import type { ContentBlockKey } from "@/db/models/content-block";
+import {
+  Field,
+  FieldContent,
+  FieldDescription,
+  FieldLabel,
+} from "@/components/ui/field";
+import { Input } from "@/components/ui/input";
 import type {
   BookCallSectionConfig,
   CTAConfig,
@@ -41,6 +65,7 @@ import type {
   TestimonialItem,
   TestimonialsSectionConfig,
 } from "@/types";
+import { cn } from "@/lib/utils";
 
 type NavigationEditorData = {
   header: HeaderConfig;
@@ -233,6 +258,323 @@ function createTestimonialAvatar(): TestimonialAvatar {
     alt: "",
     fallback: "",
   };
+}
+
+type UploadedImageAsset = {
+  id?: string;
+  src: string;
+  displaySrc?: string;
+  width?: number;
+  height?: number;
+  aspectRatio?: number;
+  alt?: string;
+  title?: string;
+  desc?: string;
+};
+
+type UploadResponse = {
+  assets?: UploadedImageAsset[];
+  error?: string;
+};
+
+function inferAvatarFallback(value: string) {
+  const parts = value
+    .trim()
+    .split(/\s+/)
+    .filter(Boolean)
+    .slice(0, 2);
+
+  if (!parts.length) {
+    return "";
+  }
+
+  return parts
+    .map((part) => part.charAt(0).toUpperCase())
+    .join("");
+}
+
+function getAvatarSummaryLabel(avatar: TestimonialAvatar, fallbackLabel: string) {
+  return avatar.alt?.trim() || avatar.fallback?.trim() || fallbackLabel;
+}
+
+function AvatarPreview({
+  avatar,
+  label,
+  size = 56,
+  className,
+}: {
+  avatar: TestimonialAvatar;
+  label: string;
+  size?: number;
+  className?: string;
+}) {
+  const [errored, setErrored] = useState(false);
+
+  useEffect(() => {
+    setErrored(false);
+  }, [avatar.src]);
+
+  const fallbackLabel =
+    avatar.fallback?.trim() || inferAvatarFallback(avatar.alt) || "NA";
+
+  if (!avatar.src || errored) {
+    return (
+      <span
+        aria-label={avatar.alt || label}
+        className={cn(
+          "inline-flex shrink-0 items-center justify-center rounded-full bg-accent-muted text-xs font-semibold uppercase tracking-[0.18em] text-accent-dark ring-1 ring-black/8",
+          className,
+        )}
+        style={{ width: size, height: size }}
+      >
+        {fallbackLabel}
+      </span>
+    );
+  }
+
+  return (
+    <span
+      className={cn(
+        "relative inline-flex shrink-0 overflow-hidden rounded-full bg-white ring-1 ring-black/8",
+        className,
+      )}
+      style={{ width: size, height: size }}
+    >
+      <img
+        src={avatar.src}
+        alt={avatar.alt || label}
+        className="h-full w-full object-cover"
+        loading="lazy"
+        onError={() => setErrored(true)}
+      />
+    </span>
+  );
+}
+
+function AvatarImageField({
+  label,
+  value,
+  fallbackLabel,
+  onChange,
+}: {
+  label: string;
+  value: TestimonialAvatar;
+  fallbackLabel: string;
+  onChange: (value: TestimonialAvatar) => void;
+}) {
+  const [open, setOpen] = useState(false);
+  const [urlDraft, setUrlDraft] = useState(value.src ?? "");
+  const [feedback, setFeedback] = useState("");
+  const [isUploading, setIsUploading] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
+
+  const summaryLabel = getAvatarSummaryLabel(value, fallbackLabel);
+
+  function openModal() {
+    setUrlDraft(value.src ?? "");
+    setFeedback("");
+    setOpen(true);
+  }
+
+  function closeModal() {
+    setFeedback("");
+    setOpen(false);
+  }
+
+  function applyImage(src: string, suggestedAlt?: string) {
+    const normalizedSrc = src.trim();
+    const nextAlt = value.alt?.trim() || suggestedAlt?.trim() || "";
+    const nextFallback = value.fallback?.trim() || inferAvatarFallback(nextAlt);
+
+    onChange({
+      ...value,
+      src: normalizedSrc,
+      alt: nextAlt,
+      fallback: nextFallback,
+    });
+  }
+
+  async function handleUpload(event: ChangeEvent<HTMLInputElement>) {
+    const file = event.target.files?.[0];
+    event.target.value = "";
+
+    if (!file) {
+      return;
+    }
+
+    setIsUploading(true);
+    setFeedback("");
+
+    try {
+      const formData = new FormData();
+      formData.append("file", file);
+
+      const response = await fetch("/api/uploads/imgbb", {
+        method: "POST",
+        credentials: "same-origin",
+        body: formData,
+      });
+      const result = (await response.json()) as UploadResponse;
+
+      if (!response.ok) {
+        throw new Error(result.error ?? "Image upload failed.");
+      }
+
+      const asset = result.assets?.[0];
+
+      if (!asset?.src) {
+        throw new Error("ImgBB did not return an image URL.");
+      }
+
+      applyImage(asset.src, asset.alt ?? asset.title);
+      setUrlDraft(asset.src);
+      setOpen(false);
+    } catch (error) {
+      setFeedback(
+        error instanceof Error ? error.message : "Image upload failed.",
+      );
+    } finally {
+      setIsUploading(false);
+    }
+  }
+
+  function handleApplyUrl() {
+    const trimmedUrl = urlDraft.trim();
+
+    if (!trimmedUrl) {
+      setFeedback("Paste a direct image URL first.");
+      return;
+    }
+
+    applyImage(trimmedUrl);
+    setFeedback("");
+    setOpen(false);
+  }
+
+  function clearImage() {
+    onChange({
+      ...value,
+      src: "",
+    });
+    setUrlDraft("");
+    setFeedback("");
+    setOpen(false);
+  }
+
+  return (
+    <>
+      <Field className="md:col-span-2">
+        <FieldLabel>{label}</FieldLabel>
+        <FieldContent>
+          <div className="flex items-center gap-3 rounded-2xl border border-border/70 bg-background/70 p-3">
+            <AvatarPreview avatar={value} label={summaryLabel} size={52} />
+            <div className="min-w-0 flex-1">
+              <p className="truncate text-sm font-medium text-foreground">
+                {value.src || "No image selected yet."}
+              </p>
+              <FieldDescription>
+                Upload to ImgBB or paste a public direct image URL. Save the
+                section afterward to persist it to Mongo.
+              </FieldDescription>
+            </div>
+            <Button type="button" variant="outline" onClick={openModal}>
+              <ImagePlusIcon />
+              Manage
+            </Button>
+          </div>
+        </FieldContent>
+      </Field>
+
+      <EditorModal
+        open={open}
+        onClose={closeModal}
+        title={label}
+        description="Upload a fresh image to ImgBB or use an existing direct image URL."
+        size="md"
+      >
+        <div className="grid gap-4">
+          <div className="rounded-2xl border border-border/70 bg-white/80 p-4">
+            <p className="text-sm font-semibold text-foreground">Current preview</p>
+            <div className="mt-3 flex items-center gap-3">
+              <AvatarPreview avatar={value} label={summaryLabel} size={64} />
+              <div className="min-w-0">
+                <p className="text-sm font-medium text-foreground">
+                  {summaryLabel}
+                </p>
+                <p className="mt-1 break-all text-xs text-muted-foreground">
+                  {value.src || "No image URL selected yet."}
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <div className="rounded-2xl border border-border/70 bg-white/80 p-4">
+            <p className="text-sm font-semibold text-foreground">Upload image</p>
+            <p className="mt-1 text-sm text-muted-foreground">
+              Pick a local file and we will upload it to ImgBB, then drop the
+              final URL into this avatar.
+            </p>
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept="image/*"
+              className="hidden"
+              onChange={handleUpload}
+            />
+            <div className="mt-3 flex flex-wrap gap-2">
+              <Button
+                type="button"
+                onClick={() => fileInputRef.current?.click()}
+                disabled={isUploading}
+              >
+                {isUploading ? (
+                  <LoaderCircleIcon className="animate-spin" />
+                ) : (
+                  <UploadCloudIcon />
+                )}
+                {isUploading ? "Uploading..." : "Choose image"}
+              </Button>
+            </div>
+          </div>
+
+          <div className="rounded-2xl border border-border/70 bg-white/80 p-4">
+            <p className="text-sm font-semibold text-foreground">Use image URL</p>
+            <p className="mt-1 text-sm text-muted-foreground">
+              Paste a public image URL. The live site will render it directly,
+              so the source must stay available and allow hotlinking.
+            </p>
+            <div className="mt-3 flex flex-col gap-3 sm:flex-row">
+              <Input
+                value={urlDraft}
+                onChange={(event) => setUrlDraft(event.target.value)}
+                placeholder="https://example.com/avatar.jpg"
+                className="flex-1"
+              />
+              <Button type="button" variant="outline" onClick={handleApplyUrl}>
+                <Link2Icon />
+                Use URL
+              </Button>
+            </div>
+          </div>
+
+          {feedback ? (
+            <div className="rounded-2xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-700">
+              {feedback}
+            </div>
+          ) : null}
+
+          {value.src ? (
+            <div className="flex justify-end">
+              <Button type="button" variant="destructive" onClick={clearImage}>
+                <Trash2Icon />
+                Clear image
+              </Button>
+            </div>
+          ) : null}
+        </div>
+      </EditorModal>
+    </>
+  );
 }
 
 function createTestimonialItem(): TestimonialItem {
@@ -469,7 +811,7 @@ function HeroBadgesEditor({
               value={badge.label}
               onChange={(label) => onItemChange({ ...badge, label })}
             />
-            <TextField
+            <IconField
               label="Icon"
               value={badge.icon}
               onChange={(icon) =>
@@ -485,25 +827,25 @@ function HeroBadgesEditor({
               value={badge.starCount}
               onChange={(starCount) => onItemChange({ ...badge, starCount })}
             />
-            <TextField
+            <ColorField
               label="Tone"
               value={badge.tone}
               onChange={(tone) => onItemChange({ ...badge, tone })}
               placeholder="#18181b"
             />
-            <TextField
+            <ColorField
               label="Text color"
               value={badge.textColor}
               onChange={(textColor) => onItemChange({ ...badge, textColor })}
               placeholder="#ffffff"
             />
-            <TextField
+            <ColorField
               label="Icon color"
               value={badge.iconColor}
               onChange={(iconColor) => onItemChange({ ...badge, iconColor })}
               placeholder="#ffffff"
             />
-            <TextField
+            <ColorField
               label="Indicator color"
               value={badge.indicatorColor}
               onChange={(indicatorColor) =>
@@ -776,7 +1118,7 @@ function NavigationCtasEditor({
               value={item.href}
               onChange={(href) => onItemChange({ ...item, href })}
             />
-            <TextField
+            <IconField
               label="Icon"
               value={item.icon}
               onChange={(icon) => onItemChange({ ...item, icon })}
@@ -813,7 +1155,7 @@ function ServiceItemsEditor({
               value={item.id}
               onChange={(id) => onItemChange({ ...item, id })}
             />
-            <TextField
+            <IconField
               label="Icon"
               value={item.icon}
               onChange={(icon) => onItemChange({ ...item, icon })}
@@ -866,7 +1208,7 @@ function RoadmapItemsEditor({
               value={item.label}
               onChange={(label) => onItemChange({ ...item, label })}
             />
-            <TextField
+            <IconField
               label="Icon"
               value={item.icon}
               onChange={(icon) => onItemChange({ ...item, icon })}
@@ -953,10 +1295,11 @@ function TestimonialAvatarsEditor({
       getItemLabel={(item, index) => item.alt || item.fallback || `Avatar ${index + 1}`}
       renderItem={(item, _index, onItemChange) => (
         <SectionGrid>
-          <TextField
+          <AvatarImageField
             label="Image source"
-            value={item.src}
-            onChange={(src) => onItemChange({ ...item, src })}
+            value={item}
+            fallbackLabel="Trusted avatar"
+            onChange={onItemChange}
           />
           <TextField
             label="Alt text"
@@ -1014,12 +1357,11 @@ function TestimonialItemsEditor({
               value={item.rating}
               onChange={(rating) => onItemChange({ ...item, rating })}
             />
-            <TextField
+            <AvatarImageField
               label="Avatar source"
-              value={item.avatar.src}
-              onChange={(src) =>
-                onItemChange({ ...item, avatar: { ...item.avatar, src } })
-              }
+              value={item.avatar}
+              fallbackLabel={item.name || "Testimonial avatar"}
+              onChange={(avatar) => onItemChange({ ...item, avatar })}
             />
             <TextField
               label="Avatar alt"
@@ -2460,7 +2802,7 @@ function BookCallEditor({
               })
             }
           />
-          <TextField
+          <IconField
             label="Icon"
             value={value.panel.primaryAction.icon}
             onChange={(icon) =>

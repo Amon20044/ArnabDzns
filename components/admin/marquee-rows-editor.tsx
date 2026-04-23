@@ -17,7 +17,9 @@ import {
 } from "lucide-react";
 import {
   ArrayMeta,
+  ColorField,
   EditorSection,
+  IconField,
   NumberField,
   SectionGrid,
   SelectField,
@@ -1170,7 +1172,7 @@ export function MarqueeRowsEditor({
                 />
                 {type === "clients" ? (
                   <>
-                    <TextField
+                    <IconField
                       label="Fallback icon ID"
                       value={seoItem.icon}
                       onChange={(icon) =>
@@ -1181,7 +1183,7 @@ export function MarqueeRowsEditor({
                       }
                       description="Optional backup if you want this logo to render as an icon."
                     />
-                    <TextField
+                    <ColorField
                       label="Icon color"
                       value={seoItem.iconColor}
                       onChange={(iconColor) =>
