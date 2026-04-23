@@ -75,13 +75,9 @@ export function ProfileCard({
                 key={`${row.value}-${index}`}
                 className="flex items-center justify-end gap-4 border-t border-black/15 py-[clamp(0.55rem,0.4rem+0.5vw,0.85rem)] first:border-t-0 first:pt-0 last:pb-0"
               >
-                <div className="text-left text-[clamp(0.68rem,0.6rem+0.2vw,0.78rem)] font-medium leading-[1.15] tracking-[-0.01em] text-black/75">
-                  {lines.map((line, lineIndex) => (
-                    <span key={`${line}-${lineIndex}`} className="block">
-                      {line}
-                    </span>
-                  ))}
-                </div>
+                <span className="whitespace-nowrap text-left text-[clamp(0.68rem,0.6rem+0.2vw,0.78rem)] font-medium leading-none tracking-[-0.01em] text-black/75">
+                  {lines.join(" ")}
+                </span>
                 <span
                   className="font-bold leading-none tracking-[-0.04em] text-[clamp(1.45rem,1.15rem+0.9vw,1.9rem)]"
                   style={{ color: row.valueColor ?? "#000000" }}
@@ -93,6 +89,8 @@ export function ProfileCard({
           })}
         </ul>
       </div>
+
+      <div aria-hidden className="h-px w-full bg-black/15" />
 
       <div className="flex items-center justify-between gap-3 px-[clamp(0.95rem,0.8rem+0.6vw,1.25rem)] py-[clamp(0.8rem,0.65rem+0.55vw,1.1rem)]">
         <div className="min-w-0">
