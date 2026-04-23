@@ -37,7 +37,7 @@ function IntroBadgeRow({
   badges: AboutPageContent["intro"]["badges"];
 }) {
   return (
-    <div className="flex flex-wrap items-center gap-3">
+    <div className="flex flex-wrap items-center justify-center gap-3">
       {badges.map((badge) => {
         const hasIndicator = badge.icon === "indicator";
         const hasIcon = badge.icon && badge.icon !== "none" && !hasIndicator;
@@ -297,7 +297,7 @@ export function AboutPage({
             mobileFlatSectionClassName,
           )}
         >
-          <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(216,180,254,0.24),transparent_28%),radial-gradient(circle_at_right_center,rgba(255,255,255,0.48),transparent_30%)]" />
+          <div className="pointer-events-none absolute inset-0 max-md:hidden bg-[radial-gradient(circle_at_top_left,rgba(216,180,254,0.24),transparent_28%),radial-gradient(circle_at_right_center,rgba(255,255,255,0.48),transparent_30%)]" />
 
           <IntroBadgeRow badges={content.intro.badges} />
 
@@ -308,7 +308,7 @@ export function AboutPage({
                 className="absolute inset-0 opacity-95"
                 style={introStripedBackground}
               />
-              <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(255,255,255,0.55),transparent_22%),radial-gradient(circle_at_70%_70%,rgba(168,85,247,0.14),transparent_24%)]" />
+              <div className="pointer-events-none absolute inset-0 max-md:hidden bg-[radial-gradient(circle_at_30%_20%,rgba(255,255,255,0.55),transparent_22%),radial-gradient(circle_at_70%_70%,rgba(168,85,247,0.14),transparent_24%)]" />
 
               <div className="relative z-[1]">
                 <span className="inline-flex rounded-full border border-white/70 bg-white/85 px-4 py-2 text-[11px] font-semibold uppercase tracking-[0.18em] text-accent-dark shadow-[0_10px_26px_rgba(168,85,247,0.08)]">
@@ -354,7 +354,7 @@ export function AboutPage({
               className="relative overflow-hidden rounded-[2rem] border border-white/80 p-6 shadow-[0_24px_60px_rgba(88,28,135,0.08)] sm:p-8 md:p-10"
               style={softSurfaceGradient}
             >
-              <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(255,255,255,0.65),transparent_28%),radial-gradient(circle_at_bottom_right,rgba(216,180,254,0.18),transparent_32%)]" />
+              <div className="pointer-events-none absolute inset-0 max-md:hidden bg-[radial-gradient(circle_at_top_left,rgba(255,255,255,0.65),transparent_28%),radial-gradient(circle_at_bottom_right,rgba(216,180,254,0.18),transparent_32%)]" />
 
               <div className="relative z-[1]">
                 <StatusBadge
@@ -414,7 +414,7 @@ export function AboutPage({
             mobileFlatSectionClassName,
           )}
         >
-          <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(168,85,247,0.12),transparent_42%)]" />
+          <div className="pointer-events-none absolute inset-0 max-md:hidden bg-[radial-gradient(circle_at_top,rgba(168,85,247,0.12),transparent_42%)]" />
 
           <Hero
             content={content.experienceHero}
@@ -453,7 +453,7 @@ export function AboutPage({
             mobileFlatSectionClassName,
           )}
         >
-          <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(168,85,247,0.16),transparent_44%),radial-gradient(circle_at_bottom,rgba(255,255,255,0.4),transparent_36%)]" />
+          <div className="pointer-events-none absolute inset-0 max-md:hidden bg-[radial-gradient(circle_at_top,rgba(168,85,247,0.16),transparent_44%),radial-gradient(circle_at_bottom,rgba(255,255,255,0.4),transparent_36%)]" />
 
           <div className="relative mx-auto max-w-5xl text-center">
             <StatusBadge
@@ -499,7 +499,7 @@ export function AboutPage({
             mobileFlatSectionClassName,
           )}
         >
-          <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(168,85,247,0.12),transparent_46%)]" />
+          <div className="pointer-events-none absolute inset-0 max-md:hidden bg-[radial-gradient(circle_at_top,rgba(168,85,247,0.12),transparent_46%)]" />
 
           <Hero content={content.teamHero} className="min-h-0 py-0" childrenClassName="mt-12">
             <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
@@ -520,7 +520,7 @@ export function AboutPage({
             mobileFlatSectionClassName,
           )}
         >
-          <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(168,85,247,0.18),transparent_44%),radial-gradient(circle_at_bottom,rgba(255,255,255,0.4),transparent_34%)]" />
+          <div className="pointer-events-none absolute inset-0 max-md:hidden bg-[radial-gradient(circle_at_top,rgba(168,85,247,0.18),transparent_44%),radial-gradient(circle_at_bottom,rgba(255,255,255,0.4),transparent_34%)]" />
 
           <div className="relative mx-auto max-w-4xl text-center">
             <StatusBadge
