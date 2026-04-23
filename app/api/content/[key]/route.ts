@@ -8,7 +8,7 @@ import {
   upsertContentBlock,
   type ContentBlockUpdate,
 } from "@/db/content";
-import { getSessionFromRequest } from "@/lib/auth/api";
+import { isAdminRequestAuthorized } from "@/lib/auth/api";
 
 export const runtime = "nodejs";
 
@@ -17,26 +17,6 @@ type ContentRouteContext = {
     key: string;
   }>;
 };
-
-async function isAuthorized(request: NextRequest) {
-  const session = await getSessionFromRequest(request);
-
-  if (session) {
-    return true;
-  }
-
-  const secret = process.env.REVALIDATE_SECRET;
-
-  if (!secret && process.env.NODE_ENV !== "production") {
-    return true;
-  }
-
-  const header = request.headers.get("authorization");
-  const bearer = header?.startsWith("Bearer ") ? header.slice(7) : undefined;
-  const querySecret = request.nextUrl.searchParams.get("secret");
-
-  return Boolean(secret && (bearer === secret || querySecret === secret));
-}
 
 function badRequest(message: string, status = 400) {
   return NextResponse.json({ error: message }, { status });
@@ -110,6 +90,10 @@ function toUpdatePayload(input: unknown): ContentBlockUpdate {
 }
 
 export async function GET(_request: NextRequest, context: ContentRouteContext) {
+  if (!(await isAdminRequestAuthorized(_request))) {
+    return badRequest("Unauthorized.", 401);
+  }
+
   const { key } = await context.params;
 
   if (!isContentBlockKey(key)) {
@@ -121,7 +105,7 @@ export async function GET(_request: NextRequest, context: ContentRouteContext) {
 }
 
 export async function PATCH(request: NextRequest, context: ContentRouteContext) {
-  if (!(await isAuthorized(request))) {
+  if (!(await isAdminRequestAuthorized(request))) {
     return badRequest("Unauthorized.", 401);
   }
 
@@ -153,7 +137,7 @@ export async function PUT(request: NextRequest, context: ContentRouteContext) {
 }
 
 export async function DELETE(request: NextRequest, context: ContentRouteContext) {
-  if (!(await isAuthorized(request))) {
+  if (!(await isAdminRequestAuthorized(request))) {
     return badRequest("Unauthorized.", 401);
   }
 

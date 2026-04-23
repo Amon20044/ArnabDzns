@@ -1,4 +1,5 @@
 import { NextResponse, type NextRequest } from "next/server";
+import { getSafeRedirectPath } from "@/lib/auth/redirect";
 import { ensureSeedAdminUser, findAdminByEmail } from "@/lib/auth/admin";
 import {
   AUTH_COOKIE_NAME,
@@ -17,6 +18,9 @@ export async function POST(request: NextRequest) {
   const body = (await request.json().catch(() => null)) as Record<string, unknown> | null;
   const email = readString(body?.email).toLowerCase();
   const password = readString(body?.password);
+  const nextPath = getSafeRedirectPath(
+    readString(body?.next) || request.nextUrl.searchParams.get("next"),
+  );
 
   if (!email || !password) {
     return NextResponse.json(
@@ -49,7 +53,7 @@ export async function POST(request: NextRequest) {
   });
   const response = NextResponse.json({
     ok: true,
-    redirectTo: "/dashboard",
+    redirectTo: nextPath,
   });
 
   response.cookies.set(AUTH_COOKIE_NAME, token, {

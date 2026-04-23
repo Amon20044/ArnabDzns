@@ -1,7 +1,9 @@
 "use client"
 
-import { useRouter } from "next/navigation"
+import Link from "next/link"
+import { useRouter, useSearchParams } from "next/navigation"
 import { useState, useTransition } from "react"
+import { DEFAULT_AUTH_REDIRECT_PATH, getSafeRedirectPath } from "@/lib/auth/redirect"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import {
@@ -16,7 +18,7 @@ import {
   FieldDescription,
   FieldGroup,
   FieldLabel,
-  FieldSeparator,
+  // FieldSeparator,
 } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
 
@@ -25,8 +27,11 @@ export function LoginForm({
   ...props
 }: React.ComponentProps<"div">) {
   const router = useRouter()
+  const searchParams = useSearchParams()
   const [message, setMessage] = useState("")
   const [isPending, startTransition] = useTransition()
+  const nextPath = getSafeRedirectPath(searchParams.get("next"))
+  const isChangePasswordFlow = nextPath === "/change-password"
 
   function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault()
@@ -43,6 +48,7 @@ export function LoginForm({
         body: JSON.stringify({
           email: formData.get("email"),
           password: formData.get("password"),
+          next: nextPath,
         }),
       })
       const result = (await response.json()) as {
@@ -55,7 +61,7 @@ export function LoginForm({
         return
       }
 
-      router.replace(result.redirectTo ?? "/dashboard")
+      router.replace(result.redirectTo ?? DEFAULT_AUTH_REDIRECT_PATH)
       router.refresh()
     })
   }
@@ -66,22 +72,21 @@ export function LoginForm({
         <CardHeader className="text-center">
           <CardTitle className="text-xl">Admin login</CardTitle>
           <CardDescription>
-            Sign in to manage portfolio content.
+            {isChangePasswordFlow
+              ? "Sign in first, then we’ll take you to change your password."
+              : "Sign in to manage portfolio content."}
           </CardDescription>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit}>
             <FieldGroup>
-              <FieldSeparator className="*:data-[slot=field-separator-content]:bg-card">
-                Seeded account
-              </FieldSeparator>
               <Field>
                 <FieldLabel htmlFor="email">Email</FieldLabel>
                 <Input
                   id="email"
                   name="email"
                   type="email"
-                  placeholder="arnabdzns@gmail.com"
+                  placeholder="johndoe@gmail.com"
                   autoComplete="email"
                   required
                 />
@@ -89,12 +94,12 @@ export function LoginForm({
               <Field>
                 <div className="flex items-center">
                   <FieldLabel htmlFor="password">Password</FieldLabel>
-                  <a
+                  <Link
                     href="/change-password"
                     className="ml-auto text-sm underline-offset-4 hover:underline"
                   >
                     Change password
-                  </a>
+                  </Link>
                 </div>
                 <Input
                   id="password"
@@ -118,9 +123,6 @@ export function LoginForm({
           </form>
         </CardContent>
       </Card>
-      <FieldDescription className="px-6 text-center">
-        Protected by a 2 day signed admin session.
-      </FieldDescription>
     </div>
   )
 }

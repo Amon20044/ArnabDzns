@@ -1,4 +1,5 @@
 import { NextResponse, type NextRequest } from "next/server";
+import { getSafeRedirectPath } from "@/lib/auth/redirect";
 import { AUTH_COOKIE_NAME, verifySessionToken } from "@/lib/auth/session";
 
 const protectedRoutes = ["/dashboard", "/change-password"];
@@ -11,12 +12,13 @@ function isProtectedPath(pathname: string) {
 
 export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
+  const nextPath = getSafeRedirectPath(request.nextUrl.searchParams.get("next"));
   const session = await verifySessionToken(
     request.cookies.get(AUTH_COOKIE_NAME)?.value,
   );
 
   if (pathname === "/login" && session) {
-    return NextResponse.redirect(new URL("/dashboard", request.url));
+    return NextResponse.redirect(new URL(nextPath, request.url));
   }
 
   if (isProtectedPath(pathname) && !session) {

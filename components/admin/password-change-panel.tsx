@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import { CheckCircle2Icon, KeyRoundIcon, QrCodeIcon } from "lucide-react";
+import { useRouter } from "next/navigation";
 import { useEffect, useState, useTransition } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -15,8 +16,15 @@ interface SetupPayload {
   qrDataUrl: string;
 }
 
+type SetupStatus = "loading" | "ready" | "error";
+
+const CHANGE_PASSWORD_LOGIN_PATH = "/login?next=%2Fchange-password";
+
 export function PasswordChangePanel() {
+  const router = useRouter();
   const [setup, setSetup] = useState<SetupPayload | null>(null);
+  const [setupStatus, setSetupStatus] = useState<SetupStatus>("loading");
+  const [setupRequestId, setSetupRequestId] = useState(0);
   const [otp, setOtp] = useState("");
   const [verified, setVerified] = useState(false);
   const [message, setMessage] = useState("");
@@ -26,15 +34,36 @@ export function PasswordChangePanel() {
     let ignore = false;
 
     async function loadSetup() {
+      setSetupStatus("loading");
+      setMessage("");
+
       const response = await fetch("/api/auth/password/setup", {
         cache: "no-store",
       });
+      const result = (await response.json().catch(() => null)) as
+        | (SetupPayload & { message?: string })
+        | null;
 
-      if (!response.ok || ignore) {
+      if (ignore) {
         return;
       }
 
-      setSetup((await response.json()) as SetupPayload);
+      if (response.status === 401) {
+        setSetupStatus("error");
+        setMessage("Your session expired. Redirecting to login...");
+        router.replace(CHANGE_PASSWORD_LOGIN_PATH);
+        router.refresh();
+        return;
+      }
+
+      if (!response.ok || !result) {
+        setSetupStatus("error");
+        setMessage(result?.message ?? "Authenticator setup could not be loaded.");
+        return;
+      }
+
+      setSetup(result);
+      setSetupStatus("ready");
     }
 
     loadSetup();
@@ -42,7 +71,7 @@ export function PasswordChangePanel() {
     return () => {
       ignore = true;
     };
-  }, []);
+  }, [router, setupRequestId]);
 
   function verifyOtp(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -55,9 +84,15 @@ export function PasswordChangePanel() {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ otp }),
+        body: JSON.stringify({ otp: otp.trim() }),
       });
       const result = (await response.json()) as { message?: string; verified?: boolean };
+
+      if (response.status === 401) {
+        router.replace(CHANGE_PASSWORD_LOGIN_PATH);
+        router.refresh();
+        return;
+      }
 
       if (!response.ok || !result.verified) {
         setMessage(result.message ?? "Authenticator code could not be verified.");
@@ -88,12 +123,22 @@ export function PasswordChangePanel() {
       });
       const result = (await response.json()) as { message?: string; changed?: boolean };
 
+      if (response.status === 401) {
+        router.replace(CHANGE_PASSWORD_LOGIN_PATH);
+        router.refresh();
+        return;
+      }
+
       if (!response.ok || !result.changed) {
+        if (response.status === 403) {
+          setVerified(false);
+        }
+
         setMessage(result.message ?? "Password could not be changed.");
         return;
       }
 
-      setMessage("Password changed.");
+      setMessage("Password changed. Use the new password the next time you sign in.");
       setVerified(false);
       setOtp("");
       event.currentTarget.reset();
@@ -112,7 +157,7 @@ export function PasswordChangePanel() {
         </CardHeader>
         <CardContent className="grid gap-4">
           <div className="grid place-items-center rounded-2xl border border-border bg-white p-4">
-            {setup?.qrDataUrl ? (
+            {setupStatus === "ready" && setup?.qrDataUrl ? (
               <Image
                 src={setup.qrDataUrl}
                 width={220}
@@ -121,14 +166,25 @@ export function PasswordChangePanel() {
                 unoptimized
                 className="size-56"
               />
+            ) : setupStatus === "error" ? (
+              <div className="grid gap-3 px-4 py-6 text-center text-sm text-rose-600">
+                <p>{message || "Authenticator setup could not be loaded."}</p>
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => setSetupRequestId((current) => current + 1)}
+                >
+                  Retry
+                </Button>
+              </div>
             ) : (
               <div className="grid size-56 place-items-center text-sm text-muted-foreground">
-                Loading QR
+                Loading authenticator setup...
               </div>
             )}
           </div>
           <div className="rounded-xl border border-border bg-white/70 p-3 font-mono text-xs leading-5 text-text-secondary">
-            {setup?.secret ?? "Loading secret"}
+            {setupStatus === "ready" ? setup?.secret : "Loading secret..."}
           </div>
         </CardContent>
       </Card>
@@ -155,15 +211,21 @@ export function PasswordChangePanel() {
                 <Input
                   id="otp"
                   value={otp}
-                  onChange={(event) => setOtp(event.target.value)}
+                  onChange={(event) =>
+                    setOtp(event.target.value.replace(/\D/g, "").slice(0, 6))
+                  }
                   inputMode="numeric"
                   pattern="[0-9]*"
                   autoComplete="one-time-code"
                   placeholder="000000"
+                  disabled={setupStatus !== "ready" || isPending}
                   required
                 />
               </Field>
-              <Button type="submit" disabled={isPending || otp.length < 6}>
+              <Button
+                type="submit"
+                disabled={setupStatus !== "ready" || isPending || otp.length < 6}
+              >
                 {verified ? "Verified" : "Verify code"}
               </Button>
             </FieldGroup>
@@ -184,7 +246,7 @@ export function PasswordChangePanel() {
                   name="password"
                   type="password"
                   autoComplete="new-password"
-                  disabled={!verified || isPending}
+                  disabled={setupStatus !== "ready" || !verified || isPending}
                   required
                 />
               </Field>
@@ -195,11 +257,14 @@ export function PasswordChangePanel() {
                   name="confirmPassword"
                   type="password"
                   autoComplete="new-password"
-                  disabled={!verified || isPending}
+                  disabled={setupStatus !== "ready" || !verified || isPending}
                   required
                 />
               </Field>
-              <Button type="submit" disabled={!verified || isPending}>
+              <Button
+                type="submit"
+                disabled={setupStatus !== "ready" || !verified || isPending}
+              >
                 Save password
               </Button>
             </FieldGroup>
