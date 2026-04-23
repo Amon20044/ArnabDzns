@@ -1,7 +1,7 @@
 "use client"
 
 import Link from "next/link"
-import { useRouter, useSearchParams } from "next/navigation"
+import { useRouter } from "next/navigation"
 import { useState, useTransition } from "react"
 import { DEFAULT_AUTH_REDIRECT_PATH, getSafeRedirectPath } from "@/lib/auth/redirect"
 import { cn } from "@/lib/utils"
@@ -24,14 +24,16 @@ import { Input } from "@/components/ui/input"
 
 export function LoginForm({
   className,
+  nextPath,
   ...props
-}: React.ComponentProps<"div">) {
+}: React.ComponentProps<"div"> & {
+  nextPath?: string | null
+}) {
   const router = useRouter()
-  const searchParams = useSearchParams()
   const [message, setMessage] = useState("")
   const [isPending, startTransition] = useTransition()
-  const nextPath = getSafeRedirectPath(searchParams.get("next"))
-  const isChangePasswordFlow = nextPath === "/change-password"
+  const safeNextPath = getSafeRedirectPath(nextPath)
+  const isChangePasswordFlow = safeNextPath === "/change-password"
 
   function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault()
@@ -48,7 +50,7 @@ export function LoginForm({
         body: JSON.stringify({
           email: formData.get("email"),
           password: formData.get("password"),
-          next: nextPath,
+          next: safeNextPath,
         }),
       })
       const result = (await response.json()) as {
