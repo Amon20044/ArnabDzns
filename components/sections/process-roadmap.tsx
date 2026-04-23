@@ -127,7 +127,7 @@ function ProcessStepRow({
               <Icon
                 name={item.icon}
                 strokeWidth={1.6}
-                className="size-36 text-[rgba(88,28,135,0.18)] sm:size-40"
+                className="size-36 text-[#CBADE7] sm:size-40"
               />
             </motion.div>
           ) : null}

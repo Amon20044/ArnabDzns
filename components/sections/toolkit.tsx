@@ -40,7 +40,7 @@ function ServiceCard({
       <Icon
         name={item.icon}
         strokeWidth={1.6}
-        className="pointer-events-none absolute right-[-1.25rem] top-[-1rem] z-0 size-40 text-[rgba(88,28,135)] transition-transform duration-500 ease-out group-hover:scale-105 group-hover:-rotate-3 sm:size-44"
+        className="pointer-events-none absolute right-[-1.25rem] top-[-1rem] z-0 size-40 text-[#CBADE7] transition-transform duration-500 ease-out group-hover:scale-105 group-hover:-rotate-3 sm:size-44"
       />
 
       <div className="relative z-[1] mt-auto pt-28 text-left sm:pt-32">

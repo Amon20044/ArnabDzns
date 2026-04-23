@@ -17,8 +17,7 @@ interface HomeLandingHeroProps {
 }
 
 const ease = [0.22, 1, 0.36, 1] as const;
-const MOBILE_HERO_LOTTIE_SRC = "/Mobile.lottie";
-const MOBILE_HERO_FALLBACK_SRC = "/Mobile.svg";
+const MOBILE_HERO_LOTTIE_SRC = "/mobile-low.lottie";
 
 const blurUp: Variants = {
   hidden: { opacity: 0, y: 28, filter: "blur(18px)" },
@@ -162,14 +161,14 @@ export function HomeLandingHero({
           ) : isDesktop ? (
             <div className="relative mx-auto h-[clamp(12.5rem,36vw,23rem)] w-full">
               <DotLottieReact
-                src="/HeroTitle.lottie"
+                src="/herotitle-low.lottie"
                 autoplay
                 loop
                 renderConfig={{ autoResize: true }}
                 style={{ width: "100%", height: "100%" }}
               />
             </div>
-          ) : hasMobileLottie ? (
+          ) : (
             <div className="relative mx-auto aspect-[380/400] w-full sm:max-w-[24rem]">
               <DotLottieReact
                 src={MOBILE_HERO_LOTTIE_SRC}
@@ -179,15 +178,6 @@ export function HomeLandingHero({
                 style={{ width: "100%", height: "100%" }}
               />
             </div>
-          ) : (
-            <Image
-              src={MOBILE_HERO_FALLBACK_SRC}
-              alt={heroTitle}
-              width={384}
-              height={475}
-              preload
-              className="mx-auto h-auto w-full sm:max-w-[24rem]"
-            />
           )}
         </div>
       </motion.div>
