@@ -9,6 +9,7 @@ import {
   useEffect,
   useRef,
   useState,
+  type CSSProperties,
   type MouseEvent as ReactMouseEvent,
 } from "react";
 import { PrimaryButton } from "@/components/ui/primary-button";
@@ -36,6 +37,42 @@ function resolveCTAIcon(config: CTAConfig) {
   }
 }
 
+function useVisualViewportBottomOffset() {
+  const [bottomOffset, setBottomOffset] = useState(0);
+
+  useEffect(() => {
+    const viewport = window.visualViewport;
+
+    if (!viewport) {
+      return;
+    }
+
+    let frame = 0;
+
+    const updateBottomOffset = () => {
+      window.cancelAnimationFrame(frame);
+      frame = window.requestAnimationFrame(() => {
+        const offset = window.innerHeight - viewport.height - viewport.offsetTop;
+        setBottomOffset(Math.max(0, Math.round(offset)));
+      });
+    };
+
+    updateBottomOffset();
+    viewport.addEventListener("resize", updateBottomOffset);
+    viewport.addEventListener("scroll", updateBottomOffset);
+    window.addEventListener("orientationchange", updateBottomOffset);
+
+    return () => {
+      window.cancelAnimationFrame(frame);
+      viewport.removeEventListener("resize", updateBottomOffset);
+      viewport.removeEventListener("scroll", updateBottomOffset);
+      window.removeEventListener("orientationchange", updateBottomOffset);
+    };
+  }, []);
+
+  return bottomOffset;
+}
+
 export const Navigation = ({ content = navigationConfig }: NavigationProps) => {
   const pathname = usePathname();
   const navbarRef = useRef<HTMLElement>(null);
@@ -45,6 +82,7 @@ export const Navigation = ({ content = navigationConfig }: NavigationProps) => {
   const [itemCenters, setItemCenters] = useState<Record<string, number>>({});
   const [activeSectionId, setActiveSectionId] = useState("home");
   const [mobileTooltipId, setMobileTooltipId] = useState<string | null>(null);
+  const visualViewportBottomOffset = useVisualViewportBottomOffset();
 
   const { items } = content;
   const ctas = content.ctas.map((cta) => ({
@@ -67,6 +105,10 @@ export const Navigation = ({ content = navigationConfig }: NavigationProps) => {
   const mobilePrimaryCta = ctas.find(
     (cta) => cta.variant === "primary" && !!(cta.href ?? cta.path) && !!cta.Icon,
   );
+  const mobileNavStyle = {
+    "--mobile-nav-viewport-offset": `${visualViewportBottomOffset}px`,
+    bottom: "calc(2px - var(--mobile-nav-viewport-offset))",
+  } as CSSProperties;
 
   const syncHashForSection = useCallback((sectionId: string) => {
     const nextUrl = sectionId === "home" ? "/" : `/#${sectionId}`;
@@ -315,7 +357,7 @@ export const Navigation = ({ content = navigationConfig }: NavigationProps) => {
         role="navigation"
         aria-label="Main navigation"
         className="fixed left-1/2 z-50 w-[min(calc(100vw-1rem),28rem)] -translate-x-1/2 sm:hidden"
-        style={{ bottom: "0px" }}
+        style={mobileNavStyle}
         initial={{ y: 24, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ type: "spring", stiffness: 320, damping: 26, delay: 0.1 }}
