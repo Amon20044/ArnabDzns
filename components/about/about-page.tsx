@@ -144,7 +144,7 @@ function ExperienceCard({ item }: { item: AboutExperienceItem }) {
           <path d={EXPERIENCE_BLOB_PATH} fill={item.tone} />
         </svg>
 
-        <div className="absolute inset-0 flex items-center justify-center p-10">
+        <div className="absolute inset-0 flex items-center justify-center p-3">
           {logoSrc ? (
             <div className="relative h-full w-full">
               <Image
@@ -202,29 +202,6 @@ function ExperienceCard({ item }: { item: AboutExperienceItem }) {
   );
 }
 
-function PrincipleCard({
-  title,
-  description,
-}: AboutPageContent["manifesto"]["principles"][number]) {
-  return (
-    <article
-      className="relative overflow-hidden rounded-[1.6rem] border border-white/80 p-5 text-left shadow-[0_18px_46px_rgba(88,28,135,0.08)]"
-      style={softSurfaceGradient}
-    >
-      <div
-        aria-hidden
-        className="pointer-events-none absolute inset-x-8 top-0 h-px bg-gradient-to-r from-transparent via-white to-transparent"
-      />
-      <Heading variant="h5" as="h3">
-        {title}
-      </Heading>
-      <Text variant="p3" className="mt-3 text-pretty">
-        {description}
-      </Text>
-    </article>
-  );
-}
-
 function TeamCard({ member }: { member: AboutTeamMember }) {
   return (
     <ProfileCard
@@ -251,14 +228,7 @@ export function AboutPage({
   return (
     <div className="flex flex-1">
       <main className="page-section-stack mx-auto flex w-full max-w-6xl flex-1 flex-col px-2 pb-32 pt-4 md:px-10 md:pb-40">
-        <section
-          className={cn(
-            "page-section-frame page-surface page-reveal relative overflow-hidden",
-            mobileFlatSectionClassName,
-          )}
-        >
-          <div className="pointer-events-none absolute inset-0 max-md:hidden bg-[radial-gradient(circle_at_top_left,rgba(216,180,254,0.24),transparent_28%),radial-gradient(circle_at_right_center,rgba(255,255,255,0.48),transparent_30%)]" />
-
+        <section className="page-reveal relative">
           <IntroBadgeRow badges={content.intro.badges} />
 
           <div className="mt-8 grid gap-6 xl:grid-cols-[minmax(0,0.95fr)_minmax(0,1.18fr)] xl:items-center">
@@ -290,64 +260,74 @@ export function AboutPage({
               />
             </div>
 
-            <article className="relative w-full">
-              <h2
-                className={cn(
-                  "text-[clamp(2.1rem,5.6vw,4.2rem)] font-bold leading-[0.98] tracking-[-0.035em] text-text-primary",
-                )}
-                aria-label={content.intro.title}
-              >
-                <span aria-hidden>A designer who cares more about </span>
-                <span aria-hidden className="relative inline-block whitespace-nowrap align-baseline">
+            <article
+              className="relative overflow-hidden rounded-[2rem] border border-white/80 p-6 shadow-[0_24px_60px_rgba(88,28,135,0.08)] sm:p-8 md:p-10"
+              style={softSurfaceGradient}
+            >
+              <div className="pointer-events-none absolute inset-0 max-md:hidden bg-[radial-gradient(circle_at_top_left,rgba(255,255,255,0.65),transparent_28%),radial-gradient(circle_at_bottom_right,rgba(216,180,254,0.18),transparent_32%)]" />
+
+              <div className="relative z-[1]">
+                <h2
+                  className={cn(
+                    "text-[clamp(2.1rem,5.6vw,4.2rem)] font-bold leading-[0.98] tracking-[-0.035em] text-text-primary",
+                  )}
+                  aria-label={content.intro.title}
+                >
+                  <span aria-hidden>A designer who cares more about </span>
                   <span
                     aria-hidden
-                    className="pointer-events-none absolute inset-x-[-0.08em] bottom-[0.14em] h-[0.38em] -rotate-[1.5deg] rounded-[0.4em] bg-accent/25"
-                  />
+                    className="relative inline-block whitespace-nowrap align-baseline"
+                  >
+                    <span
+                      aria-hidden
+                      className="pointer-events-none absolute inset-x-[-0.08em] bottom-[0.14em] h-[0.38em] -rotate-[1.5deg] rounded-[0.4em] bg-accent/25"
+                    />
+                    <span
+                      className={cn(
+                        caveat.className,
+                        "relative text-[1.1em] leading-[0.9] text-accent-dark",
+                      )}
+                    >
+                      clarity
+                    </span>
+                  </span>
+                  <span aria-hidden> than </span>
                   <span
+                    aria-hidden
                     className={cn(
                       caveat.className,
-                      "relative text-[1.1em] leading-[0.9] text-accent-dark",
+                      "text-[1.1em] leading-[0.9] text-text-primary/40 line-through decoration-accent/55 decoration-[0.06em] underline-offset-[0.05em]",
                     )}
                   >
-                    clarity
+                    decoration.
                   </span>
-                </span>
-                <span aria-hidden> than </span>
-                <span
-                  aria-hidden
-                  className={cn(
-                    caveat.className,
-                    "text-[1.1em] leading-[0.9] text-text-primary/40 line-through decoration-accent/55 decoration-[0.06em] underline-offset-[0.05em]",
-                  )}
-                >
-                  decoration.
-                </span>
-              </h2>
+                </h2>
 
-              <div className="mt-8 max-w-2xl space-y-5">
-                {content.intro.paragraphs.map((paragraph) => (
-                  <Text key={paragraph} variant="p2" className="text-pretty">
-                    {paragraph}
+                <div className="mt-8 space-y-5">
+                  {content.intro.paragraphs.map((paragraph) => (
+                    <Text key={paragraph} variant="p2" className="max-w-2xl text-pretty">
+                      {paragraph}
+                    </Text>
+                  ))}
+                </div>
+
+                <div className="mt-8 flex flex-wrap items-end justify-between gap-4 border-t border-dashed border-black/8 pt-6">
+                  <p
+                    className={cn(
+                      caveat.className,
+                      "text-[clamp(2rem,5vw,3rem)] leading-none tracking-[-0.05em] text-accent-dark",
+                    )}
+                  >
+                    - {content.intro.signature}
+                  </p>
+                  <Text
+                    as="span"
+                    variant="p3"
+                    className="uppercase tracking-[0.16em] text-text-secondary/76"
+                  >
+                    {content.intro.timezone}
                   </Text>
-                ))}
-              </div>
-
-              <div className="mt-10 flex max-w-2xl flex-wrap items-end justify-between gap-4 border-t border-dashed border-black/10 pt-6">
-                <p
-                  className={cn(
-                    caveat.className,
-                    "text-[clamp(2rem,5vw,3rem)] leading-none tracking-[-0.05em] text-accent-dark",
-                  )}
-                >
-                  - {content.intro.signature}
-                </p>
-                <Text
-                  as="span"
-                  variant="p3"
-                  className="uppercase tracking-[0.16em] text-text-secondary/76"
-                >
-                  {content.intro.timezone}
-                </Text>
+                </div>
               </div>
             </article>
           </div>
@@ -387,52 +367,6 @@ export function AboutPage({
               </div>
             </div>
           </Hero>
-        </section>
-
-        <section
-          className={cn(
-            "page-section-frame page-surface page-reveal relative overflow-hidden",
-            mobileFlatSectionClassName,
-          )}
-        >
-          <div className="pointer-events-none absolute inset-0 max-md:hidden bg-[radial-gradient(circle_at_top,rgba(168,85,247,0.16),transparent_44%),radial-gradient(circle_at_bottom,rgba(255,255,255,0.4),transparent_36%)]" />
-
-          <div className="relative mx-auto max-w-5xl text-center">
-            <StatusBadge
-              interactive={false}
-              tone="#2f1544"
-              textColor="#faf5ff"
-              iconColor="#faf5ff"
-            >
-              {content.manifesto.eyebrow}
-            </StatusBadge>
-
-            <Heading
-              variant="h1"
-              as="h2"
-              className="mt-6 text-[clamp(2.9rem,9vw,6.4rem)] leading-[0.9] tracking-[-0.055em]"
-            >
-              {content.manifesto.lead}{" "}
-              <span className="font-secondary italic text-accent">
-                {content.manifesto.accent}
-              </span>
-              <br />
-              {content.manifesto.middle}{" "}
-              <span className="text-text-primary/52">
-                {content.manifesto.tail}
-              </span>
-            </Heading>
-
-            <Text variant="p1" className="mx-auto mt-6 max-w-3xl text-center">
-              {content.manifesto.description}
-            </Text>
-          </div>
-
-          <div className="relative mt-12 grid gap-4 md:grid-cols-3">
-            {content.manifesto.principles.map((principle) => (
-              <PrincipleCard key={principle.id} {...principle} />
-            ))}
-          </div>
         </section>
 
         <section

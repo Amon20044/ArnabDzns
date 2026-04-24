@@ -34,20 +34,6 @@ export interface AboutExperienceItem {
   tone: string;
 }
 
-export interface AboutManifestoContent {
-  eyebrow: string;
-  lead: string;
-  accent: string;
-  middle: string;
-  tail: string;
-  description: string;
-  principles: Array<{
-    id: string;
-    title: string;
-    description: string;
-  }>;
-}
-
 export interface AboutTeamMemberRow {
   label: string | [string] | [string, string];
   value: string;
@@ -79,7 +65,6 @@ export interface AboutPageContent {
   experienceHero: HeroSectionConfig;
   experienceMeta: string;
   experience: AboutExperienceItem[];
-  manifesto: AboutManifestoContent;
   teamHero: HeroSectionConfig;
   team: AboutTeamMember[];
   contact: AboutContactContent;
@@ -163,7 +148,7 @@ export const aboutPageContent: AboutPageContent = {
     {
       id: "gods-reign",
       company: "Gods Reign",
-      companyImageUrl: "https://gods-reign.vercel.app/_next/image?url=%2FGR-icon.webp&w=1920&q=75",
+      companyImageUrl: "https://godsreign.in/wp-content/uploads/2022/10/Gold.png.webp",
       role: "Senior Graphic Designer",
       summary:
         "Lead visuals aligned with brand presence, performance content, and digital communication across the esports roster.",
@@ -221,35 +206,6 @@ export const aboutPageContent: AboutPageContent = {
       tone: "#2f1544",
     },
   ],
-  manifesto: {
-    eyebrow: "Personal POV",
-    lead: "I design",
-    accent: "visual systems",
-    middle: "that make brands feel",
-    tail: "intentional.",
-    description:
-      "Hi, I'm Arnab - a visual designer working across brand presence, social-first creative, and digital surfaces. My work sits where taste meets execution: sharp, memorable, and built to read fast.",
-    principles: [
-      {
-        id: "systems",
-        title: "Systems over decoration",
-        description:
-          "The aesthetic should help the work travel, not just make the first frame look pretty.",
-      },
-      {
-        id: "speed",
-        title: "Built for speed",
-        description:
-          "I care about first-glance readability, rhythm, and the kind of pacing that survives real feeds and fast scroll.",
-      },
-      {
-        id: "taste",
-        title: "Taste with structure",
-        description:
-          "Every decision is aimed at making the brand feel more deliberate, more usable, and easier to grow.",
-      },
-    ],
-  },
   teamHero: {
     badges: [
       {
@@ -270,7 +226,7 @@ export const aboutPageContent: AboutPageContent = {
     {
       id: "amon-sharma",
       name: "Amon Sharma",
-      designation: "Software Engineer | Architect",
+      designation: "Software & UI Engineer Architect",
       imageSrc: "/Amon.svg",
       imageAlt: "Illustration of Amon Sharma",
       rows: [
@@ -319,11 +275,11 @@ export const aboutPageContent: AboutPageContent = {
   contact: {
     badge: {
       id: "about-availability",
-      label: "Available | Apr - Jun 2026",
+      label: "Available",
       icon: "indicator",
-      tone: "#ffffff",
+      tone: "#22c55e",
       textColor: "#ffffff",
-      indicatorColor: "#22c55e",
+      indicatorColor: "#ffffff",
       pulse: true,
     },
     lead: "Taking on a small number of",

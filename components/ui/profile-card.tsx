@@ -77,7 +77,7 @@ export function ProfileCard({
                 className="flex items-center justify-between border-t border-black/15 py-[clamp(0.55rem,0.4rem+0.5vw,0.85rem)] first:border-t-0 first:pt-0 last:pb-0"
               >
                 {/* LEFT */}
-                <span className="flex flex-col items-start text-left text-[clamp(0.7rem,0.62rem+0.22vw,0.82rem)] font-medium leading-[1.1] tracking-[-0.01em] text-black">
+                <span className="flex flex-col items-start text-left -ml-1 text-[clamp(0.7rem,0.62rem+0.22vw,0.82rem)] font-medium leading-[1.1] tracking-[-0.01em] text-black">
                   {lines.map((line, lineIndex) => {
                     const isFirst = lineIndex === 0;
                     const highlight = isFirst ? row.labelHighlightColor : undefined;
@@ -121,11 +121,11 @@ export function ProfileCard({
       <div aria-hidden className="h-0 w-full border-t-2 border-black" />
 
       <div className="flex items-center justify-between gap-3 px-[clamp(0.95rem,0.8rem+0.6vw,1.25rem)] py-[clamp(0.8rem,0.65rem+0.55vw,1.1rem)]">
-        <div className="min-w-0">
-          <p className="truncate text-[clamp(1rem,0.88rem+0.55vw,1.2rem)] font-bold leading-tight tracking-[-0.025em] text-black">
+        <div className="flex min-w-0 flex-col items-start text-left">
+          <p className="w-full truncate text-left text-[clamp(1rem,0.88rem+0.55vw,1.2rem)] font-bold leading-tight tracking-[-0.025em] text-black">
             {name}
           </p>
-          <p className="truncate text-[clamp(0.72rem,0.65rem+0.25vw,0.85rem)] leading-tight text-black/60">
+          <p className="w-full truncate text-left text-[clamp(0.72rem,0.65rem+0.25vw,0.85rem)] leading-tight text-black/60">
             {designation}
           </p>
         </div>
