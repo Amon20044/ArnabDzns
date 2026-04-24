@@ -5,9 +5,9 @@ import Image from "next/image";
 import { CalendarClock, CalendarDays, Mail } from "lucide-react";
 import { Hero } from "@/components/sections/hero";
 import { PrimaryButton } from "@/components/ui/primary-button";
-import { Icon } from "@/components/ui/icon";
 import { ProfileCard } from "@/components/ui/profile-card";
 import { StatusBadge } from "@/components/ui/status-badge";
+import { renderStatusBadgeLeading } from "@/components/ui/status-badge-leading";
 import { Heading, Text } from "@/components/ui/typography";
 import {
   aboutPageContent,
@@ -36,41 +36,21 @@ function IntroBadgeRow({
 }) {
   return (
     <div className="flex flex-wrap items-center justify-center gap-3">
-      {badges.map((badge) => {
-        const hasIndicator = badge.icon === "indicator";
-        const hasIcon = badge.icon && badge.icon !== "none" && !hasIndicator;
-
-        return (
-          <span
-            key={badge.id ?? badge.label}
-            className="inline-flex items-center gap-2 rounded-full border px-4 py-2 text-[13px] font-semibold tracking-[-0.01em] shadow-[0_12px_30px_rgba(88,28,135,0.08)]"
-            style={{
-              backgroundColor: badge.tone ?? "rgba(255,255,255,0.94)",
-              color: badge.textColor ?? "#18181b",
-              borderColor: "rgba(255,255,255,0.72)",
-            }}
-          >
-            {hasIndicator ? (
-              <span
-                aria-hidden
-                className="size-2.5 rounded-full shadow-[0_0_0_4px_rgba(34,197,94,0.10)]"
-                style={{ backgroundColor: badge.indicatorColor ?? "#22c55e" }}
-              />
-            ) : null}
-
-            {hasIcon ? (
-              <Icon
-                name={badge.icon}
-                className="size-[14px]"
-                style={{ color: badge.iconColor ?? badge.textColor ?? "#18181b" }}
-                strokeWidth={2.1}
-              />
-            ) : null}
-
-            <span>{badge.label}</span>
-          </span>
-        );
-      })}
+      {badges.map((badge) => (
+        <StatusBadge
+          key={badge.id ?? badge.label}
+          interactive={false}
+          tone={badge.tone}
+          textColor={badge.textColor}
+          iconColor={badge.iconColor}
+          indicatorColor={badge.indicatorColor}
+          showIndicator={badge.icon === "indicator"}
+          pulse={badge.pulse}
+          leading={renderStatusBadgeLeading(badge)}
+        >
+          {badge.label}
+        </StatusBadge>
+      ))}
     </div>
   );
 }

@@ -77,7 +77,7 @@ export function ProfileCard({
                 className="flex items-center justify-between border-t border-black/15 py-[clamp(0.55rem,0.4rem+0.5vw,0.85rem)] first:border-t-0 first:pt-0 last:pb-0"
               >
                 {/* LEFT */}
-                <span className="flex flex-col items-start text-left -ml-1 text-[clamp(0.7rem,0.62rem+0.22vw,0.82rem)] font-medium leading-[1.1] tracking-[-0.01em] text-black">
+                <span className="flex flex-col items-start text-left -ml-3 text-[clamp(0.7rem,0.62rem+0.22vw,0.82rem)] font-medium leading-[1.1] tracking-[-0.01em] text-black">
                   {lines.map((line, lineIndex) => {
                     const isFirst = lineIndex === 0;
                     const highlight = isFirst ? row.labelHighlightColor : undefined;

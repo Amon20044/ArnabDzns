@@ -148,7 +148,7 @@ export const aboutPageContent: AboutPageContent = {
     {
       id: "gods-reign",
       company: "Gods Reign",
-      companyImageUrl: "https://godsreign.in/wp-content/uploads/2022/10/Gold.png.webp",
+      companyImageUrl: "https://i.ibb.co/svwVXg1q/Gold-png.webp",
       role: "Senior Graphic Designer",
       summary:
         "Lead visuals aligned with brand presence, performance content, and digital communication across the esports roster.",
@@ -160,7 +160,7 @@ export const aboutPageContent: AboutPageContent = {
     {
       id: "lets-game-now-senior",
       company: "Lets Game Now",
-      companyImageUrl: "https://media.licdn.com/dms/image/v2/D560BAQFM0UISqu7SvA/company-logo_200_200/company-logo_200_200/0/1721459640006?e=1778716800&v=beta&t=a2WD9qJ7o49nK46zp1NsRNXGF_F6KvY43Sju4yBg_Do",
+      companyImageUrl: "https://i.ibb.co/tp3V2BcH/Untitled-design-8.png",
       role: "Senior Graphic Designer",
       summary:
         "Led visual execution across brand communication, campaign assets, and digital content systems for a creator-led gaming platform.",
@@ -172,7 +172,7 @@ export const aboutPageContent: AboutPageContent = {
     {
       id: "lets-game-now-graphic",
       company: "Lets Game Now",
-      companyImageUrl: "",
+      companyImageUrl: "https://i.ibb.co/tp3V2BcH/Untitled-design-8.png",
       role: "Graphic Designer",
       summary:
         "Creative production, digital assets, and structured visual communication for the community side of the brand.",
