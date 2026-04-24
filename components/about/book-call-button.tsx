@@ -119,7 +119,7 @@ function BookCallModal({
           />
 
           <motion.div
-            className="relative z-10 flex w-full max-w-md flex-col overflow-hidden rounded-t-[1.9rem] border border-white/80 bg-[linear-gradient(180deg,rgba(255,255,255,0.98)_0%,rgba(248,247,252,0.94)_100%)] shadow-[0_32px_72px_rgba(15,23,42,0.22)] sm:rounded-[1.9rem]"
+            className="relative z-10 flex w-full max-w-md flex-col overflow-hidden rounded-t-[1.9rem] border border-white/80 bg-[linear-gradient(180deg,rgba(255,255,255,0.98)_0%,rgba(248,247,252,0.94)_100%)] shadow-[0_32px_72px_rgba(15,23,42,0.22)] max-md:!shadow-none sm:rounded-[1.9rem]"
             initial={{ y: 48, opacity: 0, scale: 0.98 }}
             animate={{ y: 0, opacity: 1, scale: 1 }}
             exit={{ y: 24, opacity: 0, scale: 0.98 }}
@@ -171,7 +171,7 @@ function BookCallModal({
                 type="button"
                 onClick={onClose}
                 aria-label="Close"
-                className="inline-flex size-9 shrink-0 items-center justify-center rounded-full border border-black/10 bg-white text-text-primary shadow-[0_8px_22px_rgba(15,23,42,0.06)] transition-transform duration-200 hover:-translate-y-0.5"
+                className="inline-flex size-9 shrink-0 items-center justify-center rounded-full border border-black/10 bg-white text-text-primary shadow-[0_8px_22px_rgba(15,23,42,0.06)] transition-transform duration-200 hover:-translate-y-0.5 max-md:!shadow-none"
               >
                 <X className="size-4" strokeWidth={2.2} />
               </button>
@@ -193,7 +193,7 @@ function BookCallModal({
                     onChange={(event) => setName(event.target.value)}
                     placeholder="Eg. Priya Sharma"
                     autoFocus
-                    className="h-11 rounded-xl border-black/10 bg-white px-4 text-sm shadow-[inset_0_1px_0_rgba(255,255,255,0.6)] focus-visible:border-accent/60 focus-visible:ring-accent/20"
+                    className="h-11 rounded-xl border-black/10 bg-white px-4 text-sm shadow-[inset_0_1px_0_rgba(255,255,255,0.6)] focus-visible:border-accent/60 focus-visible:ring-accent/20 max-md:!shadow-none"
                   />
                 </label>
 
@@ -209,7 +209,7 @@ function BookCallModal({
                     value={company}
                     onChange={(event) => setCompany(event.target.value)}
                     placeholder="Eg. Acme Studio"
-                    className="h-11 rounded-xl border-black/10 bg-white px-4 text-sm shadow-[inset_0_1px_0_rgba(255,255,255,0.6)] focus-visible:border-accent/60 focus-visible:ring-accent/20"
+                    className="h-11 rounded-xl border-black/10 bg-white px-4 text-sm shadow-[inset_0_1px_0_rgba(255,255,255,0.6)] focus-visible:border-accent/60 focus-visible:ring-accent/20 max-md:!shadow-none"
                   />
                 </label>
               </div>

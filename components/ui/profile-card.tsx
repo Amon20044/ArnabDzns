@@ -52,7 +52,7 @@ export function ProfileCard({
   return (
     <article
       className={cn(
-        "relative mx-auto flex w-full max-w-[22rem] flex-col overflow-hidden rounded-[1.75rem] border-2 border-black bg-white shadow-[0_28px_60px_-18px_rgba(15,23,42,0.28)]",
+        "relative mx-auto flex w-full max-w-[22rem] flex-col overflow-hidden rounded-[1.75rem] border-2 border-black bg-white shadow-[0_28px_60px_-18px_rgba(15,23,42,0.28)] max-md:!shadow-none",
         className,
       )}
       style={style}

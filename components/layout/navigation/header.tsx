@@ -126,7 +126,7 @@ export const Header = ({ content = headerConfig }: HeaderProps) => {
               showIndicator
               pulse
               tone="#059669"
-              indicatorColor="#34d399"
+              indicatorColor="#ffffff"
             >
               {availabilityLabel}
             </StatusBadge>

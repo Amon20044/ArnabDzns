@@ -59,7 +59,7 @@ function IntroBadgeRow({
 function AvailabilityStatCard({ stat }: { stat: AboutAvailabilityStat }) {
   return (
     <div
-      className="relative flex h-full flex-col justify-center overflow-hidden rounded-[1.45rem] border border-white/80 px-5 py-6 text-center"
+      className="relative flex h-full flex-col justify-center overflow-hidden rounded-[1.45rem] border border-white/80 px-5 py-6 text-center max-md:!shadow-none"
       style={softSurfaceGradient}
     >
       <Text
@@ -73,7 +73,7 @@ function AvailabilityStatCard({ stat }: { stat: AboutAvailabilityStat }) {
         {stat.statusColor ? (
           <span
             aria-hidden
-            className="size-2.5 rounded-full shadow-[0_0_0_5px_rgba(34,197,94,0.12)]"
+            className="size-2.5 rounded-full shadow-[0_0_0_5px_rgba(34,197,94,0.12)] max-md:!shadow-none"
             style={{ backgroundColor: stat.statusColor }}
           />
         ) : null}
@@ -99,7 +99,7 @@ function ExperienceCard({ item }: { item: AboutExperienceItem }) {
 
   return (
     <article
-      className="relative flex flex-col overflow-hidden rounded-[1.75rem] border border-white/80 p-3 shadow-[0_22px_58px_rgba(88,28,135,0.10)]"
+      className="relative flex flex-col overflow-hidden rounded-[1.75rem] border border-white/80 p-3 shadow-[0_22px_58px_rgba(88,28,135,0.10)] max-md:!shadow-none"
       style={softSurfaceGradient}
     >
       <div className="relative aspect-[1/1.05] overflow-hidden rounded-[1.4rem] bg-[linear-gradient(180deg,rgba(255,255,255,0.65)_0%,rgba(248,247,252,0.55)_100%)]">
@@ -161,7 +161,7 @@ function ExperienceCard({ item }: { item: AboutExperienceItem }) {
 
       <div className="mt-4 flex items-center justify-center gap-3 px-2 pb-1">
         <span
-          className="flex size-10 shrink-0 items-center justify-center rounded-xl border border-black/6 shadow-[inset_0_1px_0_rgba(255,255,255,0.45)]"
+          className="flex size-10 shrink-0 items-center justify-center rounded-xl border border-black/6 shadow-[inset_0_1px_0_rgba(255,255,255,0.45)] max-md:!shadow-none"
           style={{ backgroundColor: item.tone }}
         >
           <CalendarDays
@@ -242,7 +242,7 @@ export function AboutPage({
             </div>
 
             <article
-              className="relative overflow-hidden rounded-[2rem] border border-white/80 p-6 shadow-[0_24px_60px_rgba(88,28,135,0.08)] sm:p-8 md:p-10"
+              className="relative overflow-hidden rounded-[2rem] border border-white/80 p-6 shadow-[0_24px_60px_rgba(88,28,135,0.08)] max-md:!shadow-none sm:p-8 md:p-10"
               style={softSurfaceGradient}
             >
               <div className="pointer-events-none absolute inset-0 max-md:hidden bg-[radial-gradient(circle_at_top_left,rgba(255,255,255,0.65),transparent_28%),radial-gradient(circle_at_bottom_right,rgba(216,180,254,0.18),transparent_32%)]" />
