@@ -156,15 +156,6 @@ function BookCallModal({
                   Let&apos;s get on a{" "}
                   <span className="font-secondary italic text-accent">call.</span>
                 </Heading>
-
-                <Text
-                  variant="p3"
-                  id={descriptionId}
-                  className="max-w-[34ch] text-pretty"
-                >
-                  Quick intro over WhatsApp. Drop your name and brand so I can
-                  prep before we chat.
-                </Text>
               </div>
 
               <button
@@ -232,10 +223,6 @@ function BookCallModal({
                   disabled={!canSubmit}
                 />
               </div>
-
-              <p className="mt-4 text-center text-[11px] uppercase tracking-[0.14em] text-text-secondary/70">
-                Message opens in WhatsApp, prefilled
-              </p>
             </form>
           </motion.div>
         </motion.div>
