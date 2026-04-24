@@ -388,7 +388,11 @@ export function AboutPage({
               {content.contact.badge.label}
             </StatusBadge>
 
-            <Heading variant="h2" as="h2" className="mt-6 text-[clamp(2.4rem,7vw,4.6rem)]">
+            <Heading
+              variant="h2"
+              as="h2"
+              className="mt-6 text-[clamp(2.4rem,7vw,4.6rem)] leading-[0.9]"
+            >
               {content.contact.lead}{" "}
               <span className="font-secondary italic text-accent">
                 {content.contact.accent}
