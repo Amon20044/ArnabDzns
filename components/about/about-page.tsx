@@ -159,7 +159,7 @@ function ExperienceCard({ item }: { item: AboutExperienceItem }) {
 
       <div className="mx-2 mt-5 border-t border-dashed border-black/10" />
 
-      <div className="mt-4 flex items-center gap-3 px-2 pb-1">
+      <div className="mt-4 flex items-center justify-center gap-3 px-2 pb-1">
         <span
           className="flex size-10 shrink-0 items-center justify-center rounded-xl border border-black/6 shadow-[inset_0_1px_0_rgba(255,255,255,0.45)]"
           style={{ backgroundColor: item.tone }}
@@ -170,11 +170,11 @@ function ExperienceCard({ item }: { item: AboutExperienceItem }) {
             style={{ color: isDarkTone ? "#faf5ff" : "#2f1544" }}
           />
         </span>
-        <div>
+        <div className="text-left">
           <p className="text-sm font-semibold tracking-[-0.02em] text-text-primary">
             {item.dates}
           </p>
-          <Text variant="p3" className="mt-0.5 text-xs">
+          <Text variant="p3" className="mt-0.5 text-left text-xs">
             {item.location}
           </Text>
         </div>
