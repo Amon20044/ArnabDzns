@@ -2,10 +2,11 @@
 
 import type { CSSProperties } from "react";
 import Image from "next/image";
-import { CalendarClock, CalendarDays, Mail } from "lucide-react";
+import { CalendarDays, Mail } from "lucide-react";
 import { Hero } from "@/components/sections/hero";
 import { PrimaryButton } from "@/components/ui/primary-button";
 import { ProfileCard } from "@/components/ui/profile-card";
+import { BookCallButton } from "@/components/about/book-call-button";
 import { StatusBadge } from "@/components/ui/status-badge";
 import { renderStatusBadgeLeading } from "@/components/ui/status-badge-leading";
 import { Heading, Text } from "@/components/ui/typography";
@@ -405,13 +406,7 @@ export function AboutPage({
                 href={site.contact.inquiryPath}
                 Icon={Mail}
               />
-              <PrimaryButton
-                label={content.contact.secondaryLabel}
-                href={site.contact.bookingUrl}
-                external
-                Icon={CalendarClock}
-                tone="white"
-              />
+              <BookCallButton label={content.contact.secondaryLabel} />
             </div>
           </div>
         </section>

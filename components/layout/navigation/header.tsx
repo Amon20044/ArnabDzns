@@ -75,20 +75,6 @@ export const Header = ({ content = headerConfig }: HeaderProps) => {
           onFocus={() => setBrandHovered(true)}
           onBlur={() => setBrandHovered(false)}
         >
-          <motion.span
-            aria-hidden
-            className="pointer-events-none absolute inset-0 rounded-full border border-black/10 bg-white/0 shadow-[0_8px_22px_rgba(15,23,42,0.06)]"
-            initial={false}
-            animate={{
-              opacity: brandHovered ? 1 : 0,
-              scale: brandHovered ? 1 : 0.98,
-              backgroundColor: brandHovered
-                ? "rgba(255,255,255,0.36)"
-                : "rgba(255,255,255,0)",
-            }}
-            transition={{ duration: 0.22, ease: "easeOut" }}
-          />
-
           <motion.div
             className="relative z-[1] size-11 shrink-0 overflow-hidden rounded-full
                        bg-black-soft ring-1 ring-black/10
