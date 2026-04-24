@@ -68,14 +68,15 @@ export function ProfileCard({
           draggable={false}
         />
 
-        <ul className="absolute right-4 top-11 flex flex-col">
+        <ul className="absolute right-5 top-11 flex flex-col">
           {rows.map((row, index) => {
             const lines = toLabelLines(row.label);
             return (
               <li
                 key={`${row.value}-${index}`}
-                className="flex items-center justify-end gap-3 border-t border-black/15 py-[clamp(0.55rem,0.4rem+0.5vw,0.85rem)] first:border-t-0 first:pt-0 last:pb-0"
+                className="flex items-center justify-between border-t border-black/15 py-[clamp(0.55rem,0.4rem+0.5vw,0.85rem)] first:border-t-0 first:pt-0 last:pb-0"
               >
+                {/* LEFT */}
                 <span className="flex flex-col items-start text-left text-[clamp(0.7rem,0.62rem+0.22vw,0.82rem)] font-medium leading-[1.1] tracking-[-0.01em] text-black">
                   {lines.map((line, lineIndex) => {
                     const isFirst = lineIndex === 0;
@@ -104,8 +105,9 @@ export function ProfileCard({
                   })}
                 </span>
 
+                {/* RIGHT */}
                 <span
-                  className="font-bold leading-none tracking-[-0.04em] text-[clamp(1.45rem,1.15rem+0.9vw,1.9rem)]"
+                  className="font-bold leading-none tracking-[-0.04em] text-[clamp(1.45rem,1.15rem+0.9vw,1.9rem)] text-right"
                   style={{ color: row.valueColor ?? "#000000" }}
                 >
                   {row.value}

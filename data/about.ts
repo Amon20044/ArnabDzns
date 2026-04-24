@@ -25,6 +25,7 @@ export interface AboutAvailabilityStat {
 export interface AboutExperienceItem {
   id: string;
   company: string;
+  companyImageUrl?: string;
   role: string;
   summary: string;
   dates: string;
@@ -47,17 +48,19 @@ export interface AboutManifestoContent {
   }>;
 }
 
+export interface AboutTeamMemberRow {
+  label: string | [string] | [string, string];
+  value: string;
+  labelHighlightColor?: string;
+}
+
 export interface AboutTeamMember {
   id: string;
-  category: string;
-  tag: string;
   name: string;
-  title: string;
-  summary: string;
-  initials: string;
-  icon: string;
-  accent: string;
-  open?: boolean;
+  designation: string;
+  imageSrc: string;
+  imageAlt?: string;
+  rows: AboutTeamMemberRow[];
 }
 
 export interface AboutContactContent {
@@ -160,6 +163,7 @@ export const aboutPageContent: AboutPageContent = {
     {
       id: "gods-reign",
       company: "Gods Reign",
+      companyImageUrl: "https://gods-reign.vercel.app/_next/image?url=%2FGR-icon.webp&w=1920&q=75",
       role: "Senior Graphic Designer",
       summary:
         "Lead visuals aligned with brand presence, performance content, and digital communication across the esports roster.",
@@ -171,6 +175,7 @@ export const aboutPageContent: AboutPageContent = {
     {
       id: "lets-game-now-senior",
       company: "Lets Game Now",
+      companyImageUrl: "https://media.licdn.com/dms/image/v2/D560BAQFM0UISqu7SvA/company-logo_200_200/company-logo_200_200/0/1721459640006?e=1778716800&v=beta&t=a2WD9qJ7o49nK46zp1NsRNXGF_F6KvY43Sju4yBg_Do",
       role: "Senior Graphic Designer",
       summary:
         "Led visual execution across brand communication, campaign assets, and digital content systems for a creator-led gaming platform.",
@@ -182,6 +187,7 @@ export const aboutPageContent: AboutPageContent = {
     {
       id: "lets-game-now-graphic",
       company: "Lets Game Now",
+      companyImageUrl: "",
       role: "Graphic Designer",
       summary:
         "Creative production, digital assets, and structured visual communication for the community side of the brand.",
@@ -193,6 +199,7 @@ export const aboutPageContent: AboutPageContent = {
     {
       id: "carnival-esports",
       company: "Carnival Esports",
+      companyImageUrl: "https://liquipedia.net/commons/images/7/7f/Carnival_Gaming_allmode.png",
       role: "Senior Graphics Designer",
       summary:
         "Esports-focused visuals and content assets for tournaments, rosters, and launches with strong stylistic consistency.",
@@ -204,6 +211,7 @@ export const aboutPageContent: AboutPageContent = {
     {
       id: "s8ul",
       company: "S8UL",
+      companyImageUrl: "https://liquipedia.net/commons/images/5/57/Team_Soul_2019_allmode.png",
       role: "Graphics Designer",
       summary:
         "Graphics and content-led creative assets for a major gaming and esports brand, the foundation for how I think about speed and scroll.",
@@ -261,40 +269,51 @@ export const aboutPageContent: AboutPageContent = {
   team: [
     {
       id: "amon-sharma",
-      category: "Engineering",
-      tag: "Architect",
       name: "Amon Sharma",
-      title: "Software Engineer | Architect & UI Expert",
-      summary:
-        "Brings the implementation side together when the visual system needs to become a real product.",
-      initials: "AM",
-      icon: "lucide:code-xml",
-      accent: "#161122",
+      designation: "Software Engineer | Architect",
+      imageSrc: "/Amon.svg",
+      imageAlt: "Illustration of Amon Sharma",
+      rows: [
+        {
+          label: ["Upcoming", "Projects"],
+          value: "02",
+          labelHighlightColor: "#fef9c3",
+        },
+        {
+          label: ["Ongoing", "Projects"],
+          value: "01",
+          labelHighlightColor: "#fce7f3",
+        },
+        {
+          label: ["Shipped", "Projects"],
+          value: "08",
+          labelHighlightColor: "#dcfce7",
+        },
+      ],
     },
     {
       id: "siddha-bhatia",
-      category: "Motion / FX",
-      tag: "Editor",
       name: "Siddha Bhatia",
-      title: "Video & FX Editor",
-      summary:
-        "Handles movement, pacing, and the layers of polish that make launch work feel alive without losing clarity.",
-      initials: "SB",
-      icon: "lucide:clapperboard",
-      accent: "#18111d",
-    },
-    {
-      id: "open-seat",
-      category: "Open",
-      tag: "Collab",
-      name: "Open seat",
-      title: "Contract | Project-based",
-      summary:
-        "Looking to add a motion designer or illustrator for select projects. Reach out if the fit feels right.",
-      initials: "OS",
-      icon: "lucide:sparkles",
-      accent: "#7c3aed",
-      open: true,
+      designation: "Video & FX Editor",
+      imageSrc: "/Siddha.svg",
+      imageAlt: "Illustration of Siddha Bhatia",
+      rows: [
+        {
+          label: ["Upcoming", "Projects"],
+          value: "01",
+          labelHighlightColor: "#fef9c3",
+        },
+        {
+          label: ["Ongoing", "Projects"],
+          value: "02",
+          labelHighlightColor: "#fce7f3",
+        },
+        {
+          label: ["Shipped", "Projects"],
+          value: "06",
+          labelHighlightColor: "#dcfce7",
+        },
+      ],
     },
   ],
   contact: {
@@ -303,7 +322,7 @@ export const aboutPageContent: AboutPageContent = {
       label: "Available | Apr - Jun 2026",
       icon: "indicator",
       tone: "#ffffff",
-      textColor: "#2f1544",
+      textColor: "#ffffff",
       indicatorColor: "#22c55e",
       pulse: true,
     },
