@@ -132,8 +132,8 @@ export function HomeLandingHero({
 
       <h1
         className={cn(
-          "font-sans text-balance font-bold leading-[1.05] tracking-[-0.032em] text-text-primary",
-          "text-[clamp(1.875rem,1.21rem+2.86vw,3.75rem)]",
+          "font-sans text-balance font-bold leading-[1.05] tracking-[-0.032em] text-text-primary [&>span+span]:-mt-[0.12em]",
+          "text-[clamp(2.15rem,1.32rem+3.55vw,4.45rem)]",
           badges.length ? "mt-4" : "mt-2",
         )}
       >
@@ -147,7 +147,7 @@ export function HomeLandingHero({
               initial="hidden"
               animate="visible"
               variants={blurUp}
-              className="block"
+              className="block leading-[1.05]"
             >
               {isAccent ? (
                 <motion.span

@@ -279,6 +279,26 @@ body > :is(div, main) {
   animation-delay: var(--marquee-logo-delay, 180ms);
 }
 
+.site-boot-content {
+  opacity: 0;
+  filter: blur(14px);
+  transform: translateY(20px) scale(0.99);
+  animation: site-content-in 720ms cubic-bezier(0.22, 1, 0.36, 1) 1500ms forwards;
+}
+
+.site-boot-loader {
+  position: fixed;
+  inset: 0;
+  z-index: 999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(250, 248, 255, 0.84);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  animation: site-loader-out 520ms cubic-bezier(0.22, 1, 0.36, 1) 1500ms forwards;
+}
+
 .site-loader-card {
   display: grid;
   width: min(12rem, calc(100vw - 3rem));
@@ -694,6 +714,23 @@ body > :is(div, main) {
   }
 }
 
+@keyframes site-content-in {
+  to {
+    opacity: 1;
+    filter: blur(0);
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes site-loader-out {
+  to {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    filter: blur(12px);
+  }
+}
+
 @keyframes route-old {
   from {
     opacity: 1;
@@ -733,12 +770,17 @@ body > :is(div, main) {
 
   .page-reveal,
   .marquee-logo-reveal,
+  .site-boot-content,
   ::view-transition-old(.route-transition),
   ::view-transition-new(.route-transition) {
     animation: none;
     opacity: 1;
     filter: none;
     transform: none;
+  }
+
+  .site-boot-loader {
+    display: none;
   }
 
   .link-pill,
