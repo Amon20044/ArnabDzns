@@ -10,10 +10,10 @@ import {
   CopyIcon,
   KeyRoundIcon,
   Loader2Icon,
+  MailIcon,
   QrCodeIcon,
   ShieldCheckIcon,
 } from "lucide-react";
-import { useRouter } from "next/navigation";
 import { useEffect, useState, useTransition } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -23,87 +23,123 @@ import { cn } from "@/lib/utils";
 
 interface SetupPayload {
   email: string;
-  secret: string;
-  qrDataUrl: string;
+  paired: boolean;
+  secret?: string;
+  qrDataUrl?: string;
 }
 
 type SetupStatus = "loading" | "ready" | "error";
-type Step = "scan" | "verify" | "password" | "done";
+type Step = "init" | "email" | "scan" | "verify" | "password" | "done";
 
-const CHANGE_PASSWORD_LOGIN_PATH = "/login?next=%2Fchange-password";
-
-const STEPS = [
-  { key: "scan", label: "Scan", icon: QrCodeIcon },
-  { key: "verify", label: "Verify", icon: ShieldCheckIcon },
-  { key: "password", label: "Password", icon: KeyRoundIcon },
+const PHASES = [
+  { label: "Account", icon: MailIcon },
+  { label: "Verify", icon: ShieldCheckIcon },
+  { label: "Password", icon: KeyRoundIcon },
 ] as const;
 
-function stepIndex(step: Step) {
-  const order: Step[] = ["scan", "verify", "password", "done"];
-  return order.indexOf(step);
+function phaseIndex(step: Step) {
+  if (step === "init" || step === "email" || step === "scan") {
+    return 0;
+  }
+  if (step === "verify") {
+    return 1;
+  }
+  if (step === "password") {
+    return 2;
+  }
+  return 3;
 }
 
 export function PasswordChangePanel() {
-  const router = useRouter();
   const [setup, setSetup] = useState<SetupPayload | null>(null);
   const [setupStatus, setSetupStatus] = useState<SetupStatus>("loading");
   const [setupRequestId, setSetupRequestId] = useState(0);
-  const [step, setStep] = useState<Step>("scan");
+  const [step, setStep] = useState<Step>("init");
+  const [emailInput, setEmailInput] = useState("");
   const [otp, setOtp] = useState("");
   const [copied, setCopied] = useState(false);
   const [message, setMessage] = useState("");
   const [isError, setIsError] = useState(false);
   const [isPending, startTransition] = useTransition();
 
+  // On load, probe with no email. A live session resolves straight to the
+  // authenticator step; otherwise the API asks us for an email first.
   useEffect(() => {
     let ignore = false;
 
-    async function loadSetup() {
+    async function init() {
       setSetupStatus("loading");
       setMessage("");
       setIsError(false);
 
-      const response = await fetch("/api/auth/password/setup", {
-        cache: "no-store",
-      });
+      const response = await fetch("/api/auth/password/setup", { cache: "no-store" });
       const result = (await response.json().catch(() => null)) as
-        | (SetupPayload & { message?: string })
+        | (SetupPayload & { message?: string; needsEmail?: boolean })
         | null;
 
       if (ignore) {
         return;
       }
 
-      if (response.status === 401) {
-        setSetupStatus("error");
-        setIsError(true);
-        setMessage("Your session expired. Redirecting to login...");
-        router.replace(CHANGE_PASSWORD_LOGIN_PATH);
-        router.refresh();
+      if (response.status === 400 && result?.needsEmail) {
+        setStep("email");
+        setSetupStatus("ready");
         return;
       }
 
       if (!response.ok || !result) {
         setSetupStatus("error");
-        setIsError(true);
+        setStep("email");
         setMessage(result?.message ?? "Authenticator setup could not be loaded.");
+        setIsError(true);
         return;
       }
 
       setSetup(result);
       setSetupStatus("ready");
+      setStep(result.qrDataUrl ? "scan" : "verify");
     }
 
-    loadSetup();
+    init();
 
     return () => {
       ignore = true;
     };
-  }, [router, setupRequestId]);
+  }, [setupRequestId]);
 
   function notify(text: string, error = false) {
     setMessage(text);
     setIsError(error);
+  }
+
+  function submitEmail(event: React.FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    const value = emailInput.trim().toLowerCase();
+
+    if (!value) {
+      return;
+    }
+
+    startTransition(async () => {
+      notify("");
+
+      const response = await fetch(
+        `/api/auth/password/setup?email=${encodeURIComponent(value)}`,
+        { cache: "no-store" },
+      );
+      const result = (await response.json().catch(() => null)) as
+        | (SetupPayload & { message?: string })
+        | null;
+
+      if (!response.ok || !result) {
+        notify(result?.message ?? "We couldn't find an admin with that email.", true);
+        return;
+      }
+
+      setSetup(result);
+      setSetupStatus("ready");
+      setStep(result.qrDataUrl ? "scan" : "verify");
+    });
   }
 
   async function copySecret() {
@@ -128,18 +164,10 @@ export function PasswordChangePanel() {
 
       const response = await fetch("/api/auth/password/verify-otp", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ otp: otp.trim() }),
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ otp: otp.trim(), email: setup?.email }),
       });
       const result = (await response.json()) as { message?: string; verified?: boolean };
-
-      if (response.status === 401) {
-        router.replace(CHANGE_PASSWORD_LOGIN_PATH);
-        router.refresh();
-        return;
-      }
 
       if (!response.ok || !result.verified) {
         notify(result.message ?? "Authenticator code could not be verified.", true);
@@ -161,25 +189,18 @@ export function PasswordChangePanel() {
 
       const response = await fetch("/api/auth/password/change", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
+          email: setup?.email,
           password: formData.get("password"),
           confirmPassword: formData.get("confirmPassword"),
         }),
       });
       const result = (await response.json()) as { message?: string; changed?: boolean };
 
-      if (response.status === 401) {
-        router.replace(CHANGE_PASSWORD_LOGIN_PATH);
-        router.refresh();
-        return;
-      }
-
       if (!response.ok || !result.changed) {
         if (response.status === 403) {
-          // Verification window lapsed — send them back to re-verify.
+          // Verification window lapsed — send them back to re-enter a code.
           setOtp("");
           setStep("verify");
         }
@@ -195,7 +216,7 @@ export function PasswordChangePanel() {
     });
   }
 
-  const activeIndex = stepIndex(step);
+  const activePhase = phaseIndex(step);
 
   return (
     <section className="mx-auto flex w-full max-w-md flex-col gap-6 px-4 pb-24 pt-10 md:px-6">
@@ -203,21 +224,22 @@ export function PasswordChangePanel() {
         <div className="flex size-12 items-center justify-center rounded-2xl bg-accent-surface text-accent-dark">
           <ShieldCheckIcon className="size-6" />
         </div>
-        <h1 className="text-xl font-semibold text-text-primary">Secure password change</h1>
+        <h1 className="text-xl font-semibold text-text-primary">Change your password</h1>
         <p className="max-w-sm text-sm text-text-secondary">
-          Pair an authenticator app, confirm a code, then set your new password.
+          Confirm a code from your authenticator, then set a new password — no current
+          password needed.
         </p>
       </header>
 
       {step !== "done" ? (
         <ol className="flex items-center justify-center gap-2">
-          {STEPS.map((item, index) => {
-            const isComplete = index < activeIndex;
-            const isCurrent = index === activeIndex;
-            const StepIcon = item.icon;
+          {PHASES.map((item, index) => {
+            const isComplete = index < activePhase;
+            const isCurrent = index === activePhase;
+            const PhaseIcon = item.icon;
 
             return (
-              <li key={item.key} className="flex items-center gap-2">
+              <li key={item.label} className="flex items-center gap-2">
                 <span
                   className={cn(
                     "flex items-center gap-2 rounded-full border px-3 py-1.5 text-xs font-medium transition-colors",
@@ -231,16 +253,16 @@ export function PasswordChangePanel() {
                   {isComplete ? (
                     <CheckIcon className="size-3.5" />
                   ) : (
-                    <StepIcon className="size-3.5" />
+                    <PhaseIcon className="size-3.5" />
                   )}
                   {item.label}
                 </span>
-                {index < STEPS.length - 1 ? (
+                {index < PHASES.length - 1 ? (
                   <span
                     aria-hidden
                     className={cn(
                       "h-px w-4 transition-colors",
-                      index < activeIndex ? "bg-emerald-300" : "bg-border",
+                      index < activePhase ? "bg-emerald-300" : "bg-border",
                     )}
                   />
                 ) : null}
@@ -251,6 +273,60 @@ export function PasswordChangePanel() {
       ) : null}
 
       <Card className="rounded-2xl bg-white/86 shadow-[0_24px_80px_rgba(88,28,135,0.12)]">
+        {step === "init" ? (
+          <CardContent className="grid place-items-center gap-2 py-16 text-sm text-muted-foreground">
+            <Loader2Icon className="size-5 animate-spin" />
+            Checking your account...
+          </CardContent>
+        ) : null}
+
+        {step === "email" ? (
+          <>
+            <CardHeader>
+              <div className="flex size-10 items-center justify-center rounded-xl bg-accent-surface text-accent-dark">
+                <MailIcon className="size-5" />
+              </div>
+              <CardTitle>Which account?</CardTitle>
+              <CardDescription>
+                Enter the admin email so we can match it to your authenticator.
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <form onSubmit={submitEmail}>
+                <FieldGroup>
+                  <Field>
+                    <FieldLabel htmlFor="email">Admin email</FieldLabel>
+                    <Input
+                      id="email"
+                      type="email"
+                      value={emailInput}
+                      onChange={(event) => setEmailInput(event.target.value)}
+                      placeholder="you@example.com"
+                      autoComplete="email"
+                      autoFocus
+                      disabled={isPending}
+                      required
+                    />
+                  </Field>
+                  <Button type="submit" disabled={isPending || !emailInput.trim()}>
+                    {isPending ? (
+                      <>
+                        <Loader2Icon className="size-4 animate-spin" />
+                        Checking...
+                      </>
+                    ) : (
+                      <>
+                        Continue
+                        <ArrowRightIcon data-icon="inline-end" className="size-4" />
+                      </>
+                    )}
+                  </Button>
+                </FieldGroup>
+              </form>
+            </CardContent>
+          </>
+        ) : null}
+
         {step === "scan" ? (
           <>
             <CardHeader>
@@ -265,7 +341,7 @@ export function PasswordChangePanel() {
             </CardHeader>
             <CardContent className="grid gap-4">
               <div className="grid place-items-center rounded-2xl border border-border bg-white p-4">
-                {setupStatus === "ready" && setup?.qrDataUrl ? (
+                {setup?.qrDataUrl ? (
                   <Image
                     src={setup.qrDataUrl}
                     width={220}
@@ -293,32 +369,32 @@ export function PasswordChangePanel() {
                 )}
               </div>
 
-              <div className="grid gap-1.5">
-                <FieldLabel>Can&apos;t scan? Enter this key</FieldLabel>
-                <div className="flex items-center gap-2">
-                  <code className="flex-1 truncate rounded-xl border border-border bg-white/70 px-3 py-2 font-mono text-xs text-text-secondary">
-                    {setupStatus === "ready" ? setup?.secret : "Loading key..."}
-                  </code>
-                  <Button
-                    type="button"
-                    variant="outline"
-                    size="icon"
-                    aria-label="Copy setup key"
-                    disabled={setupStatus !== "ready"}
-                    onClick={copySecret}
-                  >
-                    {copied ? (
-                      <CheckIcon className="size-4 text-emerald-600" />
-                    ) : (
-                      <CopyIcon className="size-4" />
-                    )}
-                  </Button>
+              {setup?.secret ? (
+                <div className="grid gap-1.5">
+                  <FieldLabel>Can&apos;t scan? Enter this key</FieldLabel>
+                  <div className="flex items-center gap-2">
+                    <code className="flex-1 truncate rounded-xl border border-border bg-white/70 px-3 py-2 font-mono text-xs text-text-secondary">
+                      {setup.secret}
+                    </code>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="icon"
+                      aria-label="Copy setup key"
+                      onClick={copySecret}
+                    >
+                      {copied ? (
+                        <CheckIcon className="size-4 text-emerald-600" />
+                      ) : (
+                        <CopyIcon className="size-4" />
+                      )}
+                    </Button>
+                  </div>
                 </div>
-              </div>
+              ) : null}
 
               <Button
                 type="button"
-                disabled={setupStatus !== "ready"}
                 onClick={() => {
                   notify("");
                   setStep("verify");
@@ -339,7 +415,8 @@ export function PasswordChangePanel() {
               </div>
               <CardTitle>Confirm the connection</CardTitle>
               <CardDescription>
-                Enter the 6-digit code your authenticator is showing right now.
+                Enter the 6-digit code your authenticator is showing right now
+                {setup?.email ? ` for ${setup.email}` : ""}.
               </CardDescription>
             </CardHeader>
             <CardContent className="grid gap-4">
@@ -369,7 +446,7 @@ export function PasswordChangePanel() {
                       variant="outline"
                       onClick={() => {
                         notify("");
-                        setStep("scan");
+                        setStep(setup?.qrDataUrl ? "scan" : "email");
                       }}
                     >
                       <ArrowLeftIcon data-icon="inline-start" className="size-4" />
@@ -464,10 +541,10 @@ export function PasswordChangePanel() {
             </CardHeader>
             <CardContent className="grid gap-3">
               <Button asChild>
-                <Link href="/dashboard">Return to dashboard</Link>
+                <Link href="/login">Sign in with your new password</Link>
               </Button>
               <Button asChild variant="outline">
-                <Link href="/login">Sign in again</Link>
+                <Link href="/dashboard">Return to dashboard</Link>
               </Button>
             </CardContent>
           </>
