@@ -28,7 +28,7 @@ export const homeHeroSection = {
       iconColor: "#dbeafe",
     },
   ],
-  title: ["Good design gets noticed.", " Great design gets chosen."],
+  title: ["Your audience judges in seconds.", " We win those seconds."],
   description:
     "Creative work built for clicks, trust, and attention. We help brands and businesses connect with their audience through thoughtful, strategic design.",
   cta: {
