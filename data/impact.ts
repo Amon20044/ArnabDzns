@@ -53,7 +53,7 @@ export const impactSection: ImpactSectionConfig = {
       shortLabel: "Impressions",
       category: "reach",
       tags: ["youtube", "instagram", "broadcast"],
-      type: "featured",
+      type: "stat-trend",
       size: "sm",
       accent: "violet",
       priority: 100,
@@ -73,7 +73,7 @@ export const impactSection: ImpactSectionConfig = {
         timeframe: "year on year",
       },
       chart: {
-        kind: "area",
+        kind: "sparkline",
         points: [
           { label: "Jan", value: 6 },
           { label: "Feb", value: 9 },

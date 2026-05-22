@@ -68,15 +68,15 @@ function MarkerHighlight({
         className="absolute inset-x-0 inset-y-[0.04em] -z-10 rounded-[0.32em]"
         style={{
           backgroundImage:
-            "linear-gradient(102deg, var(--accent-dark) 0%, var(--accent) 50%, #c084fc 100%)",
+            "linear-gradient(102deg, #ede0ff 0%, #d8b4fe 52%, #ece1ff 100%)",
           transformOrigin: "0% 65%",
-          boxShadow: "0 8px 22px -10px rgba(168,85,247,0.6)",
+          boxShadow: "0 6px 18px -10px rgba(168,85,247,0.45)",
         }}
         initial={{ scaleX: 0, rotate: -1.8, opacity: 0 }}
         animate={{ scaleX: 1, rotate: -1.8, opacity: 1 }}
         transition={{ delay, duration: 0.5, ease }}
       />
-      <span className="relative text-white">{children}</span>
+      <span className="relative text-accent-dark">{children}</span>
     </span>
   );
 }

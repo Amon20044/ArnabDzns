@@ -18,7 +18,7 @@ const ease = [0.22, 1, 0.36, 1] as const;
 const viewport = { amount: 0.35, once: false } as const;
 
 export const sizeSpanClass: Record<ImpactCardSize, string> = {
-  sm: "col-span-2 sm:col-span-3 md:col-span-2 lg:col-span-2",
+  sm: "col-span-2 sm:col-span-2 md:col-span-2 lg:col-span-2",
   md: "col-span-2 sm:col-span-6 md:col-span-3 lg:col-span-3",
   wide: "col-span-2 sm:col-span-6 md:col-span-6 lg:col-span-4",
   tall: "col-span-2 sm:col-span-6 md:col-span-2 lg:col-span-2 md:row-span-2",
