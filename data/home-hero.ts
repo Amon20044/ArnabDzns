@@ -30,7 +30,7 @@ export const homeHeroSection = {
   ],
   title: ["Your audience judges in seconds.", " We win those seconds."],
   description:
-    "Creative work built for clicks, trust, and attention. We help brands and businesses connect with their audience through thoughtful, strategic design.",
+    "Every creative decision is built for one thing, making your brand the obvious choice",
   cta: {
     label: "Get in Touch",
     href: "/contact",

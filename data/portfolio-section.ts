@@ -3,10 +3,10 @@ import type { HeroSectionConfig } from "@/types";
 export const portfolioSection = {
     badges: [
         {
-            id: "portfolio",
-            label: "Portfolio",
+            id: "featured",
+            label: "Featured Work",
             icon: "gallery",
-            tone: "#cafe52",
+            tone: "#c3ff39",
             iconColor: "#ffffff",
         }
     ],
