@@ -44,8 +44,11 @@ export default async function RootLayout({
       >
         <StructuredData data={getSiteJsonLd()} />
         <LiquidGlassDefs />
+        {/* Kept outside .site-boot-content: that wrapper retains a non-none
+            transform/filter after its boot animation, which would otherwise
+            become the containing block and break position: fixed here. */}
+        <IridescenceBackground color={[0.93, 0.88, 0.99]} mouseReact amplitude={0.08} speed={0.9} />
         <div className="site-boot-content">
-          <IridescenceBackground color={[0.93, 0.88, 0.99]} mouseReact amplitude={0.08} speed={0.9} />
           <LocomotiveScrollProvider>
             <RouteAwareSiteFrame
               header={content.header}
