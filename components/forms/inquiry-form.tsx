@@ -2,6 +2,7 @@
 
 import { AnimatePresence, motion } from "framer-motion";
 import {
+  ArrowUpRight,
   CheckCircle2,
   LoaderCircle,
   MessageCircleMore,
@@ -544,33 +545,25 @@ function SuccessCelebrationOverlay({
                 feel useful, specific, and worth the wait.
               </Text>
 
-              <div className="mt-6 grid gap-3 sm:grid-cols-2">
-                <div className="rounded-[1.5rem] border border-white/70 bg-white/78 p-4 shadow-[0_16px_38px_rgba(88,28,135,0.08)] max-md:!shadow-none">
-                  <Text as="span" variant="p3" className="text-text-secondary/74">
-                    What just happened
-                  </Text>
-                  <Heading variant="h5" as="h3" className="mt-2">
-                    Your message landed successfully.
-                  </Heading>
-                  <Text variant="p2" className="mt-2 text-text-secondary">
+              <div className="mt-6 flex items-center gap-3.5 rounded-full border border-emerald-200/70 bg-[linear-gradient(120deg,rgba(236,253,245,0.95)_0%,rgba(220,252,231,0.82)_100%)] py-3 pl-3 pr-5 shadow-[0_16px_38px_rgba(5,150,105,0.10)] max-md:!shadow-none">
+                <span className="inline-flex size-9 shrink-0 items-center justify-center rounded-full bg-emerald-500/14 text-emerald-600">
+                  <CheckCircle2 className="size-[18px]" strokeWidth={2.3} />
+                </span>
+                <p className="min-w-0 text-pretty text-[15px] leading-snug text-emerald-900">
+                  <span className="font-semibold">Your message landed safely.</span>{" "}
+                  <span className="text-emerald-800/75">
                     {autoReplySent
-                      ? "A confirmation email is also on its way, so you have a clean paper trail."
-                      : "Your submission is secured, and we will follow up from the inbox you used."}
-                  </Text>
-                </div>
-
-                <div className="rounded-[1.5rem] border border-white/70 bg-[linear-gradient(180deg,rgba(250,245,255,0.92)_0%,rgba(255,255,255,0.88)_100%)] p-4 shadow-[0_16px_38px_rgba(88,28,135,0.08)] max-md:!shadow-none">
-                  <Text as="span" variant="p3" className="text-text-secondary/74">
-                    Need faster alignment? Feel free to reach out on WhatsApp.
-                  </Text>
-                </div>
+                      ? "A confirmation email is already on its way — your tidy paper trail."
+                      : "We'll reply straight to the inbox you reached out from."}
+                  </span>
+                </p>
               </div>
 
               <div className="mt-6 flex flex-col gap-3 sm:flex-row">
                 <PrimaryButton
-                  label="Back to the page"
-                  onClick={onClose}
-                  Icon={CheckCircle2}
+                  label="Explore projects"
+                  href="/#portfolio"
+                  Icon={ArrowUpRight}
                   className="w-full"
                   fullWidth
                 />
