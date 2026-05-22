@@ -55,9 +55,9 @@ export function ImpactSection({
         />
 
         <div className="relative z-10 px-5 py-6 sm:px-7 sm:py-8 md:px-10 md:py-10 max-md:!px-0 max-md:!py-0">
-          <header className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(18rem,24rem)] lg:items-end">
-            <div>
-              <div className="flex flex-wrap gap-3">
+          <header className="flex flex-col items-center text-center">
+            <div className="flex w-full flex-col items-center">
+              <div className="flex flex-wrap justify-center gap-3">
                 {content.hero.badges?.map((badge, index) => (
                   <StatusBadge
                     key={badge.id ?? `${badge.label}-${index}`}
