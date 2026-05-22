@@ -32,7 +32,7 @@ export default async function Home() {
           <HomeLandingHero content={content.homeHero} />
         </div>
 
-        <section className="page-reveal" style={homeHeroToClientsGapStyle}>
+        <section className="page-reveal client-marquee-shell" style={homeHeroToClientsGapStyle}>
           <ImageMarquee
             rows={content.clientsMarquee}
             type="clients"

@@ -2,7 +2,7 @@
 
 import { motion, type Variants } from "framer-motion";
 import { ArrowRight } from "lucide-react";
-import { Fragment, useEffect, useState, type ReactNode } from "react";
+import { useEffect, useState } from "react";
 import { PrimaryButton } from "@/components/ui/primary-button";
 import { renderStatusBadgeLeading } from "@/components/ui/status-badge-leading";
 import { StatusBadge } from "@/components/ui/status-badge";
@@ -81,12 +81,6 @@ export function HomeLandingHero({
   const descriptionStep = titleStartStep + titleLines.length;
   const ctaStep = descriptionStep + (content.description ? 1 : 0);
 
-  // Start the hand-drawn emphasis just as the accent line finishes revealing.
-  const accentRevealDelay =
-    0.08 + (titleStartStep + titleLines.length - 1) * 0.12;
-  const accentMarkerDelay = accentRevealDelay + 0.5;
-  const accentUnderlineDelay = accentRevealDelay + 0.78;
-
   useEffect(() => {
     const mediaQuery = window.matchMedia("(min-width: 640px)");
 
@@ -139,8 +133,8 @@ export function HomeLandingHero({
       <h1
         className={cn(
           "font-sans text-balance font-bold leading-[1.05] tracking-[-0.032em] text-text-primary",
-          "text-[clamp(2.5rem,1.4rem+4.2vw,4rem)]",
-          badges.length ? "mt-6 sm:mt-7" : "mt-2",
+          "text-[clamp(1.875rem,1.21rem+2.86vw,3.75rem)]",
+          badges.length ? "mt-4" : "mt-2",
         )}
       >
         {titleLines.map((line, index) => {

@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState, type CSSProperties } from "react";
 import type { IconType } from "react-icons";
 import {
   SiApple,
@@ -319,6 +319,7 @@ function MarqueeRow({
               const clientLabel = image.alt ?? image.client ?? "";
               const ClientIcon = image.icon ? CLIENT_ICON_REGISTRY[image.icon] : undefined;
               const imageSrc = image.src;
+              const isSvgImage = imageSrc?.toLowerCase().endsWith(".svg") ?? false;
 
               if (!isClient && !imageSrc) {
                 return null;
@@ -351,8 +352,9 @@ function MarqueeRow({
                       width={image.width ?? 160}
                       height={image.height ?? 48}
                       sizes={imageSizes}
+                      unoptimized={isSvgImage}
                       priority={image.priority ?? (segmentIndex === 0 && rowIndex === 0 && imageIndex < 2)}
-                      className="h-full w-auto object-contain brightness-0 opacity-100 transition-all duration-400 ease-out hover:brightness-100 hover:opacity-100"
+                      className="h-auto max-h-full w-auto max-w-[10rem] object-contain opacity-80 drop-shadow-[0_10px_24px_rgba(15,23,42,0.08)] transition-all duration-300 ease-out group-hover:scale-110 group-hover:opacity-100"
                     />
                   ) : (
                     <span className="text-sm font-semibold uppercase tracking-[0.18em] text-text-secondary">
@@ -382,7 +384,14 @@ function MarqueeRow({
               return (
                 <article
                   key={`${image.id ?? image.src ?? image.icon ?? image.client ?? "marquee-item"}-${segmentIndex}-${imageIndex}`}
-                  className="group relative shrink-0"
+                  className={cn("group relative shrink-0", isClient && "marquee-logo-reveal")}
+                  style={
+                    isClient
+                      ? ({
+                          "--marquee-logo-delay": `${180 + Math.min(imageIndex, 8) * 52}ms`,
+                        } as CSSProperties)
+                      : undefined
+                  }
                   onPointerEnter={() => {
                     hoverRef.current = true;
                   }}

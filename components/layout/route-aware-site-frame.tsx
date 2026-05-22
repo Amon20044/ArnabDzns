@@ -1,6 +1,7 @@
 "use client";
 
 import { usePathname } from "next/navigation";
+import { PageTransitionShell } from "@/components/layout/page-transition-shell";
 import { Header, Navigation } from "@/components/layout/navigation";
 import { SiteFooter } from "@/components/layout/site-footer";
 import { shouldHideSiteChrome } from "@/lib/admin/route-visibility";
@@ -25,7 +26,7 @@ export function RouteAwareSiteFrame({
     <>
       {hideChrome ? null : <Header content={header} />}
       <div className={cn("flex flex-1 flex-col", hideChrome ? "" : "pt-24")}>
-        {children}
+        <PageTransitionShell>{children}</PageTransitionShell>
       </div>
       {hideChrome ? null : <SiteFooter site={site} />}
       {hideChrome ? null : <Navigation content={navigation} />}
