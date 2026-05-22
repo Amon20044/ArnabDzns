@@ -44,21 +44,21 @@ export default async function RootLayout({
       >
         <StructuredData data={getSiteJsonLd()} />
         <LiquidGlassDefs />
-        {/* Kept outside .site-boot-content: that wrapper retains a non-none
-            transform/filter after its boot animation, which would otherwise
-            become the containing block and break position: fixed here. */}
+        {/* The boot wrapper (.site-boot-content) keeps a non-none transform/filter
+            during and after its animation, which makes it the containing block for
+            any position: fixed descendant. So the background AND the fixed chrome
+            (header + bottom nav) live OUTSIDE it; only the scrolling page content is
+            wrapped (inside RouteAwareSiteFrame) so the boot reveal still applies. */}
         <IridescenceBackground color={[0.93, 0.88, 0.99]} mouseReact amplitude={0.08} speed={0.9} />
-        <div className="site-boot-content">
-          <LocomotiveScrollProvider>
-            <RouteAwareSiteFrame
-              header={content.header}
-              navigation={content.navigation}
-              site={content.site}
-            >
-              {children}
-            </RouteAwareSiteFrame>
-          </LocomotiveScrollProvider>
-        </div>
+        <LocomotiveScrollProvider>
+          <RouteAwareSiteFrame
+            header={content.header}
+            navigation={content.navigation}
+            site={content.site}
+          >
+            {children}
+          </RouteAwareSiteFrame>
+        </LocomotiveScrollProvider>
         <div className="site-boot-loader" aria-label="Loading site" role="status">
           <div className="site-loader-card">
             <span className="site-loader-mark" />
