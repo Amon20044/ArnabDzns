@@ -1,6 +1,6 @@
 import { NextResponse, type NextRequest } from "next/server";
-import { findAdminById } from "@/lib/auth/admin";
-import { requireAdminRequest } from "@/lib/auth/api";
+import { findAdminByEmail, findAdminById } from "@/lib/auth/admin";
+import { getSessionFromRequest } from "@/lib/auth/api";
 import { hashPassword, isStrongEnoughPassword } from "@/lib/auth/password";
 
 export const runtime = "nodejs";
@@ -12,19 +12,23 @@ function readString(value: unknown) {
 }
 
 export async function POST(request: NextRequest) {
-  const session = await requireAdminRequest(request);
-
-  if (!session) {
-    return NextResponse.json({ message: "Unauthorized." }, { status: 401 });
-  }
-
+  const session = await getSessionFromRequest(request);
   const body = (await request.json().catch(() => null)) as Record<string, unknown> | null;
   const password = readString(body?.password);
   const confirmPassword = readString(body?.confirmPassword);
-  const user = await findAdminById(session.sub);
+  const email = readString(body?.email).toLowerCase();
+
+  const user = session
+    ? await findAdminById(session.sub)
+    : email
+      ? await findAdminByEmail(email)
+      : null;
 
   if (!user) {
-    return NextResponse.json({ message: "User not found." }, { status: 404 });
+    return NextResponse.json(
+      { message: "No admin account matches that email." },
+      { status: 404 },
+    );
   }
 
   if (!isStrongEnoughPassword(password)) {

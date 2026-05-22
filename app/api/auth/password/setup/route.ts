@@ -1,34 +1,61 @@
 import { NextResponse, type NextRequest } from "next/server";
-import { findAdminById } from "@/lib/auth/admin";
-import { requireAdminRequest } from "@/lib/auth/api";
+import { findAdminByEmail, findAdminById } from "@/lib/auth/admin";
+import { getSessionFromRequest } from "@/lib/auth/api";
 import { createOtpAuthUri, createOtpQrDataUrl, generateTotpSecret } from "@/lib/auth/totp";
 
 export const runtime = "nodejs";
 
+function readEmail(value: string | null) {
+  return typeof value === "string" ? value.trim().toLowerCase() : "";
+}
+
 export async function GET(request: NextRequest) {
-  const session = await requireAdminRequest(request);
+  const session = await getSessionFromRequest(request);
+  const email = readEmail(request.nextUrl.searchParams.get("email"));
 
-  if (!session) {
-    return NextResponse.json({ message: "Unauthorized." }, { status: 401 });
+  // Identify the account by an active session first, otherwise by the email
+  // provided in the public "reset via authenticator" flow.
+  const user = session
+    ? await findAdminById(session.sub)
+    : email
+      ? await findAdminByEmail(email)
+      : null;
+
+  if (!session && !email) {
+    return NextResponse.json(
+      { message: "Enter your admin email to continue.", needsEmail: true },
+      { status: 400 },
+    );
   }
-
-  const user = await findAdminById(session.sub);
 
   if (!user) {
-    return NextResponse.json({ message: "User not found." }, { status: 404 });
+    return NextResponse.json(
+      { message: "No admin account matches that email." },
+      { status: 404 },
+    );
   }
 
-  if (!user.totpSecret) {
+  const wasUnpaired = !user.totpSecret;
+
+  if (wasUnpaired) {
     user.totpSecret = generateTotpSecret();
     await user.save();
   }
 
-  const qrDataUrl = await createOtpQrDataUrl(user.email, user.totpSecret);
+  // Only reveal the secret/QR for first-time pairing, or to an already
+  // authenticated admin re-pairing. Never expose an existing secret to an
+  // anonymous visitor who merely typed the email.
+  const reveal = wasUnpaired || Boolean(session);
 
   return NextResponse.json({
     email: user.email,
-    secret: user.totpSecret,
-    otpauthUrl: createOtpAuthUri(user.email, user.totpSecret),
-    qrDataUrl,
+    paired: !wasUnpaired,
+    ...(reveal
+      ? {
+          secret: user.totpSecret,
+          otpauthUrl: createOtpAuthUri(user.email, user.totpSecret),
+          qrDataUrl: await createOtpQrDataUrl(user.email, user.totpSecret),
+        }
+      : {}),
   });
 }
