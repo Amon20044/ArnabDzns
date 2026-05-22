@@ -138,8 +138,8 @@ export function HomeLandingHero({
 
       <h1
         className={cn(
-          "font-sans text-balance font-bold leading-[1.1] tracking-[-0.028em] text-text-primary",
-          "text-[clamp(1.875rem,1.1rem+3vw,3.25rem)]",
+          "font-sans text-balance font-bold leading-[1.05] tracking-[-0.032em] text-text-primary",
+          "text-[clamp(2.5rem,1.4rem+4.2vw,4rem)]",
           badges.length ? "mt-6 sm:mt-7" : "mt-2",
         )}
       >
