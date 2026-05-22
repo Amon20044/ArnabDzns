@@ -115,9 +115,9 @@ export function HomeLandingHero({
 
       <h1
         className={cn(
-          "font-sans text-balance font-bold leading-[1.05] tracking-[-0.032em] text-text-primary",
-          "text-[clamp(2.5rem,1.3rem+5vw,4.75rem)]",
-          badges.length ? "mt-7 sm:mt-9" : "mt-2",
+          "font-sans text-balance font-bold leading-[1.1] tracking-[-0.028em] text-text-primary",
+          "text-[clamp(1.875rem,1.1rem+3vw,3.25rem)]",
+          badges.length ? "mt-6 sm:mt-7" : "mt-2",
         )}
       >
         {titleLines.map((line, index) => {
