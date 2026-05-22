@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import Link from "next/link";
 import { motion } from "framer-motion";
 import {
   startTransition,
@@ -22,8 +23,10 @@ interface HeaderProps {
 export const Header = ({ content = headerConfig }: HeaderProps) => {
   const { availabilityLabel, brand, socials } = content;
   const [isVisible, setIsVisible] = useState(true);
+  const [brandHovered, setBrandHovered] = useState(false);
   const lastScrollYRef = useRef(0);
   const isVisibleRef = useRef(true);
+  const brandHref = brand.path === "/" ? "/about" : brand.path;
 
   const handleScroll = useEffectEvent(() => {
     const currentScrollY = window.scrollY;
@@ -63,12 +66,20 @@ export const Header = ({ content = headerConfig }: HeaderProps) => {
       <LiquidGlassBackdrop />
 
       <div className="relative z-10 mx-auto flex h-[72px] w-full max-w-7xl items-center justify-between gap-3 px-4 sm:gap-4 sm:px-8">
-        <div className="flex min-w-0 flex-1 items-center gap-2.5 py-1 pr-1 sm:gap-3.5 sm:pr-3">
+        <Link
+          href={brandHref}
+          className="group relative flex min-w-0 flex-1 items-center gap-2.5 rounded-full py-1 pr-1 sm:gap-3.5 sm:pr-3"
+          aria-label={`Open ${brand.name} bio`}
+          onMouseEnter={() => setBrandHovered(true)}
+          onMouseLeave={() => setBrandHovered(false)}
+          onFocus={() => setBrandHovered(true)}
+          onBlur={() => setBrandHovered(false)}
+        >
           <motion.div
-            className="relative size-11 shrink-0 overflow-hidden rounded-full
+            className="relative z-[1] size-11 shrink-0 overflow-hidden rounded-full
                        bg-black-soft ring-1 ring-black/10
                        shadow-[0_4px_14px_rgba(9,9,11,0.10)]"
-            whileHover={{ scale: 1.04 }}
+            animate={{ scale: brandHovered ? 1.04 : 1 }}
             transition={{ type: "spring", stiffness: 340, damping: 22 }}
           >
             <Image
@@ -81,15 +92,27 @@ export const Header = ({ content = headerConfig }: HeaderProps) => {
             />
           </motion.div>
 
-          <div className="min-w-0">
+          <div className="relative z-[1] min-w-0">
             <p className="truncate text-[15px] font-semibold leading-tight tracking-tight text-text-primary">
               {brand.name}
             </p>
-            <p className="truncate text-[12.5px] leading-[18px] text-text-secondary">
-              {brand.role}
-            </p>
+
+            <div className="relative h-[18px] overflow-hidden">
+              <motion.div
+                className="flex flex-col"
+                animate={{ y: brandHovered ? -18 : 0 }}
+                transition={{ duration: 0.32, ease: [0.4, 0, 0.2, 1] }}
+              >
+                <span className="truncate text-[12.5px] leading-[18px] text-text-secondary">
+                  {brand.role}
+                </span>
+                <span className="truncate text-[12.5px] leading-[18px] text-accent">
+                  Open Bio
+                </span>
+              </motion.div>
+            </div>
           </div>
-        </div>
+        </Link>
 
         <div className="flex shrink-0 items-center gap-2 sm:gap-4">
           <motion.div
@@ -103,7 +126,7 @@ export const Header = ({ content = headerConfig }: HeaderProps) => {
               showIndicator
               pulse
               tone="#059669"
-              indicatorColor="#34d399"
+              indicatorColor="#ffffff"
             >
               {availabilityLabel}
             </StatusBadge>

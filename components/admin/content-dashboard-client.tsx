@@ -118,6 +118,30 @@ function hasPersistableStructuredData(value: unknown) {
   return value !== null && value !== undefined;
 }
 
+function CountPill({
+  children,
+  tone = "muted",
+  className,
+}: {
+  children: ReactNode;
+  tone?: "muted" | "accent";
+  className?: string;
+}) {
+  return (
+    <span
+      className={cn(
+        "inline-flex h-5 min-w-5 shrink-0 items-center justify-center rounded-full px-1.5 text-[10px] font-semibold tabular-nums",
+        tone === "accent"
+          ? "bg-accent text-white"
+          : "bg-muted text-muted-foreground",
+        className,
+      )}
+    >
+      {children}
+    </span>
+  );
+}
+
 function SectionsNavigationPanel({
   blockCount,
   search,
@@ -144,36 +168,42 @@ function SectionsNavigationPanel({
   headerAction?: ReactNode;
 }) {
   return (
-    <Card className={cn("min-h-0 rounded-2xl bg-white/84", className)}>
-      <CardHeader className="shrink-0 border-b border-border/70 pb-3">
-        <div className="flex items-center justify-between gap-2">
-          <div className="flex items-center gap-2">
-            <LayoutPanelTopIcon className="size-4 text-muted-foreground" />
-            <CardTitle>Sections</CardTitle>
-          </div>
-          <div className="flex items-center gap-2">
-            <Badge variant="outline">{blockCount}</Badge>
-            {headerAction}
-          </div>
+    <div
+      className={cn(
+        "relative flex min-h-0 flex-col overflow-hidden rounded-2xl border border-border/70 bg-white/85 shadow-[0_6px_20px_rgba(15,23,42,0.04)] backdrop-blur-sm",
+        className,
+      )}
+    >
+      <div className="flex shrink-0 items-center justify-between gap-2 border-b border-border/70 px-4 py-3">
+        <div className="flex min-w-0 items-center gap-2">
+          <LayoutPanelTopIcon className="size-4 shrink-0 text-muted-foreground" />
+          <p className="truncate font-heading text-sm font-semibold tracking-[-0.01em] text-foreground">
+            Sections
+          </p>
+          <CountPill>{blockCount}</CountPill>
         </div>
-      </CardHeader>
-      <CardContent className="flex min-h-0 flex-1 flex-col gap-3 overflow-hidden pt-3">
+        {headerAction ? <div className="flex items-center gap-2">{headerAction}</div> : null}
+      </div>
+
+      <div className="shrink-0 border-b border-border/60 px-3 py-3">
         <div className="relative">
           <SearchIcon className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
           <Input
             value={search}
             onChange={(event) => onSearchChange(event.target.value)}
             placeholder="Search sections..."
-            className="pl-9"
+            className="h-9 pl-9"
           />
         </div>
+      </div>
 
-        <div
-          className="-mx-1 flex min-h-0 flex-1 flex-col gap-2 overflow-y-auto overscroll-contain px-1 pb-6 pr-1 touch-pan-y"
-          style={{ WebkitOverflowScrolling: "touch" }}
-        >
-          {groupedBlocks.length ? (
-            groupedBlocks.map(([group, groupBlocks]) => {
+      <div
+        className="min-h-0 flex-1 overflow-y-auto overscroll-contain touch-pan-y"
+        style={{ WebkitOverflowScrolling: "touch" }}
+      >
+        {groupedBlocks.length ? (
+          <ul className="flex flex-col">
+            {groupedBlocks.map(([group, groupBlocks], groupIndex) => {
               const isOpen = deferredSearch.length > 0 || openGroups.has(group);
               const GroupIcon = GROUP_ICONS[group] ?? FolderIcon;
               const hasSelected = groupBlocks.some(
@@ -181,102 +211,125 @@ function SectionsNavigationPanel({
               );
 
               return (
-                <div
+                <li
                   key={group}
                   className={cn(
-                    "overflow-hidden rounded-xl border bg-white/70 transition",
-                    hasSelected
-                      ? "border-foreground/15 shadow-[0_4px_14px_rgba(15,23,42,0.05)]"
-                      : "border-border/70",
+                    "relative",
+                    groupIndex > 0 && "border-t border-border/50",
                   )}
                 >
+                  {hasSelected && !isOpen ? (
+                    <span
+                      aria-hidden
+                      className="pointer-events-none absolute inset-y-2 left-0 w-[3px] rounded-r-full bg-accent/70"
+                    />
+                  ) : null}
+
                   <button
                     type="button"
                     onClick={() => onToggleGroup(group)}
                     aria-expanded={isOpen ? "true" : "false"}
-                    className="flex w-full items-center justify-between gap-2 px-3 py-2.5 text-left transition hover:bg-background/80"
+                    className={cn(
+                      "flex w-full items-center justify-between gap-3 px-3 py-3 text-left transition-colors",
+                      "hover:bg-muted/50",
+                      isOpen && "bg-muted/30",
+                    )}
                   >
-                    <div className="flex min-w-0 items-center gap-2">
-                      <GroupIcon className="size-4 shrink-0 text-muted-foreground" />
-                      <span className="truncate text-sm font-semibold text-foreground">
+                    <div className="flex min-w-0 flex-1 items-center gap-2.5">
+                      <span
+                        className={cn(
+                          "flex size-7 shrink-0 items-center justify-center rounded-lg transition-colors",
+                          hasSelected
+                            ? "bg-accent/12 text-accent"
+                            : "bg-muted text-muted-foreground",
+                        )}
+                      >
+                        <GroupIcon className="size-[15px]" strokeWidth={2} />
+                      </span>
+                      <span className="truncate text-sm font-semibold tracking-[-0.01em] text-foreground">
                         {GROUP_LABELS[group] ?? group}
                       </span>
-                      <Badge variant="outline" className="shrink-0">
-                        {groupBlocks.length}
-                      </Badge>
+                      <CountPill>{groupBlocks.length}</CountPill>
                     </div>
                     <ChevronDownIcon
                       className={cn(
-                        "size-4 shrink-0 text-muted-foreground transition-transform duration-200",
-                        isOpen && "rotate-180",
+                        "size-4 shrink-0 text-muted-foreground/70 transition-transform duration-200",
+                        isOpen && "rotate-180 text-foreground",
                       )}
+                      strokeWidth={2.2}
                     />
                   </button>
 
                   {isOpen ? (
-                    <div
-                      className="grid max-h-[min(48dvh,26rem)] gap-1 overflow-y-auto overscroll-contain border-t border-border/60 bg-background/40 p-1.5 touch-pan-y xl:max-h-none xl:overflow-visible"
-                      style={{ WebkitOverflowScrolling: "touch" }}
-                    >
+                    <ul className="flex flex-col gap-px px-2 pb-2 pt-1">
                       {groupBlocks.map((block) => {
                         const definition = getSectionDefinition(block.key);
                         const isSelected = block.key === selectedKey;
 
                         return (
-                          <button
-                            key={block.key}
-                            type="button"
-                            onClick={() => onSelectBlock(block)}
-                            className={cn(
-                              "group flex items-start gap-2.5 rounded-lg px-2.5 py-2 text-left transition",
-                              isSelected
-                                ? "bg-foreground text-background shadow-sm"
-                                : "hover:bg-white",
-                            )}
-                          >
-                            <div className="min-w-0 flex-1">
-                              <div className="flex items-center gap-1.5">
-                                <p className="truncate text-sm font-medium">
-                                  {definition.label}
-                                </p>
-                              </div>
-                              <p
-                                className={cn(
-                                  "mt-0.5 line-clamp-1 text-xs leading-5",
-                                  isSelected
-                                    ? "text-background/70"
-                                    : "text-muted-foreground",
-                                )}
-                              >
-                                {definition.description}
-                              </p>
-                            </div>
-                            <span
+                          <li key={block.key} className="relative">
+                            {isSelected ? (
+                              <span
+                                aria-hidden
+                                className="pointer-events-none absolute inset-y-1.5 left-0 w-[3px] rounded-r-full bg-accent"
+                              />
+                            ) : null}
+                            <button
+                              type="button"
+                              onClick={() => onSelectBlock(block)}
+                              aria-current={isSelected ? "true" : undefined}
                               className={cn(
-                                "mt-0.5 inline-flex h-5 min-w-5 shrink-0 items-center justify-center rounded-full px-1.5 text-[10px] font-semibold",
+                                "group flex w-full items-start gap-3 rounded-lg px-3 py-2.5 text-left transition-colors",
                                 isSelected
-                                  ? "bg-background/20 text-background"
-                                  : "bg-muted text-muted-foreground",
+                                  ? "bg-accent/10"
+                                  : "hover:bg-muted/60",
                               )}
                             >
-                              {countBlockItems(block)}
-                            </span>
-                          </button>
+                              <div className="min-w-0 flex-1">
+                                <p
+                                  className={cn(
+                                    "truncate text-sm font-medium tracking-[-0.01em]",
+                                    isSelected
+                                      ? "text-foreground"
+                                      : "text-foreground/90",
+                                  )}
+                                >
+                                  {definition.label}
+                                </p>
+                                <p
+                                  className={cn(
+                                    "mt-0.5 line-clamp-1 text-xs leading-[1.5]",
+                                    isSelected
+                                      ? "text-foreground/65"
+                                      : "text-muted-foreground",
+                                  )}
+                                >
+                                  {definition.description}
+                                </p>
+                              </div>
+                              <CountPill
+                                tone={isSelected ? "accent" : "muted"}
+                                className="mt-px"
+                              >
+                                {countBlockItems(block)}
+                              </CountPill>
+                            </button>
+                          </li>
                         );
                       })}
-                    </div>
+                    </ul>
                   ) : null}
-                </div>
+                </li>
               );
-            })
-          ) : (
-            <div className="rounded-2xl border border-dashed border-border px-4 py-8 text-sm text-muted-foreground">
-              No sections match this search yet.
-            </div>
-          )}
-        </div>
-      </CardContent>
-    </Card>
+            })}
+          </ul>
+        ) : (
+          <div className="m-3 rounded-xl border border-dashed border-border px-4 py-8 text-center text-sm text-muted-foreground">
+            No sections match this search yet.
+          </div>
+        )}
+      </div>
+    </div>
   );
 }
 

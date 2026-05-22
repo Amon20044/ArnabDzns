@@ -1,12 +1,14 @@
 "use client";
 
 import type { CSSProperties } from "react";
-import { ArrowUpRight, CalendarClock, Mail } from "lucide-react";
+import Image from "next/image";
+import { CalendarDays, Mail } from "lucide-react";
 import { Hero } from "@/components/sections/hero";
 import { PrimaryButton } from "@/components/ui/primary-button";
-import { Icon } from "@/components/ui/icon";
 import { ProfileCard } from "@/components/ui/profile-card";
+import { BookCallButton } from "@/components/about/book-call-button";
 import { StatusBadge } from "@/components/ui/status-badge";
+import { renderStatusBadgeLeading } from "@/components/ui/status-badge-leading";
 import { Heading, Text } from "@/components/ui/typography";
 import {
   aboutPageContent,
@@ -15,6 +17,7 @@ import {
   type AboutPageContent,
   type AboutTeamMember,
 } from "@/data/about";
+import { caveat } from "@/config/fonts";
 import { cn } from "@/lib/utils";
 import type { SiteConfig } from "@/types";
 import { siteConfig } from "@/data/site";
@@ -34,41 +37,21 @@ function IntroBadgeRow({
 }) {
   return (
     <div className="flex flex-wrap items-center justify-center gap-3">
-      {badges.map((badge) => {
-        const hasIndicator = badge.icon === "indicator";
-        const hasIcon = badge.icon && badge.icon !== "none" && !hasIndicator;
-
-        return (
-          <span
-            key={badge.id ?? badge.label}
-            className="inline-flex items-center gap-2 rounded-full border px-4 py-2 text-[13px] font-semibold tracking-[-0.01em] shadow-[0_12px_30px_rgba(88,28,135,0.08)]"
-            style={{
-              backgroundColor: badge.tone ?? "rgba(255,255,255,0.94)",
-              color: badge.textColor ?? "#18181b",
-              borderColor: "rgba(255,255,255,0.72)",
-            }}
-          >
-            {hasIndicator ? (
-              <span
-                aria-hidden
-                className="size-2.5 rounded-full shadow-[0_0_0_4px_rgba(34,197,94,0.10)]"
-                style={{ backgroundColor: badge.indicatorColor ?? "#22c55e" }}
-              />
-            ) : null}
-
-            {hasIcon ? (
-              <Icon
-                name={badge.icon}
-                className="size-[14px]"
-                style={{ color: badge.iconColor ?? badge.textColor ?? "#18181b" }}
-                strokeWidth={2.1}
-              />
-            ) : null}
-
-            <span>{badge.label}</span>
-          </span>
-        );
-      })}
+      {badges.map((badge) => (
+        <StatusBadge
+          key={badge.id ?? badge.label}
+          interactive={false}
+          tone={badge.tone}
+          textColor={badge.textColor}
+          iconColor={badge.iconColor}
+          indicatorColor={badge.indicatorColor}
+          showIndicator={badge.icon === "indicator"}
+          pulse={badge.pulse}
+          leading={renderStatusBadgeLeading(badge)}
+        >
+          {badge.label}
+        </StatusBadge>
+      ))}
     </div>
   );
 }
@@ -76,7 +59,7 @@ function IntroBadgeRow({
 function AvailabilityStatCard({ stat }: { stat: AboutAvailabilityStat }) {
   return (
     <div
-      className="relative flex h-full flex-col justify-center overflow-hidden rounded-[1.45rem] border border-white/80 px-5 py-6 text-center"
+      className="relative flex h-full flex-col justify-center overflow-hidden rounded-[1.45rem] border border-white/80 px-5 py-6 text-center max-md:!shadow-none"
       style={softSurfaceGradient}
     >
       <Text
@@ -90,7 +73,7 @@ function AvailabilityStatCard({ stat }: { stat: AboutAvailabilityStat }) {
         {stat.statusColor ? (
           <span
             aria-hidden
-            className="size-2.5 rounded-full shadow-[0_0_0_5px_rgba(34,197,94,0.12)]"
+            className="size-2.5 rounded-full shadow-[0_0_0_5px_rgba(34,197,94,0.12)] max-md:!shadow-none"
             style={{ backgroundColor: stat.statusColor }}
           />
         ) : null}
@@ -107,171 +90,110 @@ function AvailabilityStatCard({ stat }: { stat: AboutAvailabilityStat }) {
   );
 }
 
-function ExperienceRow({ item }: { item: AboutExperienceItem }) {
-  const badgeTextColor = item.tone === "#2f1544" ? "#faf5ff" : "#18181b";
+const EXPERIENCE_BLOB_PATH =
+  "M47.2,-61.9C59.9,-52.5,68.3,-36.8,71.1,-20.6C73.9,-4.4,71.1,12.3,63.6,27.4C56.1,42.5,43.9,56,28.8,62.5C13.7,69,-4.3,68.6,-20.6,62.8C-36.9,57,-51.4,45.8,-60.2,31.3C-69,16.8,-72.1,-1,-67.9,-16.3C-63.7,-31.6,-52.2,-44.4,-39,-53.4C-25.8,-62.4,-12.9,-67.6,2.3,-70.7C17.6,-73.8,35.2,-74.8,47.2,-61.9Z";
+
+function ExperienceCard({ item }: { item: AboutExperienceItem }) {
+  const isDarkTone = item.tone === "#2f1544";
+  const logoSrc = item.companyImageUrl?.trim() ? item.companyImageUrl : null;
 
   return (
-    <article className="grid gap-4 border-t border-black/7 py-5 first:border-t-0 md:grid-cols-[auto_minmax(0,1.2fr)_minmax(0,2fr)_auto] md:items-center md:gap-6">
-      <div
-        className="flex size-12 items-center justify-center rounded-2xl border border-black/6 text-sm font-semibold tracking-[-0.02em] shadow-[inset_0_1px_0_rgba(255,255,255,0.45)]"
-        style={{ backgroundColor: item.tone, color: badgeTextColor }}
-      >
-        {item.initials}
+    <article
+      className="relative flex flex-col overflow-hidden rounded-[1.75rem] border border-white/80 p-3 shadow-[0_22px_58px_rgba(88,28,135,0.10)] max-md:!shadow-none"
+      style={softSurfaceGradient}
+    >
+      <div className="relative aspect-[1/1.05] overflow-hidden rounded-[1.4rem] bg-[linear-gradient(180deg,rgba(255,255,255,0.65)_0%,rgba(248,247,252,0.55)_100%)]">
+        <span
+          aria-hidden
+          className="absolute inset-0 flex items-center justify-center text-[clamp(6rem,18vw,10rem)] font-black tracking-[-0.08em] text-black/[0.04]"
+        >
+          {item.initials}
+        </span>
+
+        <svg
+          aria-hidden
+          viewBox="-100 -100 200 200"
+          className="absolute inset-0 h-full w-full"
+          preserveAspectRatio="xMidYMid slice"
+        >
+          <path
+            d={EXPERIENCE_BLOB_PATH}
+            fill={item.tone}
+            opacity="0.55"
+            transform="translate(-4 -2) scale(1.06)"
+          />
+          <path d={EXPERIENCE_BLOB_PATH} fill={item.tone} />
+        </svg>
+
+        <div className="absolute inset-0 flex items-center justify-center p-3">
+          {logoSrc ? (
+            <div className="relative h-full w-full">
+              <Image
+                src={logoSrc}
+                alt={`${item.company} logo`}
+                fill
+                sizes="(max-width: 640px) 60vw, 220px"
+                className="object-contain"
+              />
+            </div>
+          ) : (
+            <span
+              className="text-[clamp(2.5rem,5vw,3.5rem)] font-black tracking-[-0.04em]"
+              style={{ color: isDarkTone ? "#faf5ff" : "#2f1544" }}
+            >
+              {item.initials}
+            </span>
+          )}
+        </div>
       </div>
 
-      <div>
-        <Heading variant="h5" as="h3">
+      <div className="mt-5 flex-1 px-2 text-center">
+        <Heading variant="h4" as="h3">
           {item.company}
         </Heading>
-        <Text variant="p3" className="mt-1">
-          {item.role}
+        <p className="mt-1 text-sm font-semibold text-accent">{item.role}</p>
+        <Text variant="p3" className="mx-auto mt-3 max-w-[30ch] text-pretty text-center">
+          {item.summary}
         </Text>
       </div>
 
-      <Text variant="p2" className="max-w-2xl text-pretty">
-        {item.summary}
-      </Text>
+      <div className="mx-2 mt-5 border-t border-dashed border-black/10" />
 
-      <div className="flex items-center justify-between gap-3 md:flex-col md:items-end">
-        <div className="text-left md:text-right">
+      <div className="mt-4 flex items-center justify-center gap-3 px-2 pb-1">
+        <span
+          className="flex size-10 shrink-0 items-center justify-center rounded-xl border border-black/6 shadow-[inset_0_1px_0_rgba(255,255,255,0.45)] max-md:!shadow-none"
+          style={{ backgroundColor: item.tone }}
+        >
+          <CalendarDays
+            className="size-4"
+            strokeWidth={2.1}
+            style={{ color: isDarkTone ? "#faf5ff" : "#2f1544" }}
+          />
+        </span>
+        <div className="text-left">
           <p className="text-sm font-semibold tracking-[-0.02em] text-text-primary">
             {item.dates}
           </p>
-          <Text variant="p3" className="mt-0.5">
+          <Text variant="p3" className="mt-0.5 text-left text-xs">
             {item.location}
           </Text>
         </div>
-
-        <span className="inline-flex size-10 items-center justify-center rounded-full border border-black/8 bg-white/84 text-text-primary shadow-[0_10px_26px_rgba(15,23,42,0.08)]">
-          <ArrowUpRight className="size-4" strokeWidth={2.1} />
-        </span>
       </div>
     </article>
   );
 }
 
-function PrincipleCard({
-  title,
-  description,
-}: AboutPageContent["manifesto"]["principles"][number]) {
+function TeamCard({ member }: { member: AboutTeamMember }) {
   return (
-    <article
-      className="relative overflow-hidden rounded-[1.6rem] border border-white/80 p-5 text-left shadow-[0_18px_46px_rgba(88,28,135,0.08)]"
-      style={softSurfaceGradient}
-    >
-      <div
-        aria-hidden
-        className="pointer-events-none absolute inset-x-8 top-0 h-px bg-gradient-to-r from-transparent via-white to-transparent"
-      />
-      <Heading variant="h5" as="h3">
-        {title}
-      </Heading>
-      <Text variant="p3" className="mt-3 text-pretty">
-        {description}
-      </Text>
-    </article>
-  );
-}
-
-function TeamIllustration({ member }: { member: AboutTeamMember }) {
-  if (member.open) {
-    return (
-      <div className="relative flex min-h-[18rem] items-center justify-center overflow-hidden rounded-[1.7rem] border border-dashed border-accent/45 bg-[linear-gradient(180deg,rgba(250,245,255,0.9)_0%,rgba(255,255,255,0.7)_100%)] px-6 py-8 text-center">
-        <div className="absolute left-1/2 top-6 h-[72%] w-[46%] -translate-x-1/2 rounded-t-[7rem] rounded-b-[1.4rem] border-2 border-dashed border-accent/70" />
-        <div className="relative z-[1] max-w-[14rem]">
-          <p className="font-secondary text-[clamp(2rem,5vw,2.75rem)] italic leading-none tracking-[-0.04em] text-accent">
-            could be you
-          </p>
-          <Text variant="p3" className="mt-3 text-pretty">
-            Looking to add a motion designer or illustrator for select projects.
-          </Text>
-        </div>
-      </div>
-    );
-  }
-
-  return (
-    <div className="relative min-h-[18rem] overflow-hidden rounded-[1.7rem] border border-black/6 bg-[radial-gradient(circle_at_top,rgba(255,255,255,0.12),transparent_38%)]">
-      <div
-        aria-hidden
-        className="absolute inset-x-5 bottom-0 top-5 rounded-[2.4rem] shadow-[inset_0_1px_0_rgba(255,255,255,0.05)]"
-        style={{ backgroundColor: member.accent }}
-      />
-      <span className="absolute inset-x-0 bottom-4 text-center text-[7rem] font-bold tracking-[-0.08em] text-white/6">
-        {member.initials}
-      </span>
-      <div className="absolute inset-x-0 top-10 flex justify-center">
-        <div className="rounded-[1.6rem] border border-white/70 bg-white px-6 py-6 text-text-primary shadow-[0_22px_54px_rgba(15,23,42,0.14)]">
-          <Icon name={member.icon} className="size-12" strokeWidth={1.9} />
-        </div>
-      </div>
-    </div>
-  );
-}
-
-function TeamCard({
-  member,
-  inquiryPath,
-}: {
-  member: AboutTeamMember;
-  inquiryPath: string;
-}) {
-  const categoryTone = member.open ? "#7c3aed" : "#161122";
-  const categoryTextColor = "#faf5ff";
-
-  return (
-    <article
-      className={cn(
-        "relative overflow-hidden rounded-[2rem] border border-white/80 p-4 shadow-[0_22px_58px_rgba(88,28,135,0.10)]",
-        member.open
-          ? "bg-[linear-gradient(180deg,rgba(255,255,255,0.98)_0%,rgba(250,245,255,0.94)_100%)]"
-          : "bg-[linear-gradient(180deg,rgba(255,255,255,0.96)_0%,rgba(248,247,252,0.92)_100%)]",
-      )}
-    >
-      <div className="flex items-center justify-between gap-3">
-        <StatusBadge
-          compact
-          interactive={false}
-          tone={categoryTone}
-          textColor={categoryTextColor}
-          iconColor={categoryTextColor}
-        >
-          {member.category}
-        </StatusBadge>
-
-        <span className="inline-flex items-center rounded-full border border-black/8 bg-white/90 px-3 py-1 text-[11px] font-medium uppercase tracking-[0.12em] text-text-secondary">
-          {member.tag}
-        </span>
-      </div>
-
-      <div className="mt-4">
-        <TeamIllustration member={member} />
-      </div>
-
-      <div
-        className={cn(
-          "mt-4 flex items-center justify-between gap-3 rounded-[1.3rem] px-4 py-4",
-          member.open ? "bg-[rgba(47,21,68,0.96)] text-white" : "bg-[#161122] text-white",
-        )}
-      >
-        <div>
-          <p className="text-lg font-semibold tracking-[-0.03em]">{member.name}</p>
-          <p className="mt-1 text-sm leading-6 text-white/74">{member.title}</p>
-        </div>
-
-        <a
-          href={inquiryPath}
-          className="inline-flex size-10 shrink-0 items-center justify-center rounded-full border border-white/12 bg-white/10 transition-transform duration-200 hover:-translate-y-0.5"
-          aria-label={`Contact about ${member.name}`}
-        >
-          <ArrowUpRight className="size-4" strokeWidth={2.1} />
-        </a>
-      </div>
-
-      <Text variant="p3" className="mt-4 px-1 text-pretty">
-        {member.summary}
-      </Text>
-    </article>
+    <ProfileCard
+      imageSrc={member.imageSrc}
+      imageAlt={member.imageAlt ?? `Illustration of ${member.name}`}
+      name={member.name}
+      designation={member.designation}
+      rows={member.rows}
+      status="available"
+      className="w-full max-w-[22rem] sm:max-w-[24rem]"
+    />
   );
 }
 
@@ -287,14 +209,7 @@ export function AboutPage({
   return (
     <div className="flex flex-1">
       <main className="page-section-stack mx-auto flex w-full max-w-6xl flex-1 flex-col px-2 pb-32 pt-4 md:px-10 md:pb-40">
-        <section
-          className={cn(
-            "page-section-frame page-surface page-reveal relative overflow-hidden",
-            mobileFlatSectionClassName,
-          )}
-        >
-          <div className="pointer-events-none absolute inset-0 max-md:hidden bg-[radial-gradient(circle_at_top_left,rgba(216,180,254,0.24),transparent_28%),radial-gradient(circle_at_right_center,rgba(255,255,255,0.48),transparent_30%)]" />
-
+        <section className="page-reveal relative">
           <IntroBadgeRow badges={content.intro.badges} />
 
           <div className="mt-8 grid gap-6 xl:grid-cols-[minmax(0,0.95fr)_minmax(0,1.18fr)] xl:items-center">
@@ -327,17 +242,49 @@ export function AboutPage({
             </div>
 
             <article
-              className="relative overflow-hidden rounded-[2rem] border border-white/80 p-6 shadow-[0_24px_60px_rgba(88,28,135,0.08)] sm:p-8 md:p-10"
+              className="relative overflow-hidden rounded-[2rem] border border-white/80 p-6 shadow-[0_24px_60px_rgba(88,28,135,0.08)] max-md:!shadow-none sm:p-8 md:p-10"
               style={softSurfaceGradient}
             >
               <div className="pointer-events-none absolute inset-0 max-md:hidden bg-[radial-gradient(circle_at_top_left,rgba(255,255,255,0.65),transparent_28%),radial-gradient(circle_at_bottom_right,rgba(216,180,254,0.18),transparent_32%)]" />
 
               <div className="relative z-[1]">
-                <Heading variant="h3" as="h2" className="mt-6 max-w-[13ch]">
-                  {content.intro.title}
-                </Heading>
+                <h2
+                  className={cn(
+                    "text-[clamp(2.1rem,5.6vw,4.2rem)] font-bold leading-[0.98] tracking-[-0.035em] text-text-primary",
+                  )}
+                  aria-label={content.intro.title}
+                >
+                  <span aria-hidden>A designer who cares more about </span>
+                  <span
+                    aria-hidden
+                    className="relative inline-block whitespace-nowrap align-baseline"
+                  >
+                    <span
+                      aria-hidden
+                      className="pointer-events-none absolute inset-x-[-0.08em] bottom-[0.14em] h-[0.38em] -rotate-[1.5deg] rounded-[0.4em] bg-accent/25"
+                    />
+                    <span
+                      className={cn(
+                        caveat.className,
+                        "relative text-[1.1em] leading-[0.9] text-accent-dark",
+                      )}
+                    >
+                      clarity
+                    </span>
+                  </span>
+                  <span aria-hidden> than </span>
+                  <span
+                    aria-hidden
+                    className={cn(
+                      caveat.className,
+                      "text-[1.1em] leading-[0.9] text-text-primary/40 line-through decoration-accent/55 decoration-[0.06em] underline-offset-[0.05em]",
+                    )}
+                  >
+                    decoration.
+                  </span>
+                </h2>
 
-                <div className="mt-6 space-y-5">
+                <div className="mt-8 space-y-5">
                   {content.intro.paragraphs.map((paragraph) => (
                     <Text key={paragraph} variant="p2" className="max-w-2xl text-pretty">
                       {paragraph}
@@ -346,7 +293,12 @@ export function AboutPage({
                 </div>
 
                 <div className="mt-8 flex flex-wrap items-end justify-between gap-4 border-t border-dashed border-black/8 pt-6">
-                  <p className="font-secondary text-[clamp(2rem,5vw,3rem)] italic leading-none tracking-[-0.05em] text-accent-dark">
+                  <p
+                    className={cn(
+                      caveat.className,
+                      "text-[clamp(2rem,5vw,3rem)] leading-none tracking-[-0.05em] text-accent-dark",
+                    )}
+                  >
                     - {content.intro.signature}
                   </p>
                   <Text
@@ -368,19 +320,6 @@ export function AboutPage({
             mobileFlatSectionClassName,
           )}
         >
-          <div className="grid gap-4 md:grid-cols-4">
-            {content.availability.map((stat) => (
-              <AvailabilityStatCard key={stat.id} stat={stat} />
-            ))}
-          </div>
-        </section>
-
-        <section
-          className={cn(
-            "page-section-frame page-surface page-reveal relative overflow-hidden",
-            mobileFlatSectionClassName,
-          )}
-        >
           <div className="pointer-events-none absolute inset-0 max-md:hidden bg-[radial-gradient(circle_at_top,rgba(168,85,247,0.12),transparent_42%)]" />
 
           <Hero
@@ -388,11 +327,8 @@ export function AboutPage({
             className="min-h-0 py-0"
             childrenClassName="mt-12"
           >
-            <div
-              className="relative overflow-hidden rounded-[2rem] border border-white/80 px-5 py-6 shadow-[0_20px_56px_rgba(88,28,135,0.08)] sm:px-8 sm:py-8"
-              style={softSurfaceGradient}
-            >
-              <div className="flex flex-wrap items-end justify-between gap-4 border-b border-black/7 pb-6">
+            <div className="relative">
+              <div className="flex flex-wrap items-end justify-between gap-4 pb-6">
                 <Heading variant="h4" as="h2">
                   Work history
                 </Heading>
@@ -405,9 +341,9 @@ export function AboutPage({
                 </Text>
               </div>
 
-              <div className="mt-3">
+              <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
                 {content.experience.map((item) => (
-                  <ExperienceRow key={item.id} item={item} />
+                  <ExperienceCard key={item.id} item={item} />
                 ))}
               </div>
             </div>
@@ -420,62 +356,12 @@ export function AboutPage({
             mobileFlatSectionClassName,
           )}
         >
-          <div className="pointer-events-none absolute inset-0 max-md:hidden bg-[radial-gradient(circle_at_top,rgba(168,85,247,0.16),transparent_44%),radial-gradient(circle_at_bottom,rgba(255,255,255,0.4),transparent_36%)]" />
-
-          <div className="relative mx-auto max-w-5xl text-center">
-            <StatusBadge
-              interactive={false}
-              tone="#2f1544"
-              textColor="#faf5ff"
-              iconColor="#faf5ff"
-            >
-              {content.manifesto.eyebrow}
-            </StatusBadge>
-
-            <Heading
-              variant="h1"
-              as="h2"
-              className="mt-6 text-[clamp(2.9rem,9vw,6.4rem)] leading-[0.9] tracking-[-0.055em]"
-            >
-              {content.manifesto.lead}{" "}
-              <span className="font-secondary italic text-accent">
-                {content.manifesto.accent}
-              </span>
-              <br />
-              {content.manifesto.middle}{" "}
-              <span className="text-text-primary/52">
-                {content.manifesto.tail}
-              </span>
-            </Heading>
-
-            <Text variant="p1" className="mx-auto mt-6 max-w-3xl text-center">
-              {content.manifesto.description}
-            </Text>
-          </div>
-
-          <div className="relative mt-12 grid gap-4 md:grid-cols-3">
-            {content.manifesto.principles.map((principle) => (
-              <PrincipleCard key={principle.id} {...principle} />
-            ))}
-          </div>
-        </section>
-
-        <section
-          className={cn(
-            "page-section-frame page-surface page-reveal relative overflow-hidden",
-            mobileFlatSectionClassName,
-          )}
-        >
           <div className="pointer-events-none absolute inset-0 max-md:hidden bg-[radial-gradient(circle_at_top,rgba(168,85,247,0.12),transparent_46%)]" />
 
           <Hero content={content.teamHero} className="min-h-0 py-0" childrenClassName="mt-12">
-            <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
+            <div className="grid justify-items-center gap-6 sm:grid-cols-2">
               {content.team.map((member) => (
-                <TeamCard
-                  key={member.id}
-                  member={member}
-                  inquiryPath={site.contact.inquiryPath}
-                />
+                <TeamCard key={member.id} member={member} />
               ))}
             </div>
           </Hero>
@@ -502,7 +388,11 @@ export function AboutPage({
               {content.contact.badge.label}
             </StatusBadge>
 
-            <Heading variant="h2" as="h2" className="mt-6 text-[clamp(2.4rem,7vw,4.6rem)]">
+            <Heading
+              variant="h2"
+              as="h2"
+              className="mt-6 text-[clamp(2.4rem,7vw,4.6rem)] leading-[0.9]"
+            >
               {content.contact.lead}{" "}
               <span className="font-secondary italic text-accent">
                 {content.contact.accent}
@@ -520,13 +410,7 @@ export function AboutPage({
                 href={site.contact.inquiryPath}
                 Icon={Mail}
               />
-              <PrimaryButton
-                label={content.contact.secondaryLabel}
-                href={site.contact.bookingUrl}
-                external
-                Icon={CalendarClock}
-                tone="white"
-              />
+              <BookCallButton label={content.contact.secondaryLabel} />
             </div>
           </div>
         </section>

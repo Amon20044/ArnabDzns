@@ -25,6 +25,7 @@ export interface AboutAvailabilityStat {
 export interface AboutExperienceItem {
   id: string;
   company: string;
+  companyImageUrl?: string;
   role: string;
   summary: string;
   dates: string;
@@ -33,31 +34,19 @@ export interface AboutExperienceItem {
   tone: string;
 }
 
-export interface AboutManifestoContent {
-  eyebrow: string;
-  lead: string;
-  accent: string;
-  middle: string;
-  tail: string;
-  description: string;
-  principles: Array<{
-    id: string;
-    title: string;
-    description: string;
-  }>;
+export interface AboutTeamMemberRow {
+  label: string | [string] | [string, string];
+  value: string;
+  labelHighlightColor?: string;
 }
 
 export interface AboutTeamMember {
   id: string;
-  category: string;
-  tag: string;
   name: string;
-  title: string;
-  summary: string;
-  initials: string;
-  icon: string;
-  accent: string;
-  open?: boolean;
+  designation: string;
+  imageSrc: string;
+  imageAlt?: string;
+  rows: AboutTeamMemberRow[];
 }
 
 export interface AboutContactContent {
@@ -76,7 +65,6 @@ export interface AboutPageContent {
   experienceHero: HeroSectionConfig;
   experienceMeta: string;
   experience: AboutExperienceItem[];
-  manifesto: AboutManifestoContent;
   teamHero: HeroSectionConfig;
   team: AboutTeamMember[];
   contact: AboutContactContent;
@@ -89,7 +77,7 @@ export const aboutPageContent: AboutPageContent = {
         id: "about-me",
         label: "About Me",
         icon: "briefcase",
-        tone: "#2f1544",
+        tone: "#8c00ff",
         textColor: "#faf5ff",
         iconColor: "#faf5ff",
       },
@@ -97,9 +85,9 @@ export const aboutPageContent: AboutPageContent = {
         id: "about-years",
         label: "5+ Years designing",
         icon: "sparkles",
-        tone: "#ffffff",
-        textColor: "#18181b",
-        iconColor: "#7e22ce",
+        tone: "#ff00c3",
+        textColor: "#ffffff",
+        iconColor: "#ffffff",
       },
     ],
     portraitEyebrow: "// portrait - say hi",
@@ -145,7 +133,7 @@ export const aboutPageContent: AboutPageContent = {
         id: "experience",
         label: "Experience",
         icon: "briefcase",
-        tone: "#2f1544",
+        tone: "#0095ff",
         textColor: "#faf5ff",
         iconColor: "#faf5ff",
       },
@@ -160,6 +148,7 @@ export const aboutPageContent: AboutPageContent = {
     {
       id: "gods-reign",
       company: "Gods Reign",
+      companyImageUrl: "https://i.ibb.co/svwVXg1q/Gold-png.webp",
       role: "Senior Graphic Designer",
       summary:
         "Lead visuals aligned with brand presence, performance content, and digital communication across the esports roster.",
@@ -171,6 +160,7 @@ export const aboutPageContent: AboutPageContent = {
     {
       id: "lets-game-now-senior",
       company: "Lets Game Now",
+      companyImageUrl: "https://i.ibb.co/tp3V2BcH/Untitled-design-8.png",
       role: "Senior Graphic Designer",
       summary:
         "Led visual execution across brand communication, campaign assets, and digital content systems for a creator-led gaming platform.",
@@ -182,6 +172,7 @@ export const aboutPageContent: AboutPageContent = {
     {
       id: "lets-game-now-graphic",
       company: "Lets Game Now",
+      companyImageUrl: "https://i.ibb.co/tp3V2BcH/Untitled-design-8.png",
       role: "Graphic Designer",
       summary:
         "Creative production, digital assets, and structured visual communication for the community side of the brand.",
@@ -193,6 +184,7 @@ export const aboutPageContent: AboutPageContent = {
     {
       id: "carnival-esports",
       company: "Carnival Esports",
+      companyImageUrl: "https://liquipedia.net/commons/images/7/7f/Carnival_Gaming_allmode.png",
       role: "Senior Graphics Designer",
       summary:
         "Esports-focused visuals and content assets for tournaments, rosters, and launches with strong stylistic consistency.",
@@ -204,6 +196,7 @@ export const aboutPageContent: AboutPageContent = {
     {
       id: "s8ul",
       company: "S8UL",
+      companyImageUrl: "https://liquipedia.net/commons/images/5/57/Team_Soul_2019_allmode.png",
       role: "Graphics Designer",
       summary:
         "Graphics and content-led creative assets for a major gaming and esports brand, the foundation for how I think about speed and scroll.",
@@ -213,42 +206,13 @@ export const aboutPageContent: AboutPageContent = {
       tone: "#2f1544",
     },
   ],
-  manifesto: {
-    eyebrow: "Personal POV",
-    lead: "I design",
-    accent: "visual systems",
-    middle: "that make brands feel",
-    tail: "intentional.",
-    description:
-      "Hi, I'm Arnab - a visual designer working across brand presence, social-first creative, and digital surfaces. My work sits where taste meets execution: sharp, memorable, and built to read fast.",
-    principles: [
-      {
-        id: "systems",
-        title: "Systems over decoration",
-        description:
-          "The aesthetic should help the work travel, not just make the first frame look pretty.",
-      },
-      {
-        id: "speed",
-        title: "Built for speed",
-        description:
-          "I care about first-glance readability, rhythm, and the kind of pacing that survives real feeds and fast scroll.",
-      },
-      {
-        id: "taste",
-        title: "Taste with structure",
-        description:
-          "Every decision is aimed at making the brand feel more deliberate, more usable, and easier to grow.",
-      },
-    ],
-  },
   teamHero: {
     badges: [
       {
         id: "meet-team",
         label: "Meet The Team",
         icon: "sparkles",
-        tone: "#2f1544",
+        tone: "#000000",
         textColor: "#faf5ff",
         iconColor: "#faf5ff",
       },
@@ -261,50 +225,61 @@ export const aboutPageContent: AboutPageContent = {
   team: [
     {
       id: "amon-sharma",
-      category: "Engineering",
-      tag: "Architect",
       name: "Amon Sharma",
-      title: "Software Engineer | Architect & UI Expert",
-      summary:
-        "Brings the implementation side together when the visual system needs to become a real product.",
-      initials: "AM",
-      icon: "lucide:code-xml",
-      accent: "#161122",
+      designation: "Software & UI Engineer Architect",
+      imageSrc: "/Amon.svg",
+      imageAlt: "Illustration of Amon Sharma",
+      rows: [
+        {
+          label: ["Upcoming", "Projects"],
+          value: "02",
+          labelHighlightColor: "#fef9c3",
+        },
+        {
+          label: ["Ongoing", "Projects"],
+          value: "01",
+          labelHighlightColor: "#fce7f3",
+        },
+        {
+          label: ["Shipped", "Projects"],
+          value: "08",
+          labelHighlightColor: "#dcfce7",
+        },
+      ],
     },
     {
       id: "siddha-bhatia",
-      category: "Motion / FX",
-      tag: "Editor",
       name: "Siddha Bhatia",
-      title: "Video & FX Editor",
-      summary:
-        "Handles movement, pacing, and the layers of polish that make launch work feel alive without losing clarity.",
-      initials: "SB",
-      icon: "lucide:clapperboard",
-      accent: "#18111d",
-    },
-    {
-      id: "open-seat",
-      category: "Open",
-      tag: "Collab",
-      name: "Open seat",
-      title: "Contract | Project-based",
-      summary:
-        "Looking to add a motion designer or illustrator for select projects. Reach out if the fit feels right.",
-      initials: "OS",
-      icon: "lucide:sparkles",
-      accent: "#7c3aed",
-      open: true,
+      designation: "Video & FX Editor",
+      imageSrc: "/Siddha.svg",
+      imageAlt: "Illustration of Siddha Bhatia",
+      rows: [
+        {
+          label: ["Upcoming", "Projects"],
+          value: "01",
+          labelHighlightColor: "#fef9c3",
+        },
+        {
+          label: ["Ongoing", "Projects"],
+          value: "02",
+          labelHighlightColor: "#fce7f3",
+        },
+        {
+          label: ["Shipped", "Projects"],
+          value: "06",
+          labelHighlightColor: "#dcfce7",
+        },
+      ],
     },
   ],
   contact: {
     badge: {
       id: "about-availability",
-      label: "Available | Apr - Jun 2026",
+      label: "Available",
       icon: "indicator",
-      tone: "#ffffff",
-      textColor: "#2f1544",
-      indicatorColor: "#22c55e",
+      tone: "#22c55e",
+      textColor: "#ffffff",
+      indicatorColor: "#ffffff",
       pulse: true,
     },
     lead: "Taking on a small number of",

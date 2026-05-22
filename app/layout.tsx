@@ -1,4 +1,5 @@
 import type { CSSProperties } from "react";
+import type { Viewport } from "next";
 import "locomotive-scroll/locomotive-scroll.css";
 import { IridescenceBackground } from "@/components/background/iridescence";
 import { RouteAwareSiteFrame } from "@/components/layout/route-aware-site-frame";
@@ -17,6 +18,11 @@ import { cn } from "@/lib/utils";
 const geist = Geist({subsets:['latin'],variable:'--font-sans'});
 
 export const metadata = getRootMetadata();
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  viewportFit: "cover",
+};
 export const revalidate = 300;
 export const runtime = "nodejs";
 
