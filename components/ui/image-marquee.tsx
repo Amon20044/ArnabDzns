@@ -320,6 +320,8 @@ function MarqueeRow({
               const ClientIcon = image.icon ? CLIENT_ICON_REGISTRY[image.icon] : undefined;
               const imageSrc = image.src;
               const isSvgImage = imageSrc?.toLowerCase().endsWith(".svg") ?? false;
+              const clientLogoAspectRatio = Math.max(0.85, Math.min(aspectRatio, 7.25));
+              const clientLogoWidth = `calc(${height} * ${clientLogoAspectRatio})`;
 
               if (!isClient && !imageSrc) {
                 return null;
@@ -331,7 +333,7 @@ function MarqueeRow({
                     "relative flex items-center justify-center",
                     itemClassName,
                   )}
-                  style={{ height }}
+                  style={{ height, width: image.src ? clientLogoWidth : undefined }}
                 >
                   {ClientIcon ? (
                     <div
@@ -346,16 +348,17 @@ function MarqueeRow({
                       />
                     </div>
                   ) : image.src ? (
-                    <Image
-                      src={image.src}
-                      alt={clientLabel}
-                      width={image.width ?? 160}
-                      height={image.height ?? 48}
-                      sizes={imageSizes}
-                      unoptimized={isSvgImage}
-                      priority={image.priority ?? (segmentIndex === 0 && rowIndex === 0 && imageIndex < 2)}
-                      className="h-auto max-h-full w-auto max-w-[10rem] object-contain opacity-80 drop-shadow-[0_10px_24px_rgba(15,23,42,0.08)] transition-all duration-300 ease-out group-hover:scale-110 group-hover:opacity-100"
-                    />
+                    <div className="relative h-full w-full">
+                      <Image
+                        src={image.src}
+                        alt={clientLabel}
+                        fill
+                        sizes={imageSizes}
+                        unoptimized={isSvgImage}
+                        priority={image.priority ?? (segmentIndex === 0 && rowIndex === 0 && imageIndex < 2)}
+                        className="object-contain opacity-80 drop-shadow-[0_10px_24px_rgba(15,23,42,0.08)] transition-all duration-300 ease-out group-hover:scale-110 group-hover:opacity-100"
+                      />
+                    </div>
                   ) : (
                     <span className="text-sm font-semibold uppercase tracking-[0.18em] text-text-secondary">
                       {image.client ?? clientLabel}
