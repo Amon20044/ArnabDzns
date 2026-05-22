@@ -47,7 +47,7 @@ export default async function Home() {
         <section className="page-reveal" style={homeHeroToClientsGapStyle}>
           <ImageMarquee
             rows={content.showcaseMarquee}
-            height="clamp(18.85rem, 33.8vw, 26rem)"
+            height="clamp(24.5rem, 43.94vw, 33.8rem)"
             rowGap=".2rem"
             itemGap="1rem"
             fullBleed
