@@ -2,7 +2,7 @@ import { NextResponse, type NextRequest } from "next/server";
 import { getSafeRedirectPath } from "@/lib/auth/redirect";
 import { AUTH_COOKIE_NAME, verifySessionToken } from "@/lib/auth/session";
 
-const protectedRoutes = ["/dashboard", "/change-password"];
+const protectedRoutes = ["/dashboard"];
 
 function isProtectedPath(pathname: string) {
   return protectedRoutes.some(
@@ -32,5 +32,5 @@ export async function proxy(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/login", "/dashboard/:path*", "/change-password/:path*"],
+  matcher: ["/login", "/dashboard/:path*"],
 };
