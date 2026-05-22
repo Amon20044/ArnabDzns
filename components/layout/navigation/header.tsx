@@ -104,10 +104,10 @@ export const Header = ({ content = headerConfig }: HeaderProps) => {
                 transition={{ duration: 0.32, ease: [0.4, 0, 0.2, 1] }}
               >
                 <span className="truncate text-[12.5px] leading-[18px] text-text-secondary">
-                  {brand.role}
+                  All solutions on one stop.
                 </span>
                 <span className="truncate text-[12.5px] leading-[18px] text-accent">
-                  Open Bio
+                  Know more about me.
                 </span>
               </motion.div>
             </div>

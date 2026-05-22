@@ -400,7 +400,7 @@ interface TrendChipProps {
 export function TrendChip({ display, direction, className }: TrendChipProps) {
   const tone =
     direction === "up"
-      ? "border-emerald-200 bg-emerald-50 text-emerald-700"
+      ? "border-purple-200 bg-purple-50 text-purple-700"
       : direction === "down"
         ? "border-rose-200 bg-rose-50 text-rose-700"
         : "border-border-accent/70 bg-white/76 text-text-secondary";

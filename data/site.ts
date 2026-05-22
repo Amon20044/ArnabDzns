@@ -81,7 +81,7 @@ export const siteConfig: SiteConfig = {
   url: siteUrl,
   category: "Design & Development",
   brand: {
-    role: "Designer and Developer",
+    role: "Graphic Designer, Creative Designer, Livestream, UI UX, Brand Identity",
     bio: "Crafting tactile digital experiences that still feel human.",
     logoSrc: "/image.png",
     logoAlt: "Arnab brand portrait",
