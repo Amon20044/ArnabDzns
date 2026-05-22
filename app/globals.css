@@ -717,8 +717,11 @@ body > :is(div, main) {
 @keyframes site-content-in {
   to {
     opacity: 1;
-    filter: blur(0);
-    transform: translateY(0) scale(1);
+    /* Must resolve to `none` (not blur(0)/scale(1)) so .site-boot-content
+       stops being the containing block for position: fixed descendants
+       (header + bottom nav) once the boot animation settles. */
+    filter: none;
+    transform: none;
   }
 }
 
