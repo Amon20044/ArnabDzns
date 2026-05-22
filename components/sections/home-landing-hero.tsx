@@ -47,122 +47,6 @@ const accentShimmerTransition = {
   repeatType: "reverse",
 } as const;
 
-// Words in the accent line that receive hand-drawn emphasis.
-const ACCENT_EMPHASIS: Record<string, "highlight" | "underline"> = {
-  win: "highlight",
-  seconds: "underline",
-};
-
-// Emphasised word in a handwritten script — a marker-style annotation.
-function ScriptWord({
-  children,
-  delay,
-}: {
-  children: ReactNode;
-  delay: number;
-}) {
-  return (
-    <motion.span
-      className="mx-[0.06em] inline-block text-accent"
-      style={{
-        fontFamily: "var(--font-caveat), cursive",
-        fontSize: "1.3em",
-        lineHeight: 0.85,
-      }}
-      initial={{ opacity: 0, y: 10, rotate: -4, scale: 0.9 }}
-      animate={{ opacity: 1, y: 0, rotate: -3, scale: 1 }}
-      transition={{ delay, duration: 0.55, ease }}
-    >
-      {children}
-    </motion.span>
-  );
-}
-
-// Hand-drawn underline stroke that draws on beneath the word.
-function HandUnderline({
-  children,
-  delay,
-}: {
-  children: ReactNode;
-  delay: number;
-}) {
-  return (
-    <span className="relative inline-block">
-      <motion.span
-        className="bg-clip-text text-transparent"
-        style={accentGradient}
-        animate={accentShimmer}
-        transition={accentShimmerTransition}
-      >
-        {children}
-      </motion.span>
-      <motion.svg
-        aria-hidden
-        viewBox="0 0 200 14"
-        preserveAspectRatio="none"
-        fill="none"
-        className="pointer-events-none absolute -bottom-[0.16em] left-0 h-[0.34em] w-full overflow-visible"
-      >
-        <motion.path
-          d="M3,9 C 38,3 70,12 104,7 C 140,2 172,11 197,6"
-          stroke="var(--accent)"
-          strokeWidth={4}
-          strokeLinecap="round"
-          vectorEffect="non-scaling-stroke"
-          initial={{ pathLength: 0, opacity: 0 }}
-          animate={{ pathLength: 1, opacity: 1 }}
-          transition={{ delay, duration: 0.7, ease }}
-        />
-      </motion.svg>
-    </span>
-  );
-}
-
-// Splits the accent line into words and wraps emphasized ones with their effect.
-function renderAccentLine(
-  line: string,
-  markerDelay: number,
-  underlineDelay: number,
-) {
-  return line.split(/(\s+)/).map((token, index) => {
-    if (token.length === 0 || /^\s+$/.test(token)) {
-      return token;
-    }
-
-    const match = token.match(
-      /^([^\p{L}\p{N}]*)([\p{L}\p{N}][\p{L}\p{N}'-]*)([^\p{L}\p{N}]*)$/u,
-    );
-
-    if (!match) {
-      return <Fragment key={index}>{token}</Fragment>;
-    }
-
-    const [, pre, word, post] = match;
-    const effect = ACCENT_EMPHASIS[word.toLowerCase()];
-
-    if (effect === "highlight") {
-      return (
-        <Fragment key={index}>
-          {pre}
-          <ScriptWord delay={markerDelay}>{word}</ScriptWord>
-          {post}
-        </Fragment>
-      );
-    }
-
-    if (effect === "underline") {
-      return (
-        <Fragment key={index}>
-          {pre}
-          <HandUnderline delay={underlineDelay}>{word}</HandUnderline>
-          {post}
-        </Fragment>
-      );
-    }
-
-    return <Fragment key={index}>{token}</Fragment>;
-  });
-}
 
 function resolveCTAIcon(cta: HeroCTAConfig) {
   switch (cta.icon) {
@@ -278,11 +162,7 @@ export function HomeLandingHero({
                   animate={accentShimmer}
                   transition={accentShimmerTransition}
                 >
-                  {renderAccentLine(
-                    line,
-                    accentMarkerDelay,
-                    accentUnderlineDelay,
-                  )}
+                  {line}
                 </motion.span>
               ) : (
                 line
