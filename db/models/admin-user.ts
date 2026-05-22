@@ -31,6 +31,12 @@ const AdminUserSchema = new Schema(
     passwordChangeVerifiedAt: Date,
     passwordChangedAt: Date,
     lastLoginAt: Date,
+    otpFailedAttempts: {
+      type: Number,
+      default: 0,
+    },
+    otpAttemptWindowAt: Date,
+    otpLockedUntil: Date,
     schemaVersion: {
       type: Number,
       default: 1,
