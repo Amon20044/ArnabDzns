@@ -4,7 +4,7 @@ export const homeHeroSection = {
   badges: [
     {
       id: "returning",
-      label: "200+ Returning Clients",
+      label: "1000+ Returning Clients",
       showInMobile: true,
       icon: "building",
       tone: "#2563eb",
@@ -12,7 +12,7 @@ export const homeHeroSection = {
     },
     {
       id: "customers",
-      label: "200+ Projects Delivered",
+      label: "20000+ Projects Delivered",
       showInMobile: false,
       icon: "stars",
       starCount: 5,
@@ -21,7 +21,7 @@ export const homeHeroSection = {
     },
     {
       id: "orgs",
-      label: "10+ Teams and Orgs",
+      label: "30+ Orgs",
       showInMobile: false,
       icon: "building",
       tone: "#2563eb",

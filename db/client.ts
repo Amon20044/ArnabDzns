@@ -1,15 +1,15 @@
 import "server-only";
 
 import mongoose from "mongoose";
-import dns from "dns";
-dns.setServers(["1.1.1.1", "8.8.8.8"]);
 
 const uri = process.env.MONGODB_URI ?? process.env.MONGO_URI;
 const dbName = process.env.MONGODB_DB ?? process.env.MONGO_DB;
+const dnsServers = process.env.MONGODB_DNS_SERVERS;
 
 type MongooseCache = {
   conn: typeof mongoose | null;
   promise: Promise<typeof mongoose> | null;
+  configured: boolean;
 };
 
 const globalForMongoose = globalThis as typeof globalThis & {
@@ -19,10 +19,44 @@ const globalForMongoose = globalThis as typeof globalThis & {
 const cache = globalForMongoose.__arnab_mongoose__ ?? {
   conn: null,
   promise: null,
+  configured: false,
 };
 
 if (!globalForMongoose.__arnab_mongoose__) {
   globalForMongoose.__arnab_mongoose__ = cache;
+}
+
+function parsePositiveInt(value: string | undefined, fallback: number) {
+  const parsed = Number(value);
+  return Number.isFinite(parsed) && parsed > 0 ? parsed : fallback;
+}
+
+async function configureMongoRuntime() {
+  if (cache.configured) {
+    return;
+  }
+
+  cache.configured = true;
+  mongoose.set("bufferCommands", false);
+  mongoose.set("sanitizeFilter", true);
+  mongoose.set("strictQuery", true);
+
+  if (!dnsServers) {
+    return;
+  }
+
+  const servers = dnsServers
+    .split(",")
+    .map((server) => server.trim())
+    .filter(Boolean);
+
+  if (!servers.length) {
+    return;
+  }
+
+  const dns = await import("node:dns");
+  dns.setServers(servers);
+  console.log("[mongo] dns servers set to", dns.getServers());
 }
 
 export function hasMongoConfig() {
@@ -40,16 +74,28 @@ export async function connectMongo() {
     return cache.conn;
   }
 
+  await configureMongoRuntime();
+
   cache.promise ??= mongoose.connect(uri, {
     dbName,
-    bufferCommands: false,
-    maxPoolSize: Number(process.env.MONGODB_MAX_POOL_SIZE ?? 10),
-    serverSelectionTimeoutMS: Number(
-      process.env.MONGODB_SERVER_SELECTION_TIMEOUT_MS ?? 8000,
+    family: 4,
+    maxPoolSize: parsePositiveInt(process.env.MONGODB_MAX_POOL_SIZE, 10),
+    minPoolSize: parsePositiveInt(process.env.MONGODB_MIN_POOL_SIZE, 0),
+    serverSelectionTimeoutMS: parsePositiveInt(
+      process.env.MONGODB_SERVER_SELECTION_TIMEOUT_MS,
+      5000,
     ),
+    socketTimeoutMS: parsePositiveInt(process.env.MONGODB_SOCKET_TIMEOUT_MS, 45000),
   });
 
-  cache.conn = await cache.promise;
+  try {
+    cache.conn = await cache.promise;
+  } catch (error) {
+    cache.promise = null;
+    cache.conn = null;
+    throw error;
+  }
+
   return cache.conn;
 }
 

@@ -25,10 +25,14 @@ import {
   tagForSection,
 } from "./cache-tags";
 import { connectMongo, hasMongoConfig } from "./client";
-import type {
-  ContactPageContent,
-  HomeContent,
-  LayoutContent,
+import {
+  contactPageContent,
+  defaultContentBlockMap,
+  defaultHomeContent,
+  defaultLayoutContent,
+  type ContactPageContent,
+  type HomeContent,
+  type LayoutContent,
 } from "./content-defaults";
 import {
   CONTENT_BLOCK_KEYS,
@@ -53,7 +57,7 @@ export type ContentBlockRecord = ContentBlockSeed & {
   createdAt?: string;
   updatedAt?: string;
   schemaVersion?: number;
-  source?: "database";
+  source?: "database" | "default";
 };
 
 export type ContentBlockUpdate = Partial<
@@ -128,20 +132,53 @@ function requireMongoContentStore() {
   }
 }
 
-async function readContentBlockNoCache(key: ContentBlockKey) {
-  requireMongoContentStore();
-  await connectMongo();
+let warnedMongoFallback = false;
 
-  const block = await ContentBlockModel.findOne({ key }).lean().exec();
-  const serializedBlock = serializeBlock(block);
+function fallbackContentBlock(key: ContentBlockKey, reason: unknown) {
+  const fallback = defaultContentBlockMap[key];
 
-  if (!serializedBlock) {
-    throw new Error(
-      `Content block "${key}" was not found in MongoDB. MongoDB is now the only content source.`,
+  if (!fallback) {
+    throw reason instanceof Error
+      ? reason
+      : new Error(`Content block "${key}" is not available.`);
+  }
+
+  if (!warnedMongoFallback) {
+    warnedMongoFallback = true;
+    const message = reason instanceof Error ? reason.message : String(reason);
+    console.warn(
+      `[content] using static fallbacks because MongoDB is unavailable: ${message}`,
     );
   }
 
-  return serializedBlock;
+  return {
+    ...cloneJson(fallback),
+    source: "default",
+  } satisfies ContentBlockRecord;
+}
+
+async function readContentBlockNoCache(key: ContentBlockKey) {
+  if (!hasMongoConfig()) {
+    return fallbackContentBlock(
+      key,
+      "MONGODB_URI is not set. Add it to .env.local or your environment.",
+    );
+  }
+
+  try {
+    await connectMongo();
+
+    const block = await ContentBlockModel.findOne({ key }).lean().exec();
+    const serializedBlock = serializeBlock(block);
+
+    if (!serializedBlock) {
+      throw new Error(`Content block "${key}" was not found in MongoDB.`);
+    }
+
+    return serializedBlock;
+  } catch (error) {
+    return fallbackContentBlock(key, error);
+  }
 }
 
 export async function getContentBlock(key: ContentBlockKey) {
@@ -460,6 +497,10 @@ function resolveNavigationBlock(
 }
 
 export async function getLayoutContent(): Promise<LayoutContent> {
+  if (!hasMongoConfig()) {
+    return cloneJson(defaultLayoutContent);
+  }
+
   const [siteBlock, navigationBlock] = await Promise.all([
     getContentBlock("site"),
     getContentBlock("navigation"),
@@ -476,6 +517,10 @@ export async function getLayoutContent(): Promise<LayoutContent> {
 }
 
 export async function getHomeContent(): Promise<HomeContent> {
+  if (!hasMongoConfig()) {
+    return cloneJson(defaultHomeContent);
+  }
+
   const [
     homeHeroBlock,
     clientsMarqueeBlock,
@@ -518,6 +563,10 @@ export async function getHomeContent(): Promise<HomeContent> {
 }
 
 export async function getContactPageContent(): Promise<ContactPageContent> {
+  if (!hasMongoConfig()) {
+    return cloneJson(contactPageContent);
+  }
+
   const block = await getContentBlock("contact_page");
   const data = requireBlockData<ContactPageContent>(block);
 
