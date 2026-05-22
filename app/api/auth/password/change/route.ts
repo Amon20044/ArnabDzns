@@ -1,5 +1,5 @@
 import { NextResponse, type NextRequest } from "next/server";
-import { findAdminByEmail, findAdminById } from "@/lib/auth/admin";
+import { findAdminByEmail, findAdminById, isAllowedAdminEmail } from "@/lib/auth/admin";
 import { getSessionFromRequest } from "@/lib/auth/api";
 import { hashPassword, isStrongEnoughPassword } from "@/lib/auth/password";
 
@@ -18,13 +18,19 @@ export async function POST(request: NextRequest) {
   const confirmPassword = readString(body?.confirmPassword);
   const email = readString(body?.email).toLowerCase();
 
+  // Only the single allowed admin account may use this flow.
+  if (!session && !isAllowedAdminEmail(email)) {
+    return NextResponse.json(
+      { message: "No admin account matches that email." },
+      { status: 404 },
+    );
+  }
+
   const user = session
     ? await findAdminById(session.sub)
-    : email
-      ? await findAdminByEmail(email)
-      : null;
+    : await findAdminByEmail(email);
 
-  if (!user) {
+  if (!user || !isAllowedAdminEmail(user.email)) {
     return NextResponse.json(
       { message: "No admin account matches that email." },
       { status: 404 },

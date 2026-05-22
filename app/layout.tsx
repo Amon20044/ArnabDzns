@@ -6,7 +6,7 @@ import { RouteAwareSiteFrame } from "@/components/layout/route-aware-site-frame"
 import { LocomotiveScrollProvider } from "@/components/providers/locomotive-scroll-provider";
 import { StructuredData } from "@/components/site/structured-data";
 import { LiquidGlassDefs } from "@/components/ui/liquid-glass-defs";
-import { aeonik, poppins } from "@/config/fonts";
+import { aeonik, caveat, poppins } from "@/config/fonts";
 import { getLayoutContent } from "@/db/content";
 import { getRootMetadata } from "@/lib/seo";
 import { getSiteJsonLd } from "@/lib/structured-data";
@@ -36,7 +36,7 @@ export default async function RootLayout({
   return (
     <html
       lang={content.site.seo.language}
-      className={cn("h-full", "antialiased", aeonik.variable, poppins.variable, "font-sans", geist.variable)}
+      className={cn("h-full", "antialiased", aeonik.variable, poppins.variable, caveat.variable, "font-sans", geist.variable)}
     >
       <body
         className="min-h-full flex flex-col overflow-x-hidden bg-transparent text-foreground"

@@ -1,5 +1,5 @@
 import { NextResponse, type NextRequest } from "next/server";
-import { findAdminByEmail, findAdminById } from "@/lib/auth/admin";
+import { findAdminByEmail, findAdminById, isAllowedAdminEmail } from "@/lib/auth/admin";
 import { getSessionFromRequest } from "@/lib/auth/api";
 import { createOtpAuthUri, createOtpQrDataUrl, generateTotpSecret } from "@/lib/auth/totp";
 
@@ -13,14 +13,6 @@ export async function GET(request: NextRequest) {
   const session = await getSessionFromRequest(request);
   const email = readEmail(request.nextUrl.searchParams.get("email"));
 
-  // Identify the account by an active session first, otherwise by the email
-  // provided in the public "reset via authenticator" flow.
-  const user = session
-    ? await findAdminById(session.sub)
-    : email
-      ? await findAdminByEmail(email)
-      : null;
-
   if (!session && !email) {
     return NextResponse.json(
       { message: "Enter your admin email to continue.", needsEmail: true },
@@ -28,7 +20,21 @@ export async function GET(request: NextRequest) {
     );
   }
 
-  if (!user) {
+  // Only the single allowed admin account may use this flow.
+  if (!session && !isAllowedAdminEmail(email)) {
+    return NextResponse.json(
+      { message: "No admin account matches that email." },
+      { status: 404 },
+    );
+  }
+
+  // Identify the account by an active session first, otherwise by the email
+  // provided in the public "reset via authenticator" flow.
+  const user = session
+    ? await findAdminById(session.sub)
+    : await findAdminByEmail(email);
+
+  if (!user || !isAllowedAdminEmail(user.email)) {
     return NextResponse.json(
       { message: "No admin account matches that email." },
       { status: 404 },

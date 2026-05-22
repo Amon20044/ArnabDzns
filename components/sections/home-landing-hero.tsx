@@ -33,7 +33,7 @@ const blurUp: Variants = {
 
 const accentGradient = {
   backgroundImage:
-    "linear-gradient(110deg, var(--accent-dark) 0%, var(--accent) 28%, #efe2ff 50%, var(--accent) 72%, var(--accent-dark) 100%)",
+    "linear-gradient(110deg, var(--accent-dark) 0%, var(--accent) 50%, var(--accent-dark) 100%)",
   backgroundSize: "220% 100%",
   backgroundPositionX: "0%",
 } as const;
@@ -53,8 +53,8 @@ const ACCENT_EMPHASIS: Record<string, "highlight" | "underline"> = {
   seconds: "underline",
 };
 
-// Hand-applied highlighter swash sitting behind the word.
-function MarkerHighlight({
+// Emphasised word in a handwritten script — a marker-style annotation.
+function ScriptWord({
   children,
   delay,
 }: {
@@ -62,22 +62,19 @@ function MarkerHighlight({
   delay: number;
 }) {
   return (
-    <span className="relative isolate inline-block px-[0.16em]">
-      <motion.span
-        aria-hidden
-        className="absolute inset-x-0 inset-y-[0.04em] -z-10 rounded-[0.32em]"
-        style={{
-          backgroundImage:
-            "linear-gradient(102deg, #ede0ff 0%, #d8b4fe 52%, #ece1ff 100%)",
-          transformOrigin: "0% 65%",
-          boxShadow: "0 6px 18px -10px rgba(168,85,247,0.45)",
-        }}
-        initial={{ scaleX: 0, rotate: -1.8, opacity: 0 }}
-        animate={{ scaleX: 1, rotate: -1.8, opacity: 1 }}
-        transition={{ delay, duration: 0.5, ease }}
-      />
-      <span className="relative text-accent-dark">{children}</span>
-    </span>
+    <motion.span
+      className="mx-[0.06em] inline-block text-accent"
+      style={{
+        fontFamily: "var(--font-caveat), cursive",
+        fontSize: "1.3em",
+        lineHeight: 0.85,
+      }}
+      initial={{ opacity: 0, y: 10, rotate: -4, scale: 0.9 }}
+      animate={{ opacity: 1, y: 0, rotate: -3, scale: 1 }}
+      transition={{ delay, duration: 0.55, ease }}
+    >
+      {children}
+    </motion.span>
   );
 }
 
@@ -147,7 +144,7 @@ function renderAccentLine(
       return (
         <Fragment key={index}>
           {pre}
-          <MarkerHighlight delay={markerDelay}>{word}</MarkerHighlight>
+          <ScriptWord delay={markerDelay}>{word}</ScriptWord>
           {post}
         </Fragment>
       );

@@ -28,6 +28,7 @@ export const poppins = Poppins({
 export const caveat = Caveat({
   subsets: ["latin"],
   weight: ["700"],
+  variable: "--font-caveat",
   display: "swap",
 });
 
