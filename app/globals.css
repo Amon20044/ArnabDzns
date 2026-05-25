@@ -273,6 +273,30 @@ body > :is(div, main) {
   --reveal-delay: 120ms;
 }
 
+.home-portfolio-marquee-viewport {
+  --portfolio-marquee-row-height: calc((100vh - 0.4rem) / 3);
+  height: 100vh;
+  min-height: 100vh;
+  overflow: hidden;
+}
+
+@supports (height: 100dvh) {
+  .home-portfolio-marquee-viewport {
+    --portfolio-marquee-row-height: calc((100dvh - 0.4rem) / 3);
+    height: 100dvh;
+    min-height: 100dvh;
+  }
+}
+
+@media (min-width: 40rem) {
+  .home-portfolio-marquee-viewport {
+    --portfolio-marquee-row-height: clamp(8.5rem, 18vw, 13rem);
+    height: auto;
+    min-height: 0;
+    overflow: visible;
+  }
+}
+
 .marquee-logo-reveal {
   opacity: 0;
   animation: logo-rise-in 720ms cubic-bezier(0.22, 1, 0.36, 1) forwards;

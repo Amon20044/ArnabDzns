@@ -23,6 +23,7 @@ const homeHeroToClientsGapStyle = {
 
 export default async function Home() {
   const content = await getHomeContent();
+  const portfolioMarqueeRows = content.portfolioMarquee.slice(0, 3);
 
   return (
     <div className="flex">
@@ -55,12 +56,14 @@ export default async function Home() {
         </section>
         <div id="portfolio" data-nav-section="portfolio" className="scroll-target">
           <Hero content={content.portfolio} />
-          <section className="page-reveal">
+          <section className="home-portfolio-marquee-viewport page-reveal">
             <ImageMarquee
-              rows={content.portfolioMarquee}
-              height="clamp(8.5rem, 18vw, 13rem)"
+              rows={portfolioMarqueeRows}
+              height="var(--portfolio-marquee-row-height)"
               rowGap=".2rem"
               itemGap="1rem"
+              className="h-full py-0 sm:h-auto sm:py-2"
+              rowClassName="py-0 sm:py-2"
               fullBleed
             />
           </section>
