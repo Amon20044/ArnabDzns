@@ -13,6 +13,7 @@ import {
 } from "react";
 import { headerConfig } from "@/data/navigation";
 import { LiquidGlassBackdrop } from "@/components/ui/liquid-glass-backdrop";
+import { ShinyIconLink } from "@/components/ui/shiny-icon-link";
 import { StatusBadge } from "@/components/ui/status-badge";
 import type { HeaderConfig } from "@/types";
 import { socialIconRegistry } from "./social-icons";
@@ -139,15 +140,14 @@ export const Header = ({ content = headerConfig }: HeaderProps) => {
             className="hidden h-6 w-px bg-black/10 sm:block"
           />
 
-          <Link
+          <ShinyIconLink
             href={shopLink.path}
-            aria-label={shopLink.label}
-            className="liquid-glass hidden size-9 shrink-0 items-center justify-center rounded-[11px]
-                       text-text-primary transition-colors duration-150
-                       hover:border-accent/30 hover:text-accent sm:flex"
-          >
-            <ShoppingBag className="size-[16px]" />
-          </Link>
+            label={shopLink.label}
+            Icon={ShoppingBag}
+            size="md"
+            tone="#a855f7"
+            className="hidden sm:inline-flex"
+          />
 
           <div className="flex shrink-0 items-center gap-1.5 sm:gap-2">
             {socials.map((social, index) => {

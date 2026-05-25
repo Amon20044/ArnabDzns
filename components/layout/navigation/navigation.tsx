@@ -16,6 +16,7 @@ import { cn } from "@/lib/utils";
 import { navigationConfig } from "@/data/navigation";
 import type { CTAConfig, NavigationConfig, NavItemConfig } from "@/types";
 import { LiquidGlassBackdrop } from "@/components/ui/liquid-glass-backdrop";
+import { ShinyIconLink } from "@/components/ui/shiny-icon-link";
 import { CTAButton } from "./cta-button";
 import { iconRegistry } from "./icon-registry";
 import { NavItem } from "./nav-item";
@@ -389,14 +390,14 @@ export const Navigation = ({ content = navigationConfig }: NavigationProps) => {
       <motion.nav
         role="navigation"
         aria-label="Main navigation"
-        className="fixed left-1/2 z-50 w-[min(calc(100vw-0.75rem),26rem)] -translate-x-1/2 sm:hidden"
+        className="fixed left-1/2 z-50 w-fit max-w-[calc(100vw-1rem)] -translate-x-1/2 sm:hidden"
         style={mobileNavStyle}
         initial={{ y: 24, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ type: "spring", stiffness: 320, damping: 26, delay: 0.1 }}
       >
-        <div className="relative flex items-end gap-1.5">
-          <div className="relative min-w-0 flex-1 overflow-visible rounded-full border border-transparent px-1 py-1 shadow-none">
+        <div className="relative flex items-end justify-center gap-2">
+          <div className="relative w-[11.75rem] shrink-0 overflow-visible rounded-full border border-transparent px-1 py-1 shadow-none">
             <LiquidGlassBackdrop variant="shell" className="nav-shell-backdrop rounded-[inherit]" />
 
             <div
@@ -508,7 +509,7 @@ export const Navigation = ({ content = navigationConfig }: NavigationProps) => {
               className="pointer-events-none absolute inset-x-4 -top-px z-[1] h-px rounded-full bg-gradient-to-r from-transparent via-accent/35 to-transparent"
             />
 
-            <div className="relative z-[2] grid w-full grid-cols-2 items-center gap-0.5">
+            <div className="relative z-[2] grid w-full grid-cols-2 items-center justify-items-center gap-0.5">
               {mobileActions.map((action) => {
                 const Icon = action.Icon;
                 const isInternal = action.target.startsWith("/");
@@ -520,48 +521,18 @@ export const Navigation = ({ content = navigationConfig }: NavigationProps) => {
                   isInternal &&
                   (pathname === action.target ||
                     (action.target !== "/" && pathname.startsWith(`${action.target}/`)));
-                const actionClassName = cn(
-                  "relative flex size-8 items-center justify-center rounded-full transition-colors duration-200",
-                  action.tone === "primary"
-                    ? "bg-accent text-white shadow-[0_8px_18px_rgba(88,28,135,0.2)]"
-                    : actionIsActive
-                      ? "bg-black text-white"
-                      : "text-black hover:bg-white/64",
-                );
-                const actionContent = (
-                  <>
-                    <Icon
-                      aria-hidden
-                      className={cn(
-                        "size-[15.5px]",
-                        action.tone === "primary" ? "stroke-[1.9px]" : "stroke-[1.6px]",
-                      )}
-                    />
-                    <span className="sr-only">{action.label}</span>
-                  </>
-                );
 
-                return isInternal ? (
-                  <Link
+                return (
+                  <ShinyIconLink
                     key={action.label}
                     href={action.target}
-                    aria-label={action.label}
-                    aria-current={actionIsActive ? "page" : undefined}
-                    className={actionClassName}
-                  >
-                    {actionContent}
-                  </Link>
-                ) : (
-                  <a
-                    key={action.label}
-                    href={action.target}
-                    target={opensNewTab ? "_blank" : undefined}
-                    rel={opensNewTab ? "noopener noreferrer" : undefined}
-                    aria-label={action.label}
-                    className={actionClassName}
-                  >
-                    {actionContent}
-                  </a>
+                    label={action.label}
+                    Icon={Icon}
+                    size="nav"
+                    active={actionIsActive}
+                    external={opensNewTab}
+                    tone={action.tone === "primary" ? "#a855f7" : "#09090b"}
+                  />
                 );
               })}
             </div>

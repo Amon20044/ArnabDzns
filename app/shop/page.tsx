@@ -1,5 +1,4 @@
 import Image from "next/image";
-import Link from "next/link";
 import {
   ArrowLeft,
   Bell,
@@ -9,6 +8,8 @@ import {
   Sparkles,
 } from "lucide-react";
 import { StructuredData } from "@/components/site/structured-data";
+import { PrimaryButton } from "@/components/ui/primary-button";
+import { StatusBadge } from "@/components/ui/status-badge";
 import { getPageMetadata } from "@/lib/seo";
 import { getPageJsonLd } from "@/lib/structured-data";
 
@@ -16,21 +17,24 @@ export const metadata = getPageMetadata("shop");
 export const revalidate = 300;
 export const runtime = "nodejs";
 
-const templatePreviews = [
+const shopItems = [
   {
-    title: "Launch Kit",
-    category: "Product drops",
-    image: "/demo/marquee-01.jpg",
+    title: "Festival Carousel System",
+    category: "Social campaign pack",
+    image: "/shop/image.png",
+    width: 2048,
+    height: 1536,
+    badge: "Editorial",
+    description: "A full carousel layout system for event programs, poster drops, and launch announcements.",
   },
   {
-    title: "Storefront Pack",
-    category: "Ecommerce graphics",
-    image: "/demo/marquee-04.jpg",
-  },
-  {
-    title: "Creator Bundle",
-    category: "Social templates",
-    image: "/demo/marquee-08.jpg",
+    title: "Glitch Action Kit",
+    category: "Creative template pack",
+    image: "/shop/image2.png",
+    width: 1200,
+    height: 800,
+    badge: "Actions",
+    description: "Bold editable visuals for quick creator promos, pack reveals, and high-contrast thumbnails.",
   },
 ];
 
@@ -40,99 +44,102 @@ export default function ShopPage() {
       <StructuredData data={getPageJsonLd("shop")} />
 
       <main className="mx-auto flex w-full max-w-6xl flex-1 flex-col px-3 pb-32 pt-6 md:px-10 md:pb-40 md:pt-10">
-        <section className="page-section-frame page-surface page-reveal relative overflow-hidden px-4 py-7 sm:px-8 sm:py-10">
-          <div className="grid gap-8 lg:grid-cols-[minmax(0,0.92fr)_minmax(20rem,0.72fr)] lg:items-center">
-            <div className="max-w-2xl">
-              <span className="eyebrow-chip">
-                <ShoppingBag className="size-3.5" />
-                Digital shop
-              </span>
+        <section className="page-reveal grid gap-6 lg:grid-cols-[minmax(0,0.8fr)_minmax(0,1fr)] lg:items-end">
+          <div className="max-w-2xl">
+            <StatusBadge
+              compact
+              tone="#a855f7"
+              iconColor="#ffffff"
+              leading={<ShoppingBag className="size-3.5" />}
+            >
+              Digital Shop
+            </StatusBadge>
 
-              <h1 className="mt-5 text-[clamp(2.4rem,8vw,5.8rem)] font-semibold leading-[0.9] tracking-normal text-text-primary">
-                Graphic templates are coming soon.
-              </h1>
+            <h1 className="mt-5 max-w-[10ch] text-[clamp(2.65rem,14vw,6.5rem)] font-semibold leading-[0.88] tracking-normal text-text-primary">
+              Template drops are loading.
+            </h1>
 
-              <p className="mt-5 max-w-xl text-base leading-7 text-text-secondary sm:text-lg">
-                Premium ecommerce graphics, editable launch kits, and creator-ready
-                template packs are being prepared for the shop.
-              </p>
+            <p className="mt-5 max-w-xl text-base leading-7 text-text-secondary sm:text-lg">
+              Editable design systems, launch graphics, and creator-ready packs are being prepared for the first release.
+            </p>
 
-              <div className="mt-7 flex flex-wrap items-center gap-3">
-                <Link href="/contact" className="link-pill">
-                  <Bell className="size-4" />
-                  Notify me
-                </Link>
-
-                <Link href="/" className="link-pill-secondary">
-                  <ArrowLeft className="size-4" />
-                  Back home
-                </Link>
-              </div>
-            </div>
-
-            <div className="relative min-h-[20rem] overflow-hidden rounded-[1.5rem] border border-white/60 bg-white/70 shadow-[0_24px_70px_rgba(24,24,27,0.12)]">
-              <Image
-                src="/demo/marquee-04.jpg"
-                alt="Preview of a premium ecommerce graphic template"
-                fill
-                priority
-                sizes="(min-width: 1024px) 34vw, 92vw"
-                className="object-cover"
+            <div className="mt-7 flex flex-wrap items-center gap-3">
+              <PrimaryButton
+                label="Notify me"
+                href="/contact"
+                Icon={Bell}
+                size="compact"
+                iconVisibility="always"
               />
-              <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(255,255,255,0.04)_0%,rgba(9,9,11,0.58)_100%)]" />
-              <div className="absolute inset-x-4 bottom-4 flex items-center justify-between rounded-full border border-white/28 bg-white/18 px-4 py-3 text-white backdrop-blur-md">
-                <span className="inline-flex items-center gap-2 text-sm font-semibold">
-                  <Sparkles className="size-4" />
-                  First drop
-                </span>
-                <span className="text-xs font-medium uppercase tracking-[0.16em]">
-                  Soon
-                </span>
-              </div>
+              <PrimaryButton
+                label="Back home"
+                href="/"
+                Icon={ArrowLeft}
+                size="compact"
+                iconVisibility="always"
+                tone="white"
+              />
             </div>
+          </div>
+
+          <div className="grid gap-3 sm:grid-cols-2 lg:gap-4">
+            {shopItems.map((item, index) => (
+              <article
+                key={item.title}
+                className="group relative overflow-hidden rounded-[1.5rem] border border-border-accent/60 bg-white/84 shadow-[0_18px_52px_rgba(24,24,27,0.08)] max-md:!shadow-none"
+              >
+                <div className="relative aspect-[4/3] overflow-hidden bg-surface">
+                  <Image
+                    src={item.image}
+                    alt={`${item.title} preview`}
+                    fill
+                    priority={index === 0}
+                    sizes="(min-width: 1024px) 28vw, (min-width: 640px) 45vw, 94vw"
+                    className="object-cover transition-transform duration-500 ease-out group-hover:scale-[1.035]"
+                  />
+                </div>
+
+                <div className="grid gap-4 px-4 py-4 sm:px-5 sm:py-5">
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="min-w-0">
+                      <p className="text-xs font-semibold uppercase tracking-[0.14em] text-accent">
+                        {item.category}
+                      </p>
+                      <h2 className="mt-1 text-lg font-semibold leading-tight tracking-normal text-text-primary">
+                        {item.title}
+                      </h2>
+                    </div>
+
+                    <StatusBadge compact tone={index === 0 ? "#a855f7" : "#09090b"}>
+                      {item.badge}
+                    </StatusBadge>
+                  </div>
+
+                  <p className="text-sm leading-6 text-text-secondary">
+                    {item.description}
+                  </p>
+
+                  <div className="flex items-center justify-between gap-3 border-t border-border-accent/50 pt-3">
+                    <span className="inline-flex items-center gap-2 text-sm font-semibold text-text-primary">
+                      <Sparkles className="size-4 text-accent" />
+                      Coming soon
+                    </span>
+                    <span className="flex size-9 shrink-0 items-center justify-center rounded-full bg-accent-surface text-accent-dark">
+                      <Download className="size-4" />
+                    </span>
+                  </div>
+                </div>
+              </article>
+            ))}
           </div>
         </section>
 
-        <section className="page-reveal mt-4 grid gap-3 sm:grid-cols-3">
-          {templatePreviews.map((template) => (
-            <article
-              key={template.title}
-              className="group overflow-hidden rounded-[1.25rem] border border-border-accent/60 bg-white/82 shadow-[0_16px_42px_rgba(24,24,27,0.06)] transition-transform duration-200 hover:-translate-y-0.5"
-            >
-              <div className="relative aspect-[4/3] overflow-hidden">
-                <Image
-                  src={template.image}
-                  alt={`${template.title} template preview`}
-                  fill
-                  sizes="(min-width: 768px) 30vw, 92vw"
-                  className="object-cover transition-transform duration-500 group-hover:scale-[1.04]"
-                />
-              </div>
-
-              <div className="flex items-center justify-between gap-3 px-4 py-3">
-                <div className="min-w-0">
-                  <h2 className="truncate text-sm font-semibold text-text-primary">
-                    {template.title}
-                  </h2>
-                  <p className="mt-1 truncate text-xs text-text-secondary">
-                    {template.category}
-                  </p>
-                </div>
-
-                <span className="flex size-9 shrink-0 items-center justify-center rounded-full bg-accent-surface text-accent-dark">
-                  <Download className="size-4" />
-                </span>
-              </div>
-            </article>
-          ))}
-        </section>
-
-        <section className="page-reveal mt-3 flex flex-wrap items-center justify-between gap-3 rounded-[1.25rem] border border-border-accent/60 bg-white/78 px-4 py-4 text-sm text-text-secondary">
-          <span className="inline-flex items-center gap-2 font-medium text-text-primary">
+        <section className="page-reveal mt-4 flex flex-wrap items-center justify-between gap-3 border-y border-border-accent/60 py-4 text-sm text-text-secondary">
+          <span className="inline-flex items-center gap-2 font-semibold text-text-primary">
             <Layers3 className="size-4 text-accent" />
-            Editable templates for future drops
+            Built as editable template systems
           </span>
-          <span>Built for creators, products, and small brands.</span>
+          <span>Responsive packs for creators, launches, products, and small brands.</span>
         </section>
       </main>
     </>

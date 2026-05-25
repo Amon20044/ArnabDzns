@@ -37,10 +37,12 @@ export default async function Home() {
           <ImageMarquee
             rows={content.clientsMarquee}
             type="clients"
-            height="3rem"
+            height="var(--client-marquee-logo-height)"
             rowGap=".25rem"
-            itemGap="3rem"
+            itemGap="var(--client-marquee-logo-gap)"
             minItemsPerRow={16}
+            className="py-1 sm:py-2"
+            rowClassName="py-1 sm:py-2"
             fullBleed
           />
         </section>
@@ -60,9 +62,9 @@ export default async function Home() {
             <ImageMarquee
               rows={portfolioMarqueeRows}
               height="var(--portfolio-marquee-row-height)"
-              rowGap=".2rem"
-              itemGap="1rem"
-              className="h-full py-0 sm:h-auto sm:py-2"
+              rowGap="var(--portfolio-marquee-gap)"
+              itemGap="var(--portfolio-marquee-gap)"
+              className="home-portfolio-marquee h-full py-0 sm:h-auto sm:py-2"
               rowClassName="py-0 sm:py-2"
               fullBleed
             />
