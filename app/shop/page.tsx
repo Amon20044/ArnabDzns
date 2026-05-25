@@ -1,14 +1,7 @@
 import Image from "next/image";
-import {
-  ArrowLeft,
-  Bell,
-  Download,
-  Layers3,
-  ShoppingBag,
-  Sparkles,
-} from "lucide-react";
+import { Download, Layers3, Sparkles } from "lucide-react";
+import { ShopHero } from "@/components/shop/shop-hero";
 import { StructuredData } from "@/components/site/structured-data";
-import { PrimaryButton } from "@/components/ui/primary-button";
 import { StatusBadge } from "@/components/ui/status-badge";
 import { getPageMetadata } from "@/lib/seo";
 import { getPageJsonLd } from "@/lib/structured-data";
@@ -45,42 +38,7 @@ export default function ShopPage() {
 
       <main className="mx-auto flex w-full max-w-6xl flex-1 flex-col px-3 pb-32 pt-6 md:px-10 md:pb-40 md:pt-10">
         <section className="page-reveal grid gap-6 lg:grid-cols-[minmax(0,0.8fr)_minmax(0,1fr)] lg:items-end">
-          <div className="max-w-2xl">
-            <StatusBadge
-              compact
-              tone="#a855f7"
-              iconColor="#ffffff"
-              leading={<ShoppingBag className="size-3.5" />}
-            >
-              Digital Shop
-            </StatusBadge>
-
-            <h1 className="mt-5 max-w-[10ch] text-[clamp(2.65rem,14vw,6.5rem)] font-semibold leading-[0.88] tracking-normal text-text-primary">
-              Template drops are loading.
-            </h1>
-
-            <p className="mt-5 max-w-xl text-base leading-7 text-text-secondary sm:text-lg">
-              Editable design systems, launch graphics, and creator-ready packs are being prepared for the first release.
-            </p>
-
-            <div className="mt-7 flex flex-wrap items-center gap-3">
-              <PrimaryButton
-                label="Notify me"
-                href="/contact"
-                Icon={Bell}
-                size="compact"
-                iconVisibility="always"
-              />
-              <PrimaryButton
-                label="Back home"
-                href="/"
-                Icon={ArrowLeft}
-                size="compact"
-                iconVisibility="always"
-                tone="white"
-              />
-            </div>
-          </div>
+          <ShopHero />
 
           <div className="grid gap-3 sm:grid-cols-2 lg:gap-4">
             {shopItems.map((item, index) => (
