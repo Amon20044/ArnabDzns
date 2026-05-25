@@ -47,10 +47,16 @@ export interface SocialConfig {
   href: string;
 }
 
+export interface HeaderActionConfig {
+  label: string;
+  path: string;
+}
+
 export interface HeaderConfig {
   brand: BrandConfig;
   availabilityLabel: string;
   socials: SocialConfig[];
+  shop?: HeaderActionConfig;
 }
 
 export type NavIconRegistry = Record<NavIconId, LucideIcon>;

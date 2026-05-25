@@ -1,7 +1,7 @@
 "use client";
 
 import { AnimatePresence, motion } from "framer-motion";
-import { PhoneCall } from "lucide-react";
+import { PhoneCall, ShoppingBag } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
@@ -12,7 +12,6 @@ import {
   type CSSProperties,
   type MouseEvent as ReactMouseEvent,
 } from "react";
-import { PrimaryButton } from "@/components/ui/primary-button";
 import { cn } from "@/lib/utils";
 import { navigationConfig } from "@/data/navigation";
 import type { CTAConfig, NavigationConfig, NavItemConfig } from "@/types";
@@ -23,6 +22,17 @@ import { NavItem } from "./nav-item";
 
 interface NavigationProps {
   content?: NavigationConfig;
+}
+
+const MOBILE_SECTION_ORDER = ["home", "portfolio", "testimonials", "services", "faq"] as const;
+
+function getMobileSectionOrder(item: NavItemConfig, fallbackIndex: number) {
+  const sectionId = item.sectionId ?? item.id;
+  const sectionIndex = MOBILE_SECTION_ORDER.indexOf(
+    sectionId as (typeof MOBILE_SECTION_ORDER)[number],
+  );
+
+  return sectionIndex === -1 ? MOBILE_SECTION_ORDER.length + fallbackIndex : sectionIndex;
 }
 
 function resolveCTAIcon(config: CTAConfig) {
@@ -85,6 +95,14 @@ export const Navigation = ({ content = navigationConfig }: NavigationProps) => {
   const visualViewportBottomOffset = useVisualViewportBottomOffset();
 
   const { items } = content;
+  const mobileItems = items
+    .map((item, index) => ({ item, index }))
+    .sort(
+      (left, right) =>
+        getMobileSectionOrder(left.item, left.index) -
+        getMobileSectionOrder(right.item, right.index),
+    )
+    .map(({ item }) => item);
   const ctas = content.ctas.map((cta) => ({
     ...cta,
     Icon: resolveCTAIcon(cta),
@@ -105,9 +123,24 @@ export const Navigation = ({ content = navigationConfig }: NavigationProps) => {
   const mobilePrimaryCta = ctas.find(
     (cta) => cta.variant === "primary" && !!(cta.href ?? cta.path) && !!cta.Icon,
   );
+  const mobileActions = [
+    {
+      label: mobilePrimaryCta?.label ?? "Contact",
+      target: mobilePrimaryCta?.href ?? mobilePrimaryCta?.path ?? "/contact",
+      Icon: mobilePrimaryCta?.Icon ?? PhoneCall,
+      tone: "primary" as const,
+    },
+    {
+      label: "Shop",
+      target: "/shop",
+      Icon: ShoppingBag,
+      tone: "secondary" as const,
+    },
+  ];
   const mobileNavStyle = {
     "--mobile-nav-viewport-offset": `${visualViewportBottomOffset}px`,
-    bottom: "calc(2px - var(--mobile-nav-viewport-offset))",
+    bottom:
+      "calc(0.75rem + env(safe-area-inset-bottom) - var(--mobile-nav-viewport-offset))",
   } as CSSProperties;
 
   const syncHashForSection = useCallback((sectionId: string) => {
@@ -327,7 +360,7 @@ export const Navigation = ({ content = navigationConfig }: NavigationProps) => {
   }, []);
 
   const getIconSize = (id: string) => {
-    const baseSize = 20;
+    const baseSize = 24;
     const maxSize = 32;
 
     if (!hovered || mouseX === null) {
@@ -356,36 +389,23 @@ export const Navigation = ({ content = navigationConfig }: NavigationProps) => {
       <motion.nav
         role="navigation"
         aria-label="Main navigation"
-        className="fixed left-1/2 z-50 w-[min(calc(100vw-1rem),28rem)] -translate-x-1/2 sm:hidden"
+        className="fixed left-1/2 z-50 w-[min(calc(100vw-0.75rem),26rem)] -translate-x-1/2 sm:hidden"
         style={mobileNavStyle}
         initial={{ y: 24, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ type: "spring", stiffness: 320, damping: 26, delay: 0.1 }}
       >
-        <div className="relative pt-14">
-          {mobilePrimaryCta?.Icon ? (
-            <PrimaryButton
-              label={mobilePrimaryCta.label}
-              href={mobilePrimaryCta.href ?? mobilePrimaryCta.path ?? "/contact"}
-              Icon={mobilePrimaryCta.Icon}
-              external={!!mobilePrimaryCta.href}
-              size="compact"
-              iconVisibility="always"
-              iconOnly
-              className="absolute right-0 top-0 z-[4] -translate-y-[30%]"
-            />
-          ) : null}
-
-          <div className="relative overflow-visible rounded-full border border-transparent px-2.5 py-2.5 shadow-none">
+        <div className="relative flex items-end gap-1.5">
+          <div className="relative min-w-0 flex-1 overflow-visible rounded-full border border-transparent px-1 py-1 shadow-none">
             <LiquidGlassBackdrop variant="shell" className="nav-shell-backdrop rounded-[inherit]" />
 
             <div
               aria-hidden
-              className="pointer-events-none absolute inset-x-10 -top-px z-[1] h-px rounded-full bg-gradient-to-r from-transparent via-accent/35 to-transparent"
+              className="pointer-events-none absolute inset-x-7 -top-px z-[1] h-px rounded-full bg-gradient-to-r from-transparent via-accent/35 to-transparent"
             />
 
-            <div className="relative z-[2] flex items-center justify-between gap-1">
-              {items.map((item, index) => {
+            <div className="relative z-[2] grid grid-cols-5 items-center gap-0.5">
+              {mobileItems.map((item, index) => {
                 const Icon = iconRegistry[item.id];
                 const itemIsActive = isActive(item);
 
@@ -401,8 +421,8 @@ export const Navigation = ({ content = navigationConfig }: NavigationProps) => {
                     aria-current={itemIsActive ? "page" : undefined}
                     onClick={(event) => handleNavClick(event, item)}
                     className={cn(
-                      "relative flex flex-1 items-center justify-center rounded-full py-2.5 text-text-secondary transition-colors duration-200",
-                      itemIsActive ? "text-text-primary" : "hover:text-text-primary",
+                      "relative flex min-w-0 items-center justify-center rounded-full py-0.5 text-black transition-colors duration-200",
+                      itemIsActive ? "text-black" : "text-black/80 hover:text-black",
                     )}
                   >
                     <AnimatePresence>
@@ -421,7 +441,7 @@ export const Navigation = ({ content = navigationConfig }: NavigationProps) => {
                             "pointer-events-none absolute bottom-full z-[3] mb-3 inline-flex min-h-10 items-center justify-center rounded-full px-4 py-2",
                             index === 0
                               ? "left-0"
-                              : index === items.length - 1
+                              : index === mobileItems.length - 1
                                 ? "right-0"
                                 : "left-1/2 -translate-x-1/2",
                           )}
@@ -438,7 +458,7 @@ export const Navigation = ({ content = navigationConfig }: NavigationProps) => {
                               "absolute -bottom-1.5 h-3.5 w-3.5 rotate-45 rounded-[4px] border-r border-b border-accent/16 bg-white/92",
                               index === 0
                                 ? "left-7"
-                                : index === items.length - 1
+                                : index === mobileItems.length - 1
                                   ? "right-7"
                                   : "left-1/2 -translate-x-1/2",
                             )}
@@ -452,12 +472,12 @@ export const Navigation = ({ content = navigationConfig }: NavigationProps) => {
 
                     <motion.span
                       className={cn(
-                        "relative flex size-11 items-center justify-center rounded-full transition-colors duration-200",
-                        itemIsActive ? "text-text-primary" : "",
+                        "relative flex size-8 items-center justify-center rounded-full text-black transition-colors duration-200",
+                        itemIsActive ? "text-black" : "",
                       )}
                       animate={{
-                        y: itemIsActive ? -1.5 : 0,
-                        scale: itemIsActive ? 1.04 : 1,
+                        y: itemIsActive ? -1 : 0,
+                        scale: itemIsActive ? 1.03 : 1,
                       }}
                       transition={{ type: "spring", stiffness: 360, damping: 24 }}
                     >
@@ -469,12 +489,79 @@ export const Navigation = ({ content = navigationConfig }: NavigationProps) => {
                       ) : null}
                       <Icon
                         className={cn(
-                          "relative z-[1] size-[21px]",
+                          "relative z-[1] size-[16px] text-black",
                           itemIsActive ? "stroke-[1.7px]" : "stroke-[1.5px]",
                         )}
                       />
                     </motion.span>
                   </Link>
+                );
+              })}
+            </div>
+          </div>
+
+          <div className="relative flex h-11 w-[4.85rem] shrink-0 overflow-visible rounded-full border border-transparent px-1 py-1 shadow-none">
+            <LiquidGlassBackdrop variant="shell" className="nav-shell-backdrop rounded-[inherit]" />
+
+            <div
+              aria-hidden
+              className="pointer-events-none absolute inset-x-4 -top-px z-[1] h-px rounded-full bg-gradient-to-r from-transparent via-accent/35 to-transparent"
+            />
+
+            <div className="relative z-[2] grid w-full grid-cols-2 items-center gap-0.5">
+              {mobileActions.map((action) => {
+                const Icon = action.Icon;
+                const isInternal = action.target.startsWith("/");
+                const opensNewTab =
+                  !isInternal &&
+                  !action.target.startsWith("mailto:") &&
+                  !action.target.startsWith("tel:");
+                const actionIsActive =
+                  isInternal &&
+                  (pathname === action.target ||
+                    (action.target !== "/" && pathname.startsWith(`${action.target}/`)));
+                const actionClassName = cn(
+                  "relative flex size-8 items-center justify-center rounded-full transition-colors duration-200",
+                  action.tone === "primary"
+                    ? "bg-accent text-white shadow-[0_8px_18px_rgba(88,28,135,0.2)]"
+                    : actionIsActive
+                      ? "bg-black text-white"
+                      : "text-black hover:bg-white/64",
+                );
+                const actionContent = (
+                  <>
+                    <Icon
+                      aria-hidden
+                      className={cn(
+                        "size-[15.5px]",
+                        action.tone === "primary" ? "stroke-[1.9px]" : "stroke-[1.6px]",
+                      )}
+                    />
+                    <span className="sr-only">{action.label}</span>
+                  </>
+                );
+
+                return isInternal ? (
+                  <Link
+                    key={action.label}
+                    href={action.target}
+                    aria-label={action.label}
+                    aria-current={actionIsActive ? "page" : undefined}
+                    className={actionClassName}
+                  >
+                    {actionContent}
+                  </Link>
+                ) : (
+                  <a
+                    key={action.label}
+                    href={action.target}
+                    target={opensNewTab ? "_blank" : undefined}
+                    rel={opensNewTab ? "noopener noreferrer" : undefined}
+                    aria-label={action.label}
+                    className={actionClassName}
+                  >
+                    {actionContent}
+                  </a>
                 );
               })}
             </div>

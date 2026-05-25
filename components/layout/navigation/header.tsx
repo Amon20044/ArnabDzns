@@ -3,6 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { motion } from "framer-motion";
+import { ShoppingBag } from "lucide-react";
 import {
   startTransition,
   useEffect,
@@ -22,6 +23,7 @@ interface HeaderProps {
 
 export const Header = ({ content = headerConfig }: HeaderProps) => {
   const { availabilityLabel, brand, socials } = content;
+  const shopLink = content.shop ?? { label: "Shop", path: "/shop" };
   const [isVisible, setIsVisible] = useState(true);
   const [brandHovered, setBrandHovered] = useState(false);
   const lastScrollYRef = useRef(0);
@@ -136,6 +138,16 @@ export const Header = ({ content = headerConfig }: HeaderProps) => {
             aria-hidden
             className="hidden h-6 w-px bg-black/10 sm:block"
           />
+
+          <Link
+            href={shopLink.path}
+            aria-label={shopLink.label}
+            className="liquid-glass hidden size-9 shrink-0 items-center justify-center rounded-[11px]
+                       text-text-primary transition-colors duration-150
+                       hover:border-accent/30 hover:text-accent sm:flex"
+          >
+            <ShoppingBag className="size-[16px]" />
+          </Link>
 
           <div className="flex shrink-0 items-center gap-1.5 sm:gap-2">
             {socials.map((social, index) => {

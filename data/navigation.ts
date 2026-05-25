@@ -12,6 +12,10 @@ export const headerConfig: HeaderConfig = {
     logoAlt: siteConfig.brand.logoAlt,
   },
   availabilityLabel: "Available",
+  shop: {
+    label: "Shop",
+    path: "/shop",
+  },
   socials: siteConfig.social
     .filter((social) =>
       ["linkedin", "instagram", "discord"].includes(social.platform),

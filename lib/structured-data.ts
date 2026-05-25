@@ -32,7 +32,7 @@ function getBasePageEntity(pageKey: SitePageKey): JsonLd {
   };
 }
 
-function getBreadcrumbEntity(pageKey: "about" | "contact"): JsonLd {
+function getBreadcrumbEntity(pageKey: "about" | "contact" | "shop"): JsonLd {
   const currentPage = getSitePage(pageKey);
 
   return {
@@ -102,6 +102,10 @@ export function getPageJsonLd(pageKey: SitePageKey): JsonLd {
 
   if (pageKey === "about") {
     graph.push(getBreadcrumbEntity("about"));
+  }
+
+  if (pageKey === "shop") {
+    graph.push(getBreadcrumbEntity("shop"));
   }
 
   if (pageKey === "home") {

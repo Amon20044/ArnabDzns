@@ -67,4 +67,26 @@ export const sitePages: SitePagesConfig = {
       priority: 0.85,
     },
   },
+  shop: {
+    path: "/shop",
+    navLabel: "Shop",
+    seo: {
+      title: "Shop Templates Coming Soon",
+      description:
+        "A coming-soon storefront for premium ecommerce graphics, launch templates, and creator-ready digital design packs by Arnab.",
+      keywords: [
+        "graphic templates shop",
+        "ecommerce design templates",
+        "premium digital templates",
+        "creator graphics pack",
+        "launch page templates",
+      ],
+      pageType: "CollectionPage",
+      openGraphType: "website",
+    },
+    sitemap: {
+      changeFrequency: "monthly",
+      priority: 0.7,
+    },
+  },
 };
