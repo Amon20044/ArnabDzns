@@ -434,7 +434,6 @@ export function MarqueeRowsEditor({
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const [pickerState, setPickerState] = useState<PickerState>(null);
   const pickerStateRef = useRef<PickerState>(null);
-  pickerStateRef.current = pickerState;
   const [seoState, setSeoState] = useState<SeoState>(null);
   const [assetSearch, setAssetSearch] = useState("");
   const deferredAssetSearch = useDeferredValue(assetSearch.trim().toLowerCase());
@@ -495,6 +494,10 @@ export function MarqueeRowsEditor({
   const seoItem = seoState
     ? rows[seoState.rowIndex]?.images[seoState.itemIndex]
     : undefined;
+
+  useEffect(() => {
+    pickerStateRef.current = pickerState;
+  }, [pickerState]);
 
   useEffect(() => {
     if (pickerState && !rows[pickerState.rowIndex]) {
@@ -562,7 +565,10 @@ export function MarqueeRowsEditor({
     router.replace(`/login?next=${encodeURIComponent(nextPath)}`);
     router.refresh();
   }
-  redirectToLoginRef.current = redirectToLogin;
+
+  useEffect(() => {
+    redirectToLoginRef.current = redirectToLogin;
+  });
 
   function updateRow(rowIndex: number, nextRow: ImageMarqueeRow) {
     onChange(updateArrayItem(rows, rowIndex, nextRow));
@@ -635,7 +641,10 @@ export function MarqueeRowsEditor({
       firstInsertedIndex,
     };
   }
-  insertAssetsIntoTargetRef.current = insertAssetsIntoTarget;
+
+  useEffect(() => {
+    insertAssetsIntoTargetRef.current = insertAssetsIntoTarget;
+  });
 
   function openPicker(rowIndex: number, replaceIndex?: number) {
     setUploadError("");
