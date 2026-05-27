@@ -155,8 +155,6 @@ export function useImageUploadQueue(
   const xhrByIdRef = useRef<Map<string, XMLHttpRequest>>(new Map());
   const objectUrlsRef = useRef<Set<string>>(new Set());
 
-  itemsRef.current = items;
-
   const replaceItems = useCallback((nextItems: UploadItem[]) => {
     itemsRef.current = nextItems;
     setItems(nextItems);
@@ -360,7 +358,9 @@ export function useImageUploadQueue(
     }
   }, [maxConcurrentUploads, serialUploadByteThreshold, startNetworkUpload]);
 
-  pumpUploadsRef.current = pumpUploads;
+  useEffect(() => {
+    pumpUploadsRef.current = pumpUploads;
+  }, [pumpUploads]);
 
   const handleWorkerMessage = useCallback(
     (id: string, file: File, message: ImageWorkerOutput) => {

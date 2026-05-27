@@ -490,29 +490,22 @@ export function MarqueeRowsEditor({
   });
   const isUploading = uploadQueue.summary.inFlight > 0;
 
-  const pickerRow = pickerState ? rows[pickerState.rowIndex] : undefined;
-  const seoItem = seoState
-    ? rows[seoState.rowIndex]?.images[seoState.itemIndex]
+  const activePickerState =
+    pickerState && rows[pickerState.rowIndex] ? pickerState : null;
+  const activeSeoState =
+    seoState && rows[seoState.rowIndex]?.images?.[seoState.itemIndex]
+      ? seoState
+      : null;
+  const pickerRow = activePickerState
+    ? rows[activePickerState.rowIndex]
+    : undefined;
+  const seoItem = activeSeoState
+    ? rows[activeSeoState.rowIndex]?.images[activeSeoState.itemIndex]
     : undefined;
 
   useEffect(() => {
-    pickerStateRef.current = pickerState;
-  }, [pickerState]);
-
-  useEffect(() => {
-    if (pickerState && !rows[pickerState.rowIndex]) {
-      setPickerState(null);
-    }
-  }, [pickerState, rows]);
-
-  useEffect(() => {
-    if (
-      seoState &&
-      !rows[seoState.rowIndex]?.images?.[seoState.itemIndex]
-    ) {
-      setSeoState(null);
-    }
-  }, [rows, seoState]);
+    pickerStateRef.current = activePickerState;
+  }, [activePickerState]);
 
   const libraryItems = useMemo<LibraryEntry[]>(() => {
     return rows.flatMap((row, rowIndex) =>
@@ -653,12 +646,15 @@ export function MarqueeRowsEditor({
   }
 
   function handleSelectLibraryItem(entry: LibraryEntry) {
-    if (!pickerState) {
+    if (!activePickerState) {
       return;
     }
 
-    const { nextRows, firstInsertedIndex } = insertAssetsIntoTarget(pickerState, [entry.item]);
-    const targetRowIndex = pickerState.rowIndex;
+    const { nextRows, firstInsertedIndex } = insertAssetsIntoTarget(
+      activePickerState,
+      [entry.item],
+    );
+    const targetRowIndex = activePickerState.rowIndex;
     const finishSelection = async () => {
       if (nextRows && onPersistRows) {
         setIsPersistingRows(true);
@@ -685,7 +681,7 @@ export function MarqueeRowsEditor({
   }
 
   function handleFileSelection(fileList: FileList | null) {
-    if (!pickerState || !fileList?.length) {
+    if (!activePickerState || !fileList?.length) {
       return;
     }
 
@@ -697,7 +693,7 @@ export function MarqueeRowsEditor({
     }
 
     setUploadError("");
-    const target = pickerState;
+    const target = activePickerState;
     const ids = uploadQueue.addFiles(files);
     ids.forEach((id) => targetByItemIdRef.current.set(id, target));
 
@@ -707,19 +703,19 @@ export function MarqueeRowsEditor({
   }
 
   function updateSeoItem(nextItem: ImageMarqueeItem) {
-    if (!seoState) {
+    if (!activeSeoState) {
       return;
     }
 
-    const row = rows[seoState.rowIndex];
+    const row = rows[activeSeoState.rowIndex];
 
     if (!row) {
       return;
     }
 
-    updateRow(seoState.rowIndex, {
+    updateRow(activeSeoState.rowIndex, {
       ...row,
-      images: updateArrayItem(row.images, seoState.itemIndex, nextItem),
+      images: updateArrayItem(row.images, activeSeoState.itemIndex, nextItem),
     });
   }
 
@@ -943,12 +939,14 @@ export function MarqueeRowsEditor({
       </EditorSection>
 
       <EditorModal
-        open={Boolean(pickerState && pickerRow)}
+        open={Boolean(activePickerState && pickerRow)}
         onClose={() => setPickerState(null)}
         title={
-          pickerState?.replaceIndex !== undefined
-            ? `Replace media in Row ${pickerState.rowIndex + 1}`
-            : `Add media to Row ${pickerState ? pickerState.rowIndex + 1 : ""}`
+          activePickerState?.replaceIndex !== undefined
+            ? `Replace media in Row ${activePickerState.rowIndex + 1}`
+            : `Add media to Row ${
+                activePickerState ? activePickerState.rowIndex + 1 : ""
+              }`
         }
         description={
           type === "clients"
@@ -972,10 +970,12 @@ export function MarqueeRowsEditor({
             <Badge variant="outline">
               {type === "clients" ? "Client logo flow" : "Gallery flow"}
             </Badge>
-            {pickerState ? (
-              <Badge variant="outline">Row {pickerState.rowIndex + 1}</Badge>
+            {activePickerState ? (
+              <Badge variant="outline">
+                Row {activePickerState.rowIndex + 1}
+              </Badge>
             ) : null}
-            {pickerState?.replaceIndex !== undefined ? (
+            {activePickerState?.replaceIndex !== undefined ? (
               <Badge variant="warning">Replacing current asset</Badge>
             ) : null}
           </div>
@@ -1095,7 +1095,7 @@ export function MarqueeRowsEditor({
       </EditorModal>
 
       <EditorModal
-        open={Boolean(seoState && seoItem)}
+        open={Boolean(activeSeoState && seoItem)}
         onClose={() => setSeoState(null)}
         title="Edit image details"
         description="Refine SEO text, labels, and display metadata for the selected marquee asset."
