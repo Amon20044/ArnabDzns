@@ -51,9 +51,11 @@ export default async function Home() {
           <ImageMarquee
             rows={content.showcaseMarquee}
             height="clamp(24.5rem, 43.94vw, 33.8rem)"
-            rowGap=".2rem"
+            rowGap="1rem"
             itemGap="1rem"
             fullBleed
+            arrangeAsGrid
+            revealOnLoad
           />
         </section>
         <div id="portfolio" data-nav-section="portfolio" className="scroll-target">

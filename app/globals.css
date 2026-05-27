@@ -355,6 +355,33 @@ body > :is(div, main) {
   animation-delay: var(--marquee-logo-delay, 180ms);
 }
 
+.marquee-pixel-tear {
+  opacity: 0;
+  visibility: hidden;
+  will-change: opacity, filter, transform;
+}
+
+.marquee-pixel-tear.is-ready {
+  visibility: visible;
+  animation: marquee-pixel-tear 1800ms cubic-bezier(0.19, 1, 0.22, 1) forwards;
+}
+
+.marquee-pixel-tear::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 3;
+  opacity: 0;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='240' height='240'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='3.4' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  0 0 0 0.9 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
+  background-size: 240px 240px;
+  mix-blend-mode: overlay;
+}
+
+.marquee-pixel-tear.is-ready::after {
+  animation: marquee-pixel-tear-noise 1800ms cubic-bezier(0.19, 1, 0.22, 1) forwards;
+}
+
 .site-boot-content {
   opacity: 0;
   filter: blur(14px);
@@ -784,6 +811,60 @@ body > :is(div, main) {
   }
 }
 
+@keyframes marquee-pixel-tear {
+  0% {
+    opacity: 0;
+    filter: blur(44px) saturate(0.25) contrast(1.5) brightness(0.65);
+    transform: scale3d(1.08, 1.08, 1);
+  }
+
+  22% {
+    opacity: 0.35;
+    filter: blur(30px) saturate(0.45) contrast(1.4) brightness(0.8);
+    transform: scale3d(1.06, 1.06, 1);
+  }
+
+  48% {
+    opacity: 0.7;
+    filter: blur(16px) saturate(0.75) contrast(1.25) brightness(0.95);
+    transform: scale3d(1.035, 1.035, 1);
+  }
+
+  72% {
+    opacity: 0.92;
+    filter: blur(6px) saturate(1.08) contrast(1.1) brightness(1.04);
+    transform: scale3d(1.015, 1.015, 1);
+  }
+
+  100% {
+    opacity: 1;
+    filter: blur(0) saturate(1) contrast(1) brightness(1);
+    transform: scale3d(1, 1, 1);
+  }
+}
+
+@keyframes marquee-pixel-tear-noise {
+  0% {
+    opacity: 0;
+  }
+
+  12% {
+    opacity: 0.95;
+  }
+
+  45% {
+    opacity: 0.55;
+  }
+
+  75% {
+    opacity: 0.2;
+  }
+
+  100% {
+    opacity: 0;
+  }
+}
+
 @keyframes skeleton-shimmer {
   to {
     transform: translateX(110%);
@@ -848,13 +929,21 @@ body > :is(div, main) {
 
   .page-reveal,
   .marquee-logo-reveal,
+  .marquee-pixel-tear,
+  .marquee-pixel-tear.is-ready,
   .site-boot-content,
   ::view-transition-old(.route-transition),
   ::view-transition-new(.route-transition) {
     animation: none;
     opacity: 1;
+    visibility: visible;
     filter: none;
     transform: none;
+  }
+
+  .marquee-pixel-tear::after,
+  .marquee-pixel-tear.is-ready::after {
+    display: none;
   }
 
   .site-boot-loader {
