@@ -170,7 +170,7 @@ function SectionsNavigationPanel({
   return (
     <div
       className={cn(
-        "relative flex min-h-0 flex-col overflow-hidden rounded-2xl border border-border/70 bg-white/85 shadow-[0_6px_20px_rgba(15,23,42,0.04)] backdrop-blur-sm",
+        "relative flex min-h-0 min-w-0 flex-col overflow-hidden rounded-2xl border border-border/70 bg-white/85 shadow-[0_6px_20px_rgba(15,23,42,0.04)] backdrop-blur-sm",
         className,
       )}
     >
@@ -198,7 +198,10 @@ function SectionsNavigationPanel({
       </div>
 
       <div
-        className="min-h-0 flex-1 overflow-y-auto overscroll-contain touch-pan-y"
+        data-lenis-prevent
+        data-lenis-prevent-wheel
+        data-lenis-prevent-touch
+        className="min-h-0 flex-1 touch-pan-y overflow-y-auto overscroll-contain [scrollbar-gutter:stable]"
         style={{ WebkitOverflowScrolling: "touch" }}
       >
         {groupedBlocks.length ? (
@@ -647,7 +650,7 @@ export function ContentDashboardClient({
   const hasStructuredData = hasPersistableStructuredData(draft.data);
 
   return (
-    <section className="grid gap-5 xl:grid-cols-[20rem_minmax(0,1fr)]">
+    <section className="grid min-w-0 items-start gap-4 lg:gap-5 xl:grid-cols-[minmax(17rem,20rem)_minmax(0,1fr)]">
       {isMobileSectionsOpen ? (
         <div className="fixed inset-0 z-50 xl:hidden">
           <button
@@ -661,7 +664,7 @@ export function ContentDashboardClient({
             role="dialog"
             aria-modal="true"
             aria-label="Dashboard sections"
-            className="absolute inset-y-3 right-3 flex min-h-0 w-[min(calc(100vw-1.5rem),22rem)] flex-col"
+            className="absolute inset-y-2 right-2 flex min-h-0 w-[min(calc(100vw-1rem),22rem)] flex-col sm:inset-y-3 sm:right-3 sm:w-[min(calc(100vw-1.5rem),22rem)]"
           >
             <SectionsNavigationPanel
               blockCount={blocks.length}
@@ -700,12 +703,12 @@ export function ContentDashboardClient({
         selectedKey={selectedKey}
         onToggleGroup={toggleGroup}
         onSelectBlock={selectBlock}
-        className="hidden xl:sticky xl:top-6 xl:flex xl:h-[calc(100vh-10rem)]"
+        className="hidden xl:sticky xl:top-4 xl:flex xl:h-[calc(100dvh-2rem)] xl:max-h-[calc(100dvh-2rem)]"
       />
 
-      <div className="grid gap-4">
+      <div className="grid min-w-0 gap-4">
         {!isMobileSectionsOpen ? (
-          <div className="sticky top-4 z-30 -mb-1 flex justify-end xl:hidden">
+          <div className="sticky top-3 z-30 -mb-1 flex justify-end xl:hidden">
             <Button
               type="button"
               variant="outline"
@@ -722,8 +725,8 @@ export function ContentDashboardClient({
         ) : null}
         <Card className="rounded-2xl bg-white/88">
           <CardHeader className="border-b border-border/70">
-            <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
-              <div className="grid gap-3">
+            <div className="flex min-w-0 flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
+              <div className="grid min-w-0 gap-3">
                 <div className="flex flex-wrap items-center gap-2">
                   <Badge variant="outline">{GROUP_LABELS[selectedBlock.group] ?? selectedBlock.group}</Badge>
                   <Badge variant="outline">{selectedBlock.kind}</Badge>
@@ -733,13 +736,13 @@ export function ContentDashboardClient({
                   {hasChanges ? <Badge variant="warning">Unsaved changes</Badge> : null}
                 </div>
                 <div>
-                  <CardTitle className="text-xl">{selectedDefinition.label}</CardTitle>
+                  <CardTitle className="text-lg sm:text-xl">{selectedDefinition.label}</CardTitle>
                   <p className="mt-2 max-w-3xl text-sm text-muted-foreground">
                     {selectedDefinition.description}
                   </p>
                 </div>
               </div>
-              <div className="flex flex-wrap gap-2">
+              <div className="grid grid-cols-2 gap-2 sm:flex sm:flex-wrap lg:justify-end">
                 <Button
                   type="button"
                   variant="outline"
@@ -761,12 +764,12 @@ export function ContentDashboardClient({
             </div>
           </CardHeader>
           <CardContent className="pt-4">
-            <div className="grid gap-3 md:grid-cols-3">
+            <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
               <div className="rounded-2xl border border-border/70 bg-background/70 p-4">
                 <p className="text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground">
                   Section Key
                 </p>
-                <p className="mt-2 text-sm font-semibold text-foreground">{selectedBlock.key}</p>
+                <p className="mt-2 break-words text-sm font-semibold text-foreground">{selectedBlock.key}</p>
               </div>
               <div className="rounded-2xl border border-border/70 bg-background/70 p-4">
                 <p className="text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground">

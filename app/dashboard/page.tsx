@@ -37,19 +37,21 @@ export default async function DashboardPage() {
   );
 
   return (
-    <section className="grid gap-4">
+    <section className="grid min-w-0 gap-4">
       <Card className="rounded-2xl bg-white/88">
         <CardHeader className="border-b border-border/70">
-          <div className="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
-            <div className="grid gap-2">
+          <div className="flex min-w-0 flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
+            <div className="grid min-w-0 gap-2">
               <div className="flex items-center gap-2">
                 <Badge variant="success">
                   <ShieldCheckIcon className="mr-1 size-3" />
                   Session active
                 </Badge>
-                <Badge variant="outline">{session?.email ?? "Admin"}</Badge>
+                <Badge variant="outline" className="min-w-0 max-w-full truncate">
+                  {session?.email ?? "Admin"}
+                </Badge>
               </div>
-              <CardTitle className="text-xl">
+              <CardTitle className="text-lg sm:text-xl">
                 Structured content control center
               </CardTitle>
               <p className="max-w-3xl text-sm text-muted-foreground">
@@ -58,7 +60,7 @@ export default async function DashboardPage() {
                 data without touching raw JSON.
               </p>
             </div>
-            <Button asChild>
+            <Button asChild className="w-full sm:w-fit">
               <Link href="/dashboard/content">
                 Open content editor
                 <ArrowRightIcon />
@@ -67,7 +69,7 @@ export default async function DashboardPage() {
           </div>
         </CardHeader>
         <CardContent className="pt-4">
-          <div className="grid gap-3 md:grid-cols-4">
+          <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
             <div className="rounded-2xl border border-border/70 bg-background/70 p-4">
               <p className="text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground">
                 Sections
@@ -102,7 +104,7 @@ export default async function DashboardPage() {
         </CardContent>
       </Card>
 
-      <div className="grid gap-4 xl:grid-cols-2">
+      <div className="grid min-w-0 gap-4 xl:grid-cols-2">
         <Card className="rounded-2xl bg-white/86">
           <CardHeader className="border-b border-border/70">
             <div className="flex items-center gap-2">
@@ -120,8 +122,8 @@ export default async function DashboardPage() {
                   href={`/dashboard/content?section=${block.key}`}
                   className="rounded-2xl border border-border bg-background/70 px-4 py-3 transition hover:border-foreground/15 hover:bg-background"
                 >
-                  <div className="flex items-center justify-between gap-3">
-                    <div>
+                  <div className="flex min-w-0 items-center justify-between gap-3">
+                    <div className="min-w-0">
                       <p className="text-sm font-semibold text-foreground">
                         {definition.label}
                       </p>
@@ -129,7 +131,7 @@ export default async function DashboardPage() {
                         {getSectionSummary(block)}
                       </p>
                     </div>
-                    <ArrowRightIcon className="size-4 text-muted-foreground" />
+                    <ArrowRightIcon className="size-4 shrink-0 text-muted-foreground" />
                   </div>
                 </Link>
               );
@@ -153,9 +155,9 @@ export default async function DashboardPage() {
             ).map(([group, count]) => (
               <div
                 key={group}
-                className="flex items-center justify-between rounded-2xl border border-border bg-background/70 px-4 py-3"
+                className="flex min-w-0 items-center justify-between gap-3 rounded-2xl border border-border bg-background/70 px-4 py-3"
               >
-                <div>
+                <div className="min-w-0">
                   <p className="text-sm font-semibold text-foreground">
                     {GROUP_LABELS[group] ?? group}
                   </p>

@@ -955,17 +955,22 @@ export function MarqueeRowsEditor({
         }
         size="xl"
         footer={
-          <div className="flex items-center justify-between gap-4">
-            <p className="text-sm text-muted-foreground">
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
+            <p className="text-sm leading-6 text-muted-foreground">
               Uploaded assets are added to the draft immediately and open in the SEO editor next.
             </p>
-            <Button type="button" variant="outline" onClick={() => setPickerState(null)}>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => setPickerState(null)}
+              className="w-full sm:w-fit"
+            >
               Close
             </Button>
           </div>
         }
       >
-        <div className="grid gap-5">
+        <div className="grid min-w-0 gap-4 sm:gap-5">
           <div className="flex flex-wrap items-center gap-2">
             <Badge variant="outline">
               {type === "clients" ? "Client logo flow" : "Gallery flow"}
@@ -980,13 +985,13 @@ export function MarqueeRowsEditor({
             ) : null}
           </div>
 
-          <div className="grid gap-5 xl:grid-cols-[18rem_minmax(0,1fr)]">
-            <div className="rounded-[1.7rem] border border-black/6 bg-[linear-gradient(180deg,rgba(255,255,255,0.95)_0%,rgba(244,247,250,0.88)_100%)] p-4 shadow-[0_20px_50px_rgba(15,23,42,0.05)]">
-              <div className="flex size-12 items-center justify-center rounded-full bg-black text-white">
+          <div className="grid min-w-0 gap-4 lg:grid-cols-[minmax(0,18rem)_minmax(0,1fr)] xl:gap-5">
+            <div className="min-w-0 rounded-[1.35rem] border border-black/6 bg-[linear-gradient(180deg,rgba(255,255,255,0.95)_0%,rgba(244,247,250,0.88)_100%)] p-3 shadow-[0_20px_50px_rgba(15,23,42,0.05)] sm:rounded-[1.7rem] sm:p-4">
+              <div className="flex size-10 items-center justify-center rounded-full bg-black text-white sm:size-12">
                 <UploadCloudIcon className="size-5" />
               </div>
 
-              <div className="mt-4 grid gap-2">
+              <div className="mt-3 grid gap-2 sm:mt-4">
                 <h3 className="text-sm font-semibold text-foreground">
                   Upload to ImgBB
                 </h3>
@@ -1010,6 +1015,7 @@ export function MarqueeRowsEditor({
                   type="button"
                   disabled={isUploading || isPersistingRows}
                   onClick={() => fileInputRef.current?.click()}
+                  className="w-full"
                 >
                   <UploadCloudIcon />
                   {isUploading
@@ -1037,8 +1043,8 @@ export function MarqueeRowsEditor({
               </div>
             </div>
 
-            <div className="grid gap-4">
-              <div className="flex flex-col gap-3 md:flex-row md:items-center">
+            <div className="grid min-w-0 gap-4">
+              <div className="grid min-w-0 gap-3 md:grid-cols-[minmax(0,1fr)_auto] md:items-center">
                 <div className="relative flex-1">
                   <SearchIcon className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
                   <Input
@@ -1052,6 +1058,7 @@ export function MarqueeRowsEditor({
                   type="button"
                   variant={recentFirst ? "secondary" : "outline"}
                   onClick={() => setRecentFirst((current) => !current)}
+                  className="w-full md:w-fit"
                 >
                   <ImagesIcon />
                   {recentFirst ? "Recent first" : "Oldest first"}
@@ -1059,7 +1066,7 @@ export function MarqueeRowsEditor({
               </div>
 
               {filteredLibraryItems.length ? (
-                <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+                <div className="grid min-w-0 gap-3 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4">
                   {filteredLibraryItems.map((entry) => (
                     <button
                       key={`${entry.rowIndex}-${entry.itemIndex}-${entry.item.id ?? entry.item.src ?? entry.item.icon ?? "asset"}`}

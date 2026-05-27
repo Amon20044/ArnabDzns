@@ -20,10 +20,10 @@ import { cn } from "@/lib/utils";
 
 const STEP_LABEL: Record<UploadStep, string> = {
   queued: "Queued",
-  reading: "Reading file…",
-  decoding: "Decoding image…",
-  converting: "Converting to WebP…",
-  uploading: "Uploading to ImgBB…",
+  reading: "Reading file...",
+  decoding: "Decoding image...",
+  converting: "Converting to WebP...",
+  uploading: "Uploading to ImgBB...",
   done: "Uploaded",
   failed: "Failed",
 };
@@ -38,7 +38,7 @@ const STEP_ORDER: UploadStep[] = [
 ];
 
 function formatBytes(value: number | undefined) {
-  if (!value || !Number.isFinite(value)) return "—";
+  if (!value || !Number.isFinite(value)) return "-";
   if (value < 1024) return `${value} B`;
   if (value < 1024 * 1024) return `${(value / 1024).toFixed(1)} KB`;
   if (value < 1024 * 1024 * 1024)
@@ -52,21 +52,23 @@ export type UploadQueueViewProps = {
   emptyState?: React.ReactNode;
 };
 
-/** Renders an external queue (from useImageUploadQueue). Reusable wherever
- *  step-by-step upload feedback is needed. */
-export function UploadQueueView({ queue, className, emptyState }: UploadQueueViewProps) {
+export function UploadQueueView({
+  queue,
+  className,
+  emptyState,
+}: UploadQueueViewProps) {
   if (!queue.items.length) {
     return emptyState ? <div className={className}>{emptyState}</div> : null;
   }
 
   return (
-    <div className={cn("grid gap-2", className)}>
-      <div className="flex items-center justify-between text-xs text-text-secondary">
-        <span>
-          {queue.summary.completed} done · {queue.summary.inFlight} in flight ·{" "}
-          {queue.summary.failed} failed · {queue.summary.total} total
+    <div className={cn("grid min-w-0 gap-2", className)}>
+      <div className="flex min-w-0 flex-col gap-2 text-xs text-text-secondary sm:flex-row sm:items-center sm:justify-between">
+        <span className="min-w-0">
+          {queue.summary.completed} done / {queue.summary.inFlight} in flight /{" "}
+          {queue.summary.failed} failed / {queue.summary.total} total
         </span>
-        <div className="flex gap-2">
+        <div className="flex shrink-0 flex-wrap gap-2">
           {queue.summary.completed > 0 && (
             <button
               type="button"
@@ -93,7 +95,7 @@ export function UploadQueueView({ queue, className, emptyState }: UploadQueueVie
         />
       </div>
 
-      <ul className="grid gap-2">
+      <ul className="grid min-w-0 gap-2">
         {queue.items.map((item) => (
           <UploadRow
             key={item.id}
@@ -112,11 +114,10 @@ export type ImageBatchUploaderProps = {
   options?: UseImageUploadQueueOptions;
   hideDropZone?: boolean;
   children?: (api: {
-    addFiles: (files: FileList | File[] | null) => void;
+    addFiles: (files: FileList | File[] | null) => string[];
   }) => React.ReactNode;
 };
 
-/** All-in-one uploader: drop zone + queue + per-file step rows. */
 export function ImageBatchUploader({
   className,
   options,
@@ -142,7 +143,7 @@ export function ImageBatchUploader({
   }, []);
 
   return (
-    <div className={cn("grid gap-3", className)}>
+    <div className={cn("grid min-w-0 gap-3", className)}>
       {!hideDropZone && (
         <div
           role="button"
@@ -162,7 +163,7 @@ export function ImageBatchUploader({
           onDragLeave={() => setIsDragOver(false)}
           onDrop={handleDrop}
           className={cn(
-            "flex cursor-pointer flex-col items-center justify-center gap-2 rounded-2xl border-2 border-dashed px-6 py-8 text-sm transition",
+            "flex cursor-pointer flex-col items-center justify-center gap-2 rounded-2xl border-2 border-dashed px-4 py-7 text-center text-sm transition sm:px-6 sm:py-8",
             isDragOver
               ? "border-primary bg-primary/5 text-primary"
               : "border-black/15 bg-white/60 text-text-secondary hover:border-black/35 hover:text-text-primary",
@@ -172,8 +173,9 @@ export function ImageBatchUploader({
           <span className="font-medium">
             Drop images here or click to choose
           </span>
-          <span className="text-[11px] opacity-70">
-            Multiple files supported · processed off-thread · originals kept by default · uploads never expire
+          <span className="max-w-sm text-[11px] leading-5 opacity-70">
+            Multiple files supported / processed off-thread / originals kept by
+            default / uploads never expire
           </span>
           <input
             ref={inputRef}
@@ -207,7 +209,7 @@ function UploadRow({ item, onRetry, onRemove }: UploadRowProps) {
   return (
     <li
       className={cn(
-        "flex items-center gap-3 rounded-2xl border border-black/8 bg-white/85 px-3 py-2 shadow-[0_8px_28px_rgba(15,23,42,0.04)]",
+        "grid min-w-0 grid-cols-[3rem_minmax(0,1fr)] gap-3 rounded-2xl border border-black/8 bg-white/85 px-3 py-3 shadow-[0_8px_28px_rgba(15,23,42,0.04)] sm:flex sm:items-center sm:py-2",
         item.status === "failed" && "border-red-200 bg-red-50/40",
         item.status === "done" && "border-emerald-200/70 bg-emerald-50/40",
       )}
@@ -229,18 +231,18 @@ function UploadRow({ item, onRetry, onRemove }: UploadRowProps) {
       </div>
 
       <div className="grid min-w-0 flex-1 gap-1">
-        <div className="flex flex-wrap items-center justify-between gap-2 text-xs">
+        <div className="grid min-w-0 gap-1 text-xs sm:flex sm:flex-wrap sm:items-center sm:justify-between sm:gap-2">
           <div
             className="min-w-0 truncate font-medium text-text-primary"
             title={item.file.name}
           >
             {item.file.name}
           </div>
-          <div className="flex items-center gap-2 text-[11px] text-text-secondary">
+          <div className="flex min-w-0 flex-wrap items-center gap-1.5 text-[11px] text-text-secondary sm:gap-2">
             <span>{formatBytes(item.byteLength ?? item.file.size)}</span>
             {item.width && item.height ? (
               <span>
-                {item.width}×{item.height}
+                {item.width}x{item.height}
               </span>
             ) : null}
             <StepBadge status={item.status} />
@@ -254,7 +256,7 @@ function UploadRow({ item, onRetry, onRemove }: UploadRowProps) {
         )}
       </div>
 
-      <div className="flex shrink-0 items-center gap-1">
+      <div className="col-span-2 flex shrink-0 justify-end gap-1 sm:col-span-1 sm:items-center">
         {item.status === "failed" && (
           <button
             type="button"
@@ -288,7 +290,7 @@ function StepBadge({ status }: { status: UploadStep }) {
   return (
     <span
       className={cn(
-        "inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-medium uppercase tracking-wide",
+        "inline-flex min-w-0 items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-medium uppercase tracking-wide",
         status === "done"
           ? "bg-emerald-100 text-emerald-700"
           : status === "failed"
@@ -300,7 +302,7 @@ function StepBadge({ status }: { status: UploadStep }) {
     >
       {status === "done" && <CheckIcon className="size-3" />}
       {isWorking && <Loader2Icon className="size-3 animate-spin" />}
-      {STEP_LABEL[status]}
+      <span className="truncate">{STEP_LABEL[status]}</span>
     </span>
   );
 }
@@ -327,14 +329,14 @@ function StepProgress({ item }: { item: UploadItem }) {
           : 0;
 
   return (
-    <div className="grid gap-1">
+    <div className="grid min-w-0 gap-1">
       <div className="h-1 w-full overflow-hidden rounded-full bg-black/8">
         <div
           className="h-full rounded-full bg-primary transition-[width] duration-200 ease-out"
           style={{ width: `${fractional * 100}%` }}
         />
       </div>
-      <div className="flex flex-wrap gap-1 text-[9px] uppercase tracking-wide text-text-secondary">
+      <div className="flex min-w-0 flex-wrap gap-1 text-[9px] uppercase tracking-wide text-text-secondary">
         {STEP_ORDER.filter((step) => step !== "queued").map((step) => (
           <span
             key={step}
