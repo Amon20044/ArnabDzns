@@ -319,7 +319,6 @@ function MarqueeRow({
   const direction = row.direction ?? (rowIndex % 2 === 0 ? "left" : "right");
   const speed = row.speed ?? DEFAULT_SPEED + rowIndex * 8;
   const height = toCssValue(row.height, defaultHeight);
-  const edgePadding = `calc(${itemGap} / 2)`;
   const stackedTileHeight = `calc((${height} - ${itemGap}) / 2)`;
 
   const slots = useMemo<GridSlot[]>(() => {
@@ -560,7 +559,7 @@ function MarqueeRow({
             ref={segmentIndex === 0 ? segmentRef : undefined}
             aria-hidden={segmentIndex > 0}
             className="flex shrink-0 items-stretch"
-            style={{ gap: itemGap, paddingInline: edgePadding }}
+            style={{ gap: itemGap, paddingInlineEnd: itemGap }}
           >
             {expandedSlots.map((slot, slotIndex) => {
               const isPriorityIndex =
@@ -996,8 +995,8 @@ export function ImageMarquee({
   return (
     <section
       className={cn(
-        "relative overflow-x-clip overflow-y-visible bg-transparent [mask-image:linear-gradient(to_right,transparent,black_3%,black_97%,transparent)] [-webkit-mask-image:linear-gradient(to_right,transparent,black_3%,black_97%,transparent)]",
-        fullBleed && "left-1/2 w-screen -translate-x-1/2",
+        "image-marquee-edge-fade relative overflow-x-clip overflow-y-visible bg-transparent",
+        fullBleed && "image-marquee-full-bleed",
         revealOnLoad && "marquee-pixel-tear",
         revealOnLoad && ready && "is-ready",
         className,

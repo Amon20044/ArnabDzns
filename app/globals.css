@@ -299,44 +299,42 @@ body > :is(div, main) {
   }
 }
 
-.home-portfolio-marquee {
-  --marquee-edge-fade: clamp(2rem, 9vw, 4.5rem);
+.image-marquee-full-bleed {
+  width: 100vw;
+  max-width: 100vw;
+  margin-left: calc(50% - 50vw);
+  margin-right: calc(50% - 50vw);
+}
+
+@supports (width: 100dvw) {
+  .image-marquee-full-bleed {
+    width: 100dvw;
+    max-width: 100dvw;
+    margin-left: calc(50% - 50dvw);
+    margin-right: calc(50% - 50dvw);
+  }
+}
+
+.image-marquee-edge-fade {
+  --image-marquee-edge-fade: clamp(2rem, 8vw, 4.75rem);
   -webkit-mask-image: linear-gradient(
     to right,
     transparent 0,
-    black var(--marquee-edge-fade),
-    black calc(100% - var(--marquee-edge-fade)),
+    black var(--image-marquee-edge-fade),
+    black calc(100% - var(--image-marquee-edge-fade)),
     transparent 100%
-  ) !important;
+  );
   mask-image: linear-gradient(
     to right,
     transparent 0,
-    black var(--marquee-edge-fade),
-    black calc(100% - var(--marquee-edge-fade)),
+    black var(--image-marquee-edge-fade),
+    black calc(100% - var(--image-marquee-edge-fade)),
     transparent 100%
-  ) !important;
+  );
 }
 
-@media (max-width: 39.999rem) {
-  .home-portfolio-marquee::before,
-  .home-portfolio-marquee::after {
-    content: "";
-    position: absolute;
-    inset-block: 0;
-    z-index: 4;
-    width: var(--marquee-edge-fade);
-    pointer-events: none;
-  }
-
-  .home-portfolio-marquee::before {
-    left: 0;
-    background: linear-gradient(to right, rgba(255, 255, 255, 0.9), transparent);
-  }
-
-  .home-portfolio-marquee::after {
-    right: 0;
-    background: linear-gradient(to left, rgba(255, 255, 255, 0.9), transparent);
-  }
+.home-portfolio-marquee {
+  --image-marquee-edge-fade: clamp(2rem, 9vw, 4.75rem);
 }
 
 @media (min-width: 40rem) {
