@@ -8,7 +8,7 @@ import {
 } from "@/lib/imgbb";
 
 export const runtime = "nodejs";
-// Allow large originals — the source is uploaded as-is without re-encoding.
+// Allow large originals while Sharp converts them to lossless WebP server-side.
 export const maxDuration = 60;
 
 function toAssetLabel(filename: string) {
@@ -25,13 +25,6 @@ function normalizeAssetLabel(label: string) {
   }
 
   return label.charAt(0).toUpperCase() + label.slice(1);
-}
-
-function readBoolean(value: FormDataEntryValue | null): boolean {
-  if (value === null) return false;
-  if (typeof value !== "string") return false;
-  const normalized = value.trim().toLowerCase();
-  return normalized === "1" || normalized === "true" || normalized === "yes";
 }
 
 async function uploadWithRetry(
@@ -74,24 +67,17 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Convert to lossless WebP only when the client explicitly asks.
-    // Default: preserve the original bytes so fidelity is never touched.
-    const convert =
-      readBoolean(formData.get("convert")) ||
-      readBoolean(formData.get("webp")) ||
-      readBoolean(formData.get("lossless"));
-
     const uploads = await Promise.all(
       files.map(async (file) => {
         if (!file.type.startsWith("image/")) {
           throw new Error(`"${file.name}" is not a supported image file.`);
         }
 
-        // expiration is intentionally NOT passed -> ImgBB stores the image
-        // permanently (never expires).
+        // ImgBB receives a lossless WebP. No resize/crop is applied.
+        // Expiration is intentionally NOT passed, so ImgBB stores it permanently.
         const upload = await uploadWithRetry(file, {
           name: file.name,
-          convert,
+          convert: true,
         });
         const title = normalizeAssetLabel(toAssetLabel(file.name));
         const width = Number(upload.data.width) || upload.source.width;

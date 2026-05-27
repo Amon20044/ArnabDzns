@@ -61,7 +61,7 @@ export type UploadItem = {
 
 export type UseImageUploadQueueOptions = {
   endpoint?: string;
-  /** When true, the worker re-encodes to webp before upload. */
+  /** @deprecated ImgBB uploads now convert to lossless WebP on the server. */
   convert?: boolean;
   /** Max concurrent network uploads. Defaults to 3. */
   maxConcurrentUploads?: number;
@@ -137,7 +137,6 @@ export function useImageUploadQueue(
 ): UseImageUploadQueueReturn {
   const {
     endpoint = "/api/uploads/imgbb",
-    convert = false,
     maxConcurrentUploads = 3,
     serialUploadByteThreshold = DEFAULT_SERIAL_UPLOAD_BYTE_THRESHOLD,
     onAssetUploaded,
@@ -247,8 +246,6 @@ export function useImageUploadQueue(
         new File([blob], filename, { type: mimeType }),
         filename,
       );
-      if (convert) formData.set("convert", "1");
-
       const xhr = new XMLHttpRequest();
       xhrByIdRef.current.set(id, xhr);
       xhr.responseType = "json";
@@ -314,7 +311,6 @@ export function useImageUploadQueue(
     },
     [
       completeNetworkUpload,
-      convert,
       endpoint,
       onAssetUploaded,
       onError,
@@ -393,14 +389,10 @@ export function useImageUploadQueue(
           byteLength: message.byteLength,
         });
 
-        const filename = message.converted
-          ? renameExtension(file.name, "webp")
-          : file.name;
-
         preparedQueueRef.current.push({
           id,
           blob: message.blob,
-          filename,
+          filename: file.name,
           mimeType: message.mimeType,
           byteLength: message.byteLength,
         });
@@ -418,7 +410,7 @@ export function useImageUploadQueue(
           kind: "process",
           id: item.id,
           file: item.file,
-          convert,
+          convert: false,
         };
 
         pool.send({
@@ -439,7 +431,7 @@ export function useImageUploadQueue(
         if (failed) onError?.(failed);
       }
     },
-    [convert, ensurePool, handleWorkerMessage, onError, transitionStatus],
+    [ensurePool, handleWorkerMessage, onError, transitionStatus],
   );
 
   const addFiles = useCallback(
@@ -602,11 +594,4 @@ export function useImageUploadQueue(
   }, [items]);
 
   return { items, addFiles, retry, remove, clear, clearCompleted, summary };
-}
-
-function renameExtension(filename: string, newExt: string) {
-  const lastDot = filename.lastIndexOf(".");
-  const stem =
-    lastDot > 0 ? filename.slice(0, lastDot) : filename || "image";
-  return `${stem}.${newExt}`;
 }

@@ -41,12 +41,11 @@ export type ResolvedImage = {
 };
 
 export type ImgBBUploadOptions = ConvertImageToWebPOptions & {
-  /** Seconds until the image is deleted from ImgBB. Range: 60 – 15,552,000
-   *  (≈ 180 days). **Leave undefined (default) for permanent / never-expiring
-   *  uploads** — ImgBB does not auto-expire images unless this is passed. */
+  /** Seconds until the image is deleted from ImgBB. Range: 60-15,552,000
+   *  (about 180 days). Leave undefined for permanent uploads. */
   expiration?: number;
-  /** When true, the source is re-encoded to lossless WebP via sharp before
-   * uploading. Default false — the original bytes/mime are preserved. */
+  /** Re-encode to lossless WebP via sharp before uploading. Defaults to true.
+   *  The conversion does not resize, crop, or alter the image dimensions. */
   convert?: boolean;
 };
 
@@ -122,6 +121,8 @@ export async function convertImageToLosslessWebP(
   }
 
   const { data, info } = await pipeline
+    // No resize/extract/fitting options are used here. Sharp only normalizes
+    // orientation and encodes the decoded pixels as lossless WebP.
     .webp({
       lossless: true,
       nearLossless: false,
@@ -144,7 +145,7 @@ async function resolveImage(
   input: ImgBBImageInput,
   options: ImgBBUploadOptions,
 ): Promise<ResolvedImage> {
-  if (options.convert) {
+  if (options.convert !== false) {
     const converted = await convertImageToLosslessWebP(input, options);
     return { ...converted, converted: true };
   }

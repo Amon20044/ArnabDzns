@@ -9,6 +9,8 @@ import {
   type CSSProperties,
   type PointerEvent as ReactPointerEvent,
 } from "react";
+import { createPortal } from "react-dom";
+import { ChevronLeftIcon, ChevronRightIcon, XIcon } from "lucide-react";
 import type { IconType } from "react-icons";
 import {
   SiApple,
@@ -157,6 +159,10 @@ function resolveAspectRatio(image: ImageMarqueeItem) {
   }
 
   return DEFAULT_ASPECT_RATIO;
+}
+
+function getMarqueeImageKey(image: ImageMarqueeItem) {
+  return image.id ?? image.src ?? image.title ?? image.alt ?? "";
 }
 
 function buildGridSlots(images: ImageMarqueeItem[]): GridSlot[] {
