@@ -117,7 +117,6 @@ interface MarqueeRowProps {
   rowClassName?: string;
   itemClassName?: string;
   gridMode: boolean;
-  onImageLoad?: (src: string) => void;
   onTileClick?: (image: ImageMarqueeItem) => void;
   draggable: boolean;
   imageQuality: number;
@@ -129,7 +128,7 @@ const DEFAULT_GAP = "1rem";
 const DEFAULT_SPEED = 52;
 const DEFAULT_IMAGE_SIZES =
   "(max-width: 640px) 72vw, (max-width: 1024px) 40vw, 24vw";
-const REVEAL_FALLBACK_MS = 4500;
+const REVEAL_KICKOFF_MS = 220;
 const DRAG_THRESHOLD_PX = 6;
 
 export const CLIENT_ICON_REGISTRY: Record<ClientMarqueeIconId, IconType> = {
@@ -230,7 +229,6 @@ interface GalleryTileProps {
   imageSizes: string;
   priority: boolean;
   itemClassName?: string;
-  onImageLoad?: (src: string) => void;
   onTileClick?: (image: ImageMarqueeItem) => void;
   imageQuality: number;
 }
@@ -243,7 +241,6 @@ function GalleryTile({
   imageSizes,
   priority,
   itemClassName,
-  onImageLoad,
   onTileClick,
   imageQuality,
 }: GalleryTileProps) {
@@ -276,10 +273,8 @@ function GalleryTile({
     >
       <div
         className={cn(
-          "absolute inset-0 transition-[opacity,filter,transform] duration-[1100ms] ease-out",
-          loaded
-            ? "opacity-100 blur-0 scale-100"
-            : "opacity-0 blur-2xl scale-[1.06]",
+          "absolute inset-0 transition-[opacity,filter] duration-[420ms] ease-out",
+          loaded ? "opacity-100 blur-0" : "opacity-0 blur-lg",
         )}
       >
         <Image
@@ -291,10 +286,7 @@ function GalleryTile({
           quality={imageQuality}
           draggable={false}
           className="object-cover transition-transform duration-500 ease-out group-hover:scale-[1.035] select-none pointer-events-none"
-          onLoad={() => {
-            setLoaded(true);
-            onImageLoad?.(imageSrc);
-          }}
+          onLoad={() => setLoaded(true)}
         />
       </div>
     </div>
@@ -313,7 +305,6 @@ function MarqueeRow({
   rowClassName,
   itemClassName,
   gridMode,
-  onImageLoad,
   onTileClick,
   draggable,
   imageQuality,
@@ -638,9 +629,6 @@ function MarqueeRow({
                           priority={image.priority ?? isPriorityIndex}
                           draggable={false}
                           className="object-contain opacity-80 drop-shadow-[0_10px_24px_rgba(15,23,42,0.08)] transition-all duration-300 ease-out group-hover:scale-110 group-hover:opacity-100 select-none pointer-events-none"
-                          onLoad={() => {
-                            if (image.src) onImageLoad?.(image.src);
-                          }}
                         />
                       </div>
                     ) : (
@@ -714,7 +702,6 @@ function MarqueeRow({
                       imageSizes={imageSizes}
                       priority={isPriorityIndex}
                       itemClassName={itemClassName}
-                      onImageLoad={onImageLoad}
                       onTileClick={onTileClick}
                       imageQuality={imageQuality}
                     />
@@ -726,7 +713,6 @@ function MarqueeRow({
                       imageSizes={imageSizes}
                       priority={isPriorityIndex}
                       itemClassName={itemClassName}
-                      onImageLoad={onImageLoad}
                       onTileClick={onTileClick}
                       imageQuality={imageQuality}
                     />
@@ -759,7 +745,6 @@ function MarqueeRow({
                     imageSizes={imageSizes}
                     priority={image.priority ?? isPriorityIndex}
                     itemClassName={itemClassName}
-                    onImageLoad={onImageLoad}
                     onTileClick={onTileClick}
                     imageQuality={imageQuality}
                   />
@@ -773,16 +758,46 @@ function MarqueeRow({
   );
 }
 
-interface LightboxOverlayProps {
-  image: ImageMarqueeItem;
+interface GalleryOverlayProps {
+  images: ImageMarqueeItem[];
+  index: number;
+  onIndexChange: (next: number) => void;
   onClose: () => void;
   imageQuality: number;
 }
 
-function LightboxOverlay({ image, onClose, imageQuality }: LightboxOverlayProps) {
+function GalleryOverlay({
+  images,
+  index,
+  onIndexChange,
+  onClose,
+  imageQuality,
+}: GalleryOverlayProps) {
+  const total = images.length;
+  const safeIndex = Math.min(Math.max(index, 0), Math.max(total - 1, 0));
+  const image = images[safeIndex];
+  const dragRef = useRef<{ active: boolean; pointerId: number; startX: number; moved: boolean }>({
+    active: false,
+    pointerId: -1,
+    startX: 0,
+    moved: false,
+  });
+
+  const goPrev = useCallback(() => {
+    if (total < 2) return;
+    onIndexChange((safeIndex - 1 + total) % total);
+  }, [onIndexChange, safeIndex, total]);
+
+  const goNext = useCallback(() => {
+    if (total < 2) return;
+    onIndexChange((safeIndex + 1) % total);
+  }, [onIndexChange, safeIndex, total]);
+
   useEffect(() => {
     const onKey = (event: KeyboardEvent) => {
       if (event.key === "Escape") onClose();
+      else if (event.key === "ArrowLeft") goPrev();
+      else if (event.key === "ArrowRight") goNext();
     };
     window.addEventListener("keydown", onKey);
     const previousOverflow = document.body.style.overflow;
@@ -791,9 +806,22 @@ function LightboxOverlay({ image, onClose, imageQuality }: LightboxOverlayProps)
       window.removeEventListener("keydown", onKey);
       document.body.style.overflow = previousOverflow;
     };
-  }, [onClose]);
+  }, [goNext, goPrev, onClose]);
 
-  if (!image.src) {
+  useEffect(() => {
+    if (total < 2) return;
+    const adjacent = [
+      images[(safeIndex + 1) % total],
+      images[(safeIndex - 1 + total) % total],
+    ];
+    adjacent.forEach((adj) => {
+      if (!adj?.src) return;
+      const preload = new window.Image();
+      preload.src = adj.src;
+    });
+  }, [images, safeIndex, total]);
+
+  if (!image?.src) {
     return null;
   }
 
@@ -804,18 +832,75 @@ function LightboxOverlay({ image, onClose, imageQuality }: LightboxOverlayProps)
       ? image.height
       : Math.round(intrinsicWidth / aspectRatio);
 
+  const onStagePointerDown = (event: ReactPointerEvent<HTMLDivElement>) => {
+    if (event.pointerType === "mouse" && event.button !== 0) return;
+    dragRef.current = {
+      active: true,
+      pointerId: event.pointerId,
+      startX: event.clientX,
+      moved: false,
+    };
+    event.currentTarget.setPointerCapture(event.pointerId);
+  };
+
+  const onStagePointerMove = (event: ReactPointerEvent<HTMLDivElement>) => {
+    const state = dragRef.current;
+    if (!state.active || event.pointerId !== state.pointerId) return;
+    if (Math.abs(event.clientX - state.startX) > DRAG_THRESHOLD_PX) {
+      state.moved = true;
+    }
+  };
+
+  const onStagePointerUp = (event: ReactPointerEvent<HTMLDivElement>) => {
+    const state = dragRef.current;
+    if (!state.active || event.pointerId !== state.pointerId) return;
+    try {
+      event.currentTarget.releasePointerCapture(event.pointerId);
+    } catch {
+      /* already released */
+    }
+    state.active = false;
+    const delta = event.clientX - state.startX;
+    if (Math.abs(delta) >= 40) {
+      if (delta < 0) goNext();
+      else goPrev();
+    }
+  };
+
   return (
     <div
       role="dialog"
       aria-modal="true"
-      aria-label={image.alt ?? image.title ?? "Image preview"}
-      className="marquee-lightbox fixed inset-0 z-[120] flex items-center justify-center bg-black/85 p-4 backdrop-blur-md sm:p-8"
+      aria-label={image.alt ?? image.title ?? "Image gallery"}
+      className="marquee-lightbox fixed inset-0 z-[120] h-[100dvh] w-[100vw] overflow-hidden bg-black"
       onClick={onClose}
     >
+      <div
+        className="relative h-full w-full select-none touch-pan-y"
+        onClick={(event) => event.stopPropagation()}
+        onPointerDown={onStagePointerDown}
+        onPointerMove={onStagePointerMove}
+        onPointerUp={onStagePointerUp}
+        onPointerCancel={onStagePointerUp}
+      >
+        <Image
+          key={image.src}
+          src={image.src}
+          alt={image.alt ?? ""}
+          width={intrinsicWidth}
+          height={intrinsicHeight}
+          quality={imageQuality}
+          priority
+          sizes="100vw"
+          draggable={false}
+          className="absolute inset-0 h-full w-full select-none object-contain"
+        />
+      </div>
+
       <button
         type="button"
-        aria-label="Close preview"
-        className="absolute right-4 top-4 z-10 inline-flex h-10 w-10 items-center justify-center rounded-full border border-white/20 bg-black/40 text-white transition hover:bg-black/60 sm:right-6 sm:top-6"
+        aria-label="Close gallery"
+        className="absolute right-4 top-4 z-10 inline-flex h-11 w-11 items-center justify-center rounded-full border border-white/20 bg-black/50 text-white backdrop-blur-md transition hover:bg-black/70 sm:right-6 sm:top-6"
         onClick={(event) => {
           event.stopPropagation();
           onClose();
@@ -824,25 +909,39 @@ function LightboxOverlay({ image, onClose, imageQuality }: LightboxOverlayProps)
         <span aria-hidden className="text-xl leading-none">×</span>
       </button>
 
-      <div
-        className="relative flex items-center justify-center"
-        onClick={(event) => event.stopPropagation()}
-        style={{
-          aspectRatio,
-          width: `min(92vw, calc(92vh * ${aspectRatio}))`,
-        }}
-      >
-        <Image
-          src={image.src}
-          alt={image.alt ?? ""}
-          width={intrinsicWidth}
-          height={intrinsicHeight}
-          quality={imageQuality}
-          priority
-          sizes="92vw"
-          className="h-full w-full object-contain"
-        />
-      </div>
+      {total > 1 && (
+        <>
+          <button
+            type="button"
+            aria-label="Previous image"
+            className="absolute left-4 top-1/2 z-10 inline-flex h-12 w-12 -translate-y-1/2 items-center justify-center rounded-full border border-white/20 bg-black/50 text-white backdrop-blur-md transition hover:bg-black/70 sm:left-6 sm:h-14 sm:w-14"
+            onClick={(event) => {
+              event.stopPropagation();
+              goPrev();
+            }}
+          >
+            <span aria-hidden className="text-2xl leading-none">‹</span>
+          </button>
+          <button
+            type="button"
+            aria-label="Next image"
+            className="absolute right-4 top-1/2 z-10 inline-flex h-12 w-12 -translate-y-1/2 items-center justify-center rounded-full border border-white/20 bg-black/50 text-white backdrop-blur-md transition hover:bg-black/70 sm:right-6 sm:h-14 sm:w-14"
+            onClick={(event) => {
+              event.stopPropagation();
+              goNext();
+            }}
+          >
+            <span aria-hidden className="text-2xl leading-none">›</span>
+          </button>
+
+          <div
+            className="pointer-events-none absolute bottom-5 left-1/2 z-10 -translate-x-1/2 rounded-full bg-black/55 px-3 py-1 text-xs font-medium tracking-wide text-white/90 backdrop-blur-md sm:bottom-7 sm:text-sm"
+            aria-live="polite"
+          >
+            {safeIndex + 1} / {total}
+          </div>
+        </>
+      )}
     </div>
   );
 }
@@ -872,55 +971,51 @@ export function ImageMarquee({
 
   const gridMode = arrangeAsGrid && type === "gallery" && rows.length === 1;
 
-  const expectedSrcs = useMemo(() => {
-    const set = new Set<string>();
+  const [ready, setReady] = useState(() => !revealOnLoad);
+  const [galleryIndex, setGalleryIndex] = useState<number | null>(null);
+
+  const galleryImages = useMemo<ImageMarqueeItem[]>(() => {
+    if (!enableLightbox || type !== "gallery") return [];
+    const seen = new Set<string>();
+    const flat: ImageMarqueeItem[] = [];
     for (const row of rows) {
       for (const image of row.images) {
-        if (image.src) set.add(image.src);
+        if (!image.src || seen.has(image.src)) continue;
+        seen.add(image.src);
+        flat.push(image);
       }
     }
-    return set;
-  }, [rows]);
-
-  const expectedCount = expectedSrcs.size;
-  const loadedRef = useRef<Set<string>>(new Set());
-  const [ready, setReady] = useState(
-    () => !revealOnLoad || expectedCount === 0,
-  );
-  const [lightboxImage, setLightboxImage] = useState<ImageMarqueeItem | null>(
-    null,
-  );
-
-  const handleImageLoad = useCallback(
-    (src: string) => {
-      if (!revealOnLoad) return;
-      if (!expectedSrcs.has(src)) return;
-      loadedRef.current.add(src);
-      if (loadedRef.current.size >= expectedCount) {
-        setReady(true);
-      }
-    },
-    [expectedCount, expectedSrcs, revealOnLoad],
-  );
+    return flat;
+  }, [enableLightbox, rows, type]);
 
   useEffect(() => {
-    if (!revealOnLoad || expectedCount === 0) {
-      return;
-    }
+    if (!revealOnLoad) return;
 
-    const fallback = window.setTimeout(() => {
-      setReady(true);
-    }, REVEAL_FALLBACK_MS);
+    // Kick off the reveal on a short skeleton-style timeout. This animates
+    // all tiles at once without waiting for any image load — images keep
+    // streaming in behind the same animation, then per-tile blur-up handles
+    // any that arrive late.
+    let frame = 0;
+    const timer = window.setTimeout(() => {
+      frame = window.requestAnimationFrame(() => setReady(true));
+    }, REVEAL_KICKOFF_MS);
 
-    return () => window.clearTimeout(fallback);
-  }, [expectedCount, revealOnLoad]);
+    return () => {
+      window.clearTimeout(timer);
+      if (frame) window.cancelAnimationFrame(frame);
+    };
+  }, [revealOnLoad]);
 
   const handleTileClick = useMemo(() => {
-    if (!enableLightbox || type !== "gallery") return undefined;
+    if (!enableLightbox || type !== "gallery" || galleryImages.length === 0) {
+      return undefined;
+    }
     return (image: ImageMarqueeItem) => {
-      if (image.src) setLightboxImage(image);
+      if (!image.src) return;
+      const idx = galleryImages.findIndex((entry) => entry.src === image.src);
+      setGalleryIndex(idx === -1 ? 0 : idx);
     };
-  }, [enableLightbox, type]);
+  }, [enableLightbox, galleryImages, type]);
 
   if (!rows.length) {
     return null;
@@ -951,17 +1046,18 @@ export function ImageMarquee({
             rowClassName={rowClassName}
             itemClassName={itemClassName}
             gridMode={gridMode}
-            onImageLoad={handleImageLoad}
             onTileClick={handleTileClick}
             draggable={draggable}
             imageQuality={imageQuality}
           />
         ))}
       </div>
-      {lightboxImage && (
-        <LightboxOverlay
-          image={lightboxImage}
-          onClose={() => setLightboxImage(null)}
+      {galleryIndex !== null && galleryImages.length > 0 && (
+        <GalleryOverlay
+          images={galleryImages}
+          index={galleryIndex}
+          onIndexChange={setGalleryIndex}
+          onClose={() => setGalleryIndex(null)}
           imageQuality={imageQuality}
         />
       )}

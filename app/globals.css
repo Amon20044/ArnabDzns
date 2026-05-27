@@ -357,13 +357,13 @@ body > :is(div, main) {
 
 .marquee-pixel-tear {
   opacity: 0;
-  visibility: hidden;
+  filter: blur(40px) saturate(0.3) contrast(1.4) brightness(0.7);
+  transform: scale3d(1.05, 1.05, 1);
   will-change: opacity, filter, transform;
 }
 
 .marquee-pixel-tear.is-ready {
-  visibility: visible;
-  animation: marquee-pixel-tear 1800ms cubic-bezier(0.19, 1, 0.22, 1) forwards;
+  animation: marquee-pixel-tear 900ms cubic-bezier(0.19, 1, 0.22, 1) forwards;
 }
 
 .marquee-pixel-tear::after {
@@ -379,7 +379,7 @@ body > :is(div, main) {
 }
 
 .marquee-pixel-tear.is-ready::after {
-  animation: marquee-pixel-tear-noise 1800ms cubic-bezier(0.19, 1, 0.22, 1) forwards;
+  animation: marquee-pixel-tear-noise 900ms cubic-bezier(0.19, 1, 0.22, 1) forwards;
 }
 
 .site-boot-content {
@@ -814,26 +814,14 @@ body > :is(div, main) {
 @keyframes marquee-pixel-tear {
   0% {
     opacity: 0;
-    filter: blur(44px) saturate(0.25) contrast(1.5) brightness(0.65);
-    transform: scale3d(1.08, 1.08, 1);
+    filter: blur(40px) saturate(0.3) contrast(1.4) brightness(0.7);
+    transform: scale3d(1.05, 1.05, 1);
   }
 
-  22% {
-    opacity: 0.35;
-    filter: blur(30px) saturate(0.45) contrast(1.4) brightness(0.8);
-    transform: scale3d(1.06, 1.06, 1);
-  }
-
-  48% {
-    opacity: 0.7;
-    filter: blur(16px) saturate(0.75) contrast(1.25) brightness(0.95);
-    transform: scale3d(1.035, 1.035, 1);
-  }
-
-  72% {
-    opacity: 0.92;
-    filter: blur(6px) saturate(1.08) contrast(1.1) brightness(1.04);
-    transform: scale3d(1.015, 1.015, 1);
+  45% {
+    opacity: 0.85;
+    filter: blur(10px) saturate(0.9) contrast(1.15) brightness(0.98);
+    transform: scale3d(1.02, 1.02, 1);
   }
 
   100% {
@@ -848,16 +836,12 @@ body > :is(div, main) {
     opacity: 0;
   }
 
-  12% {
-    opacity: 0.95;
+  18% {
+    opacity: 0.9;
   }
 
-  45% {
-    opacity: 0.55;
-  }
-
-  75% {
-    opacity: 0.2;
+  60% {
+    opacity: 0.35;
   }
 
   100% {
