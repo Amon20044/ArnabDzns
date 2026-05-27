@@ -2,7 +2,20 @@
 
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { useDeferredValue, useEffect, useMemo, useRef, useState, useTransition } from "react";
+import {
+  useCallback,
+  useDeferredValue,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
+import { UploadQueueView } from "@/components/uploads/image-batch-uploader";
+import {
+  useImageUploadQueue,
+  type UploadItem,
+  type UploadedAsset,
+} from "@/lib/uploads/use-image-upload-queue";
 import {
   ArrowDownIcon,
   ArrowUpIcon,
@@ -422,13 +435,66 @@ export function MarqueeRowsEditor({
   const router = useRouter();
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const [pickerState, setPickerState] = useState<PickerState>(null);
+  const pickerStateRef = useRef<PickerState>(null);
+  pickerStateRef.current = pickerState;
   const [seoState, setSeoState] = useState<SeoState>(null);
   const [assetSearch, setAssetSearch] = useState("");
   const deferredAssetSearch = useDeferredValue(assetSearch.trim().toLowerCase());
   const [recentFirst, setRecentFirst] = useState(true);
   const [uploadError, setUploadError] = useState("");
-  const [isUploading, startUploadTransition] = useTransition();
   const [isPersistingRows, setIsPersistingRows] = useState(false);
+  const targetByItemIdRef = useRef<Map<string, PickerState>>(new Map());
+
+  const redirectToLoginRef = useRef<() => void>(() => {});
+
+  const handleAssetUploaded = useCallback(
+    (asset: UploadedAsset, item: UploadItem) => {
+      const target =
+        targetByItemIdRef.current.get(item.id) ?? pickerStateRef.current;
+      if (!target) return;
+      const marqueeItem = uploadedAssetToMarqueeItem(asset, type);
+      const { nextRows } = insertAssetsIntoTargetRef.current(target, [marqueeItem]);
+      // Update picker target so subsequent files in the same batch slot into
+      // the row at a stable index (after the most recent insertion).
+      targetByItemIdRef.current.delete(item.id);
+      if (nextRows && onPersistRows) {
+        setIsPersistingRows(true);
+        void onPersistRows(nextRows).then((saved) => {
+          setIsPersistingRows(false);
+          if (!saved) {
+            setUploadError(
+              "Image uploaded, but MongoDB did not save the row yet.",
+            );
+          }
+        });
+      }
+    },
+    [onPersistRows, type],
+  );
+
+  const handleUploadError = useCallback((item: UploadItem) => {
+    if (item.error) setUploadError(item.error);
+  }, []);
+
+  const handleUnauthorized = useCallback(() => {
+    redirectToLoginRef.current();
+  }, []);
+
+  const uploadQueue = useImageUploadQueue({
+    onAssetUploaded: handleAssetUploaded,
+    onError: handleUploadError,
+    onUnauthorized: handleUnauthorized,
+  });
+  const isUploading = uploadQueue.summary.inFlight > 0;
+
+  // Forward-declare a stable ref to insertAssetsIntoTarget — it's defined
+  // below in the component scope but the upload callback above needs it.
+  const insertAssetsIntoTargetRef = useRef<
+    (target: PickerState, assets: ImageMarqueeItem[]) => {
+      nextRows: ImageMarqueeRow[] | null;
+      firstInsertedIndex: number | null;
+    }
+  >(() => ({ nextRows: null, firstInsertedIndex: null }));
 
   const pickerRow = pickerState ? rows[pickerState.rowIndex] : undefined;
   const seoItem = seoState
@@ -501,6 +567,7 @@ export function MarqueeRowsEditor({
     router.replace(`/login?next=${encodeURIComponent(nextPath)}`);
     router.refresh();
   }
+  redirectToLoginRef.current = redirectToLogin;
 
   function updateRow(rowIndex: number, nextRow: ImageMarqueeRow) {
     onChange(updateArrayItem(rows, rowIndex, nextRow));
@@ -573,6 +640,7 @@ export function MarqueeRowsEditor({
       firstInsertedIndex,
     };
   }
+  insertAssetsIntoTargetRef.current = insertAssetsIntoTarget;
 
   function openPicker(rowIndex: number, replaceIndex?: number) {
     setUploadError("");
@@ -624,70 +692,14 @@ export function MarqueeRowsEditor({
       return;
     }
 
+    setUploadError("");
     const target = pickerState;
+    const ids = uploadQueue.addFiles(files);
+    ids.forEach((id) => targetByItemIdRef.current.set(id, target));
 
-    startUploadTransition(async () => {
-      try {
-        setUploadError("");
-
-        const uploadedAssets: ImageMarqueeItem[] = [];
-
-        for (const file of files) {
-          const formData = new FormData();
-          formData.set("file", file);
-
-          const response = await fetch("/api/uploads/imgbb", {
-            method: "POST",
-            body: formData,
-            credentials: "same-origin",
-          });
-          const result = (await response.json()) as UploadResponse;
-
-          if (response.status === 401) {
-            redirectToLogin();
-            return;
-          }
-
-          if (!response.ok || !result.assets?.length) {
-            throw new Error(result.error ?? "ImgBB upload failed.");
-          }
-
-          uploadedAssets.push(
-            ...result.assets.map((asset) => uploadedAssetToMarqueeItem(asset, type)),
-          );
-        }
-
-        const { nextRows, firstInsertedIndex } = insertAssetsIntoTarget(target, uploadedAssets);
-
-        if (nextRows && onPersistRows) {
-          setIsPersistingRows(true);
-          const saved = await onPersistRows(nextRows);
-          setIsPersistingRows(false);
-
-          if (!saved) {
-            setUploadError("Images uploaded, but MongoDB did not save the row yet.");
-            return;
-          }
-        }
-
-        setPickerState(null);
-
-        if (typeof firstInsertedIndex === "number") {
-          setSeoState({
-            rowIndex: target.rowIndex,
-            itemIndex: firstInsertedIndex,
-          });
-        }
-      } catch (error) {
-        setUploadError(
-          error instanceof Error ? error.message : "Image upload failed.",
-        );
-      } finally {
-        if (fileInputRef.current) {
-          fileInputRef.current.value = "";
-        }
-      }
-    });
+    if (fileInputRef.current) {
+      fileInputRef.current.value = "";
+    }
   }
 
   function updateSeoItem(nextItem: ImageMarqueeItem) {
@@ -1010,6 +1022,14 @@ export function MarqueeRowsEditor({
                     {uploadError}
                   </p>
                 ) : null}
+                <UploadQueueView
+                  queue={uploadQueue}
+                  emptyState={
+                    <p className="text-[11px] text-muted-foreground">
+                      Files you pick will appear here with per-step progress (reading, decoding, converting, uploading) so you can see exactly what's happening.
+                    </p>
+                  }
+                />
               </div>
             </div>
 

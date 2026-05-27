@@ -1,6 +1,5 @@
 "use client";
 
-import Image from "next/image";
 import {
   useCallback,
   useEffect,
@@ -72,7 +71,6 @@ export interface ImageMarqueeProps {
   fullBleed?: boolean;
   hoverSlowdownFactor?: number;
   minItemsPerRow?: number;
-  imageSizes?: string;
   /**
    * When true and only one row is provided (gallery type), groups consecutive
    * landscape (w>h) tiles into 2-up stacked columns; portraits and any
@@ -89,8 +87,6 @@ export interface ImageMarqueeProps {
   draggable?: boolean;
   /** Open a centered full-view overlay when a gallery tile is clicked. */
   enableLightbox?: boolean;
-  /** quality forwarded to next/image; 100 keeps webp output near-lossless. */
-  imageQuality?: number;
 }
 
 type GridSlot =
@@ -113,21 +109,17 @@ interface MarqueeRowProps {
   itemGap: string;
   hoverSlowdownFactor: number;
   minItemsPerRow: number;
-  imageSizes: string;
   rowClassName?: string;
   itemClassName?: string;
   gridMode: boolean;
   onTileClick?: (image: ImageMarqueeItem) => void;
   draggable: boolean;
-  imageQuality: number;
 }
 
 const DEFAULT_ASPECT_RATIO = 16 / 9;
 const DEFAULT_HEIGHT = "clamp(8.25rem, 18vw, 13rem)";
 const DEFAULT_GAP = "1rem";
 const DEFAULT_SPEED = 52;
-const DEFAULT_IMAGE_SIZES =
-  "(max-width: 640px) 72vw, (max-width: 1024px) 40vw, 24vw";
 const REVEAL_KICKOFF_MS = 220;
 const DRAG_THRESHOLD_PX = 6;
 
@@ -226,11 +218,9 @@ interface GalleryTileProps {
   height: string;
   width?: string;
   aspectRatio: number;
-  imageSizes: string;
   priority: boolean;
   itemClassName?: string;
   onTileClick?: (image: ImageMarqueeItem) => void;
-  imageQuality: number;
 }
 
 function GalleryTile({
@@ -238,11 +228,9 @@ function GalleryTile({
   height,
   width,
   aspectRatio,
-  imageSizes,
   priority,
   itemClassName,
   onTileClick,
-  imageQuality,
 }: GalleryTileProps) {
   const [loaded, setLoaded] = useState(false);
   const imageSrc = image.src;
@@ -277,16 +265,18 @@ function GalleryTile({
           loaded ? "opacity-100 blur-0" : "opacity-0 blur-lg",
         )}
       >
-        <Image
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
           src={imageSrc}
           alt={image.alt ?? ""}
-          fill
-          sizes={imageSizes}
-          priority={priority}
-          quality={imageQuality}
+          loading={priority ? "eager" : "lazy"}
+          decoding="async"
+          fetchPriority={priority ? "high" : "auto"}
           draggable={false}
-          className="object-cover transition-transform duration-500 ease-out group-hover:scale-[1.035] select-none pointer-events-none"
+          referrerPolicy="no-referrer-when-downgrade"
+          className="absolute inset-0 h-full w-full object-cover transition-transform duration-500 ease-out group-hover:scale-[1.035] select-none pointer-events-none"
           onLoad={() => setLoaded(true)}
+          onError={() => setLoaded(true)}
         />
       </div>
     </div>
@@ -301,13 +291,11 @@ function MarqueeRow({
   itemGap,
   hoverSlowdownFactor,
   minItemsPerRow,
-  imageSizes,
   rowClassName,
   itemClassName,
   gridMode,
   onTileClick,
   draggable,
-  imageQuality,
 }: MarqueeRowProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const trackRef = useRef<HTMLDivElement>(null);
@@ -585,9 +573,6 @@ function MarqueeRow({
                 const ClientIcon = image.icon
                   ? CLIENT_ICON_REGISTRY[image.icon]
                   : undefined;
-                const imageSrc = image.src;
-                const isSvgImage =
-                  imageSrc?.toLowerCase().endsWith(".svg") ?? false;
                 const clientLogoAspectRatio = Math.max(
                   0.85,
                   Math.min(aspectRatio, 7.25),
@@ -619,16 +604,20 @@ function MarqueeRow({
                       </div>
                     ) : image.src ? (
                       <div className="relative h-full w-full">
-                        <Image
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img
                           src={image.src}
                           alt={clientLabel}
-                          fill
-                          sizes={imageSizes}
-                          unoptimized={isSvgImage}
-                          quality={imageQuality}
-                          priority={image.priority ?? isPriorityIndex}
+                          loading={
+                            image.priority ?? isPriorityIndex ? "eager" : "lazy"
+                          }
+                          decoding="async"
+                          fetchPriority={
+                            image.priority ?? isPriorityIndex ? "high" : "auto"
+                          }
                           draggable={false}
-                          className="object-contain opacity-80 drop-shadow-[0_10px_24px_rgba(15,23,42,0.08)] transition-all duration-300 ease-out group-hover:scale-110 group-hover:opacity-100 select-none pointer-events-none"
+                          referrerPolicy="no-referrer-when-downgrade"
+                          className="absolute inset-0 h-full w-full object-contain opacity-80 drop-shadow-[0_10px_24px_rgba(15,23,42,0.08)] transition-all duration-300 ease-out group-hover:scale-110 group-hover:opacity-100 select-none pointer-events-none"
                         />
                       </div>
                     ) : (
@@ -699,22 +688,18 @@ function MarqueeRow({
                       height={stackedTileHeight}
                       width="100%"
                       aspectRatio={resolveAspectRatio(topImage)}
-                      imageSizes={imageSizes}
                       priority={isPriorityIndex}
                       itemClassName={itemClassName}
                       onTileClick={onTileClick}
-                      imageQuality={imageQuality}
                     />
                     <GalleryTile
                       image={bottomImage}
                       height={stackedTileHeight}
                       width="100%"
                       aspectRatio={resolveAspectRatio(bottomImage)}
-                      imageSizes={imageSizes}
                       priority={isPriorityIndex}
                       itemClassName={itemClassName}
                       onTileClick={onTileClick}
-                      imageQuality={imageQuality}
                     />
                   </article>
                 );
@@ -742,11 +727,9 @@ function MarqueeRow({
                     image={image}
                     height={height}
                     aspectRatio={aspectRatio}
-                    imageSizes={imageSizes}
                     priority={image.priority ?? isPriorityIndex}
                     itemClassName={itemClassName}
                     onTileClick={onTileClick}
-                    imageQuality={imageQuality}
                   />
                 </article>
               );
@@ -763,7 +746,6 @@ interface GalleryOverlayProps {
   index: number;
   onIndexChange: (next: number) => void;
   onClose: () => void;
-  imageQuality: number;
 }
 
 function GalleryOverlay({
@@ -771,7 +753,6 @@ function GalleryOverlay({
   index,
   onIndexChange,
   onClose,
-  imageQuality,
 }: GalleryOverlayProps) {
   const total = images.length;
   const safeIndex = Math.min(Math.max(index, 0), Math.max(total - 1, 0));
@@ -825,13 +806,6 @@ function GalleryOverlay({
     return null;
   }
 
-  const aspectRatio = resolveAspectRatio(image);
-  const intrinsicWidth = typeof image.width === "number" ? image.width : 1920;
-  const intrinsicHeight =
-    typeof image.height === "number"
-      ? image.height
-      : Math.round(intrinsicWidth / aspectRatio);
-
   const onStagePointerDown = (event: ReactPointerEvent<HTMLDivElement>) => {
     if (event.pointerType === "mouse" && event.button !== 0) return;
     dragRef.current = {
@@ -883,16 +857,16 @@ function GalleryOverlay({
         onPointerUp={onStagePointerUp}
         onPointerCancel={onStagePointerUp}
       >
-        <Image
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
           key={image.src}
           src={image.src}
           alt={image.alt ?? ""}
-          width={intrinsicWidth}
-          height={intrinsicHeight}
-          quality={imageQuality}
-          priority
-          sizes="100vw"
+          loading="eager"
+          decoding="async"
+          fetchPriority="high"
           draggable={false}
+          referrerPolicy="no-referrer-when-downgrade"
           className="absolute inset-0 h-full w-full select-none object-contain"
         />
       </div>
@@ -958,12 +932,10 @@ export function ImageMarquee({
   fullBleed = false,
   hoverSlowdownFactor = 0.28,
   minItemsPerRow = 8,
-  imageSizes = DEFAULT_IMAGE_SIZES,
   arrangeAsGrid = false,
   revealOnLoad = false,
   draggable = false,
   enableLightbox = false,
-  imageQuality = 100,
 }: ImageMarqueeProps) {
   const resolvedHeight = toCssValue(height, DEFAULT_HEIGHT);
   const resolvedRowGap = toCssValue(rowGap, DEFAULT_GAP);
@@ -1042,13 +1014,11 @@ export function ImageMarquee({
             itemGap={resolvedItemGap}
             hoverSlowdownFactor={hoverSlowdownFactor}
             minItemsPerRow={minItemsPerRow}
-            imageSizes={imageSizes}
             rowClassName={rowClassName}
             itemClassName={itemClassName}
             gridMode={gridMode}
             onTileClick={handleTileClick}
             draggable={draggable}
-            imageQuality={imageQuality}
           />
         ))}
       </div>
@@ -1058,7 +1028,6 @@ export function ImageMarquee({
           index={galleryIndex}
           onIndexChange={setGalleryIndex}
           onClose={() => setGalleryIndex(null)}
-          imageQuality={imageQuality}
         />
       )}
     </section>

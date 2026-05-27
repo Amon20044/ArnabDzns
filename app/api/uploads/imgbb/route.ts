@@ -1,8 +1,15 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { requireAdminRequest } from "@/lib/auth/api";
-import { uploadImageToImgBB } from "@/lib/imgbb";
+import {
+  uploadImageToImgBB,
+  type ImgBBImageInput,
+  type ImgBBUploadOptions,
+  type ImgBBUploadResult,
+} from "@/lib/imgbb";
 
 export const runtime = "nodejs";
+// Allow large originals — the source is uploaded as-is without re-encoding.
+export const maxDuration = 60;
 
 function toAssetLabel(filename: string) {
   return filename
@@ -18,6 +25,32 @@ function normalizeAssetLabel(label: string) {
   }
 
   return label.charAt(0).toUpperCase() + label.slice(1);
+}
+
+function readBoolean(value: FormDataEntryValue | null): boolean {
+  if (value === null) return false;
+  if (typeof value !== "string") return false;
+  const normalized = value.trim().toLowerCase();
+  return normalized === "1" || normalized === "true" || normalized === "yes";
+}
+
+async function uploadWithRetry(
+  input: ImgBBImageInput,
+  options: ImgBBUploadOptions,
+  attempts = 3,
+): Promise<ImgBBUploadResult> {
+  let lastError: unknown;
+  for (let attempt = 1; attempt <= attempts; attempt++) {
+    try {
+      return await uploadImageToImgBB(input, options);
+    } catch (error) {
+      lastError = error;
+      if (attempt === attempts) break;
+      const backoff = 350 * Math.pow(2, attempt - 1);
+      await new Promise((resolve) => setTimeout(resolve, backoff));
+    }
+  }
+  throw lastError instanceof Error ? lastError : new Error("ImgBB upload failed.");
 }
 
 export async function POST(request: NextRequest) {
@@ -41,18 +74,28 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // Convert to lossless WebP only when the client explicitly asks.
+    // Default: preserve the original bytes so fidelity is never touched.
+    const convert =
+      readBoolean(formData.get("convert")) ||
+      readBoolean(formData.get("webp")) ||
+      readBoolean(formData.get("lossless"));
+
     const uploads = await Promise.all(
       files.map(async (file) => {
         if (!file.type.startsWith("image/")) {
           throw new Error(`"${file.name}" is not a supported image file.`);
         }
 
-        const upload = await uploadImageToImgBB(file, {
+        // expiration is intentionally NOT passed -> ImgBB stores the image
+        // permanently (never expires).
+        const upload = await uploadWithRetry(file, {
           name: file.name,
+          convert,
         });
         const title = normalizeAssetLabel(toAssetLabel(file.name));
-        const width = Number(upload.data.width) || upload.converted.width;
-        const height = Number(upload.data.height) || upload.converted.height;
+        const width = Number(upload.data.width) || upload.source.width;
+        const height = Number(upload.data.height) || upload.source.height;
 
         return {
           id: upload.data.id,
@@ -65,6 +108,9 @@ export async function POST(request: NextRequest) {
           alt: title,
           title,
           desc: "",
+          mimeType: upload.source.mimeType,
+          byteLength: upload.source.byteLength,
+          converted: upload.source.converted,
         };
       }),
     );

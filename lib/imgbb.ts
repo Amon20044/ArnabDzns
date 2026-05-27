@@ -5,7 +5,6 @@ import { basename, parse } from "node:path";
 import sharp from "sharp";
 
 const IMGBB_UPLOAD_URL = "https://api.imgbb.com/1/upload";
-const IMGBB_MAX_UPLOAD_BYTES = 32 * 1024 * 1024;
 const WEBP_MIME_TYPE = "image/webp";
 
 export type ImgBBImageInput =
@@ -31,9 +30,24 @@ export type LosslessWebPImage = {
   height?: number;
 };
 
+export type ResolvedImage = {
+  buffer: Buffer;
+  filename: string;
+  mimeType: string;
+  byteLength: number;
+  width?: number;
+  height?: number;
+  converted: boolean;
+};
+
 export type ImgBBUploadOptions = ConvertImageToWebPOptions & {
+  /** Seconds until the image is deleted from ImgBB. Range: 60 – 15,552,000
+   *  (≈ 180 days). **Leave undefined (default) for permanent / never-expiring
+   *  uploads** — ImgBB does not auto-expire images unless this is passed. */
   expiration?: number;
-  maxUploadBytes?: number;
+  /** When true, the source is re-encoded to lossless WebP via sharp before
+   * uploading. Default false — the original bytes/mime are preserved. */
+  convert?: boolean;
 };
 
 export type ImgBBImageVariant = {
@@ -65,7 +79,10 @@ export type ImgBBUploadResult = {
   success: true;
   status: number;
   data: ImgBBUploadData;
-  converted: LosslessWebPImage;
+  source: ResolvedImage;
+  /** @deprecated kept for backwards compatibility; equals `source` when no
+   *  conversion was requested. */
+  converted: ResolvedImage;
   url: string;
   displayUrl: string;
   viewerUrl: string;
@@ -82,6 +99,7 @@ type ImgBBApiResponse = {
 type ReadImageInputResult = {
   buffer: Buffer;
   filename: string;
+  mimeType?: string;
 };
 
 export async function convertImageToLosslessWebP(
@@ -108,7 +126,7 @@ export async function convertImageToLosslessWebP(
       lossless: true,
       nearLossless: false,
       quality: 100,
-      effort: 6,
+      effort: 9,
     })
     .toBuffer({ resolveWithObject: true });
 
@@ -122,17 +140,65 @@ export async function convertImageToLosslessWebP(
   };
 }
 
+async function resolveImage(
+  input: ImgBBImageInput,
+  options: ImgBBUploadOptions,
+): Promise<ResolvedImage> {
+  if (options.convert) {
+    const converted = await convertImageToLosslessWebP(input, options);
+    return { ...converted, converted: true };
+  }
+
+  const source = await readImageInput(input, options.name);
+
+  if (source.buffer.byteLength === 0) {
+    throw new Error("Cannot upload an empty image.");
+  }
+
+  const mimeType =
+    source.mimeType?.toLowerCase() ??
+    mimeTypeFromFilename(source.filename) ??
+    "application/octet-stream";
+
+  const dimensions = await readImageDimensionsSafely(source.buffer);
+
+  return {
+    buffer: source.buffer,
+    filename: source.filename || "image",
+    mimeType,
+    byteLength: source.buffer.byteLength,
+    width: dimensions?.width,
+    height: dimensions?.height,
+    converted: false,
+  };
+}
+
+async function readImageDimensionsSafely(buffer: Buffer) {
+  try {
+    const meta = await sharp(buffer, { failOn: "none" }).metadata();
+    return { width: meta.width, height: meta.height };
+  } catch {
+    return undefined;
+  }
+}
+
 export async function uploadImageToImgBB(
   input: ImgBBImageInput,
   options: ImgBBUploadOptions = {},
 ): Promise<ImgBBUploadResult> {
-  const converted = await convertImageToLosslessWebP(input, options);
-  assertUploadSize(converted.byteLength, options.maxUploadBytes);
+  const source = await resolveImage(input, options);
 
   const endpoint = new URL(IMGBB_UPLOAD_URL);
   endpoint.searchParams.set("key", readImgBBKey());
 
-  if (options.expiration !== undefined) {
+  // Only forward an expiration when the caller passes a positive integer.
+  // Default behaviour: NO `expiration` query param -> ImgBB stores the image
+  // permanently. A null / 0 / negative value is treated as "never expire".
+  if (
+    typeof options.expiration === "number" &&
+    Number.isFinite(options.expiration) &&
+    options.expiration > 0
+  ) {
     endpoint.searchParams.set(
       "expiration",
       String(validateExpiration(options.expiration)),
@@ -142,8 +208,8 @@ export async function uploadImageToImgBB(
   const formData = new FormData();
   formData.set(
     "image",
-    new Blob([toArrayBuffer(converted.buffer)], { type: converted.mimeType }),
-    converted.filename,
+    new Blob([toArrayBuffer(source.buffer)], { type: source.mimeType }),
+    source.filename,
   );
 
   const response = await fetch(endpoint, {
@@ -162,7 +228,8 @@ export async function uploadImageToImgBB(
     success: true,
     status: payload.status ?? response.status,
     data: payload.data,
-    converted,
+    source,
+    converted: source,
     url: payload.data.image?.url ?? payload.data.url,
     displayUrl: payload.data.display_url,
     viewerUrl: payload.data.url_viewer,
@@ -233,6 +300,7 @@ async function readImageInput(
     return {
       buffer: Buffer.from(await input.arrayBuffer()),
       filename: preferredName ?? readBlobName(input) ?? "image",
+      mimeType: input.type || undefined,
     };
   }
 
@@ -258,6 +326,7 @@ function readImageDataUrl(
       ? Buffer.from(data, "base64")
       : Buffer.from(decodeURIComponent(data), "utf8"),
     filename: preferredName ?? `image.${extensionFromMimeType(mimeType)}`,
+    mimeType,
   };
 }
 
@@ -296,6 +365,7 @@ async function fetchImageUrl(
       preferredName ??
       safeDecodeURIComponent(basename(url.pathname)) ??
       "image",
+    mimeType: contentType ?? undefined,
   };
 }
 
@@ -317,6 +387,36 @@ function extensionFromMimeType(mimeType: string) {
   }
 
   return mimeType.split("/").at(1)?.replace("+xml", "") || "image";
+}
+
+function mimeTypeFromFilename(filename: string) {
+  const ext = parse(filename).ext.toLowerCase().replace(/^\./, "");
+  switch (ext) {
+    case "jpg":
+    case "jpeg":
+      return "image/jpeg";
+    case "png":
+      return "image/png";
+    case "webp":
+      return "image/webp";
+    case "gif":
+      return "image/gif";
+    case "avif":
+      return "image/avif";
+    case "bmp":
+      return "image/bmp";
+    case "svg":
+      return "image/svg+xml";
+    case "tif":
+    case "tiff":
+      return "image/tiff";
+    case "heic":
+      return "image/heic";
+    case "heif":
+      return "image/heif";
+    default:
+      return undefined;
+  }
 }
 
 function toWebPFilename(filename: string) {
@@ -348,14 +448,6 @@ function validateExpiration(expiration: number) {
   }
 
   return expiration;
-}
-
-function assertUploadSize(byteLength: number, maxUploadBytes = IMGBB_MAX_UPLOAD_BYTES) {
-  if (byteLength > maxUploadBytes) {
-    throw new Error(
-      `Converted WebP is ${byteLength} bytes, which is above ImgBB's ${maxUploadBytes} byte upload limit.`,
-    );
-  }
 }
 
 function toArrayBuffer(buffer: Buffer) {
