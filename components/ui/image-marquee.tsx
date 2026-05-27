@@ -8,6 +8,7 @@ import {
   useRef,
   useState,
   type CSSProperties,
+  type PointerEvent as ReactPointerEvent,
 } from "react";
 import type { IconType } from "react-icons";
 import {
@@ -45,13 +46,9 @@ export interface ImageMarqueeItem {
   height?: number;
   aspectRatio?: number;
   priority?: boolean;
-  /** Client / brand name (used when type="clients") */
   client?: string;
-  /** Link to client website or relevant page */
   link?: string;
-  /** Local icon id for client marquees, used instead of remote image URLs. */
   icon?: ClientMarqueeIconId;
-  /** Optional brand color applied to icon-only client items. */
   iconColor?: string;
 }
 
@@ -65,7 +62,6 @@ export interface ImageMarqueeRow {
 
 export interface ImageMarqueeProps {
   rows: ImageMarqueeRow[];
-  /** "gallery" (default) renders full images; "clients" renders compact logos */
   type?: "gallery" | "clients";
   height?: number | string;
   rowGap?: number | string;
@@ -79,17 +75,22 @@ export interface ImageMarqueeProps {
   imageSizes?: string;
   /**
    * When true and only one row is provided (gallery type), groups consecutive
-   * landscape (w>h) images into 2-up stacked columns; portrait images and
-   * odd-leftover landscapes occupy the full row height. Disabled for
-   * multi-row marquees so 3-row layouts never split.
+   * landscape (w>h) tiles into 2-up stacked columns; portraits and any
+   * odd-leftover landscape render full-height. Disabled for multi-row.
    */
   arrangeAsGrid?: boolean;
-  /**
-   * When true, the entire marquee is hidden until every image has loaded,
-   * then enters with a "pixel tear" reveal (blur + saturate + scale + noise).
-   * Individual images also fade-blur in as they decode.
-   */
+  /** Hide the marquee until all images have loaded, then play a pixel-tear reveal. */
   revealOnLoad?: boolean;
+  /**
+   * Allow pointer/touch drag to manually scrub the rows. While dragging, the
+   * auto-animation pauses. A click that exceeds the drag threshold is
+   * suppressed so it doesn't open the lightbox.
+   */
+  draggable?: boolean;
+  /** Open a centered full-view overlay when a gallery tile is clicked. */
+  enableLightbox?: boolean;
+  /** quality forwarded to next/image; 100 keeps webp output near-lossless. */
+  imageQuality?: number;
 }
 
 type GridSlot =
@@ -117,6 +118,9 @@ interface MarqueeRowProps {
   itemClassName?: string;
   gridMode: boolean;
   onImageLoad?: (src: string) => void;
+  onTileClick?: (image: ImageMarqueeItem) => void;
+  draggable: boolean;
+  imageQuality: number;
 }
 
 const DEFAULT_ASPECT_RATIO = 16 / 9;
@@ -126,6 +130,7 @@ const DEFAULT_SPEED = 52;
 const DEFAULT_IMAGE_SIZES =
   "(max-width: 640px) 72vw, (max-width: 1024px) 40vw, 24vw";
 const REVEAL_FALLBACK_MS = 4500;
+const DRAG_THRESHOLD_PX = 6;
 
 export const CLIENT_ICON_REGISTRY: Record<ClientMarqueeIconId, IconType> = {
   apple: SiApple,
@@ -217,9 +222,8 @@ function expandSlots<T>(items: T[], minimumItems: number): T[] {
   return expanded;
 }
 
-interface MarqueeTileProps {
+interface GalleryTileProps {
   image: ImageMarqueeItem;
-  type: "gallery" | "clients";
   height: string;
   width?: string;
   aspectRatio: number;
@@ -227,6 +231,8 @@ interface MarqueeTileProps {
   priority: boolean;
   itemClassName?: string;
   onImageLoad?: (src: string) => void;
+  onTileClick?: (image: ImageMarqueeItem) => void;
+  imageQuality: number;
 }
 
 function GalleryTile({
@@ -238,7 +244,9 @@ function GalleryTile({
   priority,
   itemClassName,
   onImageLoad,
-}: Omit<MarqueeTileProps, "type">) {
+  onTileClick,
+  imageQuality,
+}: GalleryTileProps) {
   const [loaded, setLoaded] = useState(false);
   const imageSrc = image.src;
 
@@ -246,13 +254,25 @@ function GalleryTile({
     return null;
   }
 
+  const clickable = Boolean(onTileClick);
+
   return (
     <div
       className={cn(
         "relative overflow-hidden rounded-[0.5rem] transition-transform duration-300 ease-out group-hover:-translate-y-1",
+        clickable && "cursor-zoom-in",
         itemClassName,
       )}
       style={{ aspectRatio, height, width }}
+      onClick={
+        clickable
+          ? (event) => {
+              event.preventDefault();
+              event.stopPropagation();
+              onTileClick?.(image);
+            }
+          : undefined
+      }
     >
       <div
         className={cn(
@@ -268,7 +288,9 @@ function GalleryTile({
           fill
           sizes={imageSizes}
           priority={priority}
-          className="object-cover transition-transform duration-500 ease-out group-hover:scale-[1.035]"
+          quality={imageQuality}
+          draggable={false}
+          className="object-cover transition-transform duration-500 ease-out group-hover:scale-[1.035] select-none pointer-events-none"
           onLoad={() => {
             setLoaded(true);
             onImageLoad?.(imageSrc);
@@ -292,6 +314,9 @@ function MarqueeRow({
   itemClassName,
   gridMode,
   onImageLoad,
+  onTileClick,
+  draggable,
+  imageQuality,
 }: MarqueeRowProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const trackRef = useRef<HTMLDivElement>(null);
@@ -302,6 +327,14 @@ function MarqueeRow({
   const speedScaleRef = useRef(1);
   const frameRef = useRef<number | null>(null);
   const nextSegmentKeyRef = useRef(2);
+  const dragRef = useRef({
+    pointerId: -1,
+    active: false,
+    moved: false,
+    startX: 0,
+    startOffset: 0,
+  });
+  const applyTransformRef = useRef<() => void>(() => {});
   const [segmentKeys, setSegmentKeys] = useState([0, 1]);
 
   const direction = row.direction ?? (rowIndex % 2 === 0 ? "left" : "right");
@@ -351,13 +384,14 @@ function MarqueeRow({
 
       track.style.transform = `translate3d(${translateX}px, 0px, 0px)`;
     };
+    applyTransformRef.current = applyTransform;
 
     const updateMetrics = () => {
       widthRef.current = segment.getBoundingClientRect().width;
       const containerWidth = container.getBoundingClientRect().width;
 
       if (widthRef.current > 0) {
-        offsetRef.current %= widthRef.current;
+        offsetRef.current = ((offsetRef.current % widthRef.current) + widthRef.current) % widthRef.current;
       } else {
         offsetRef.current = 0;
       }
@@ -397,6 +431,8 @@ function MarqueeRow({
 
       if (mediaQuery.matches || widthRef.current === 0) {
         track.style.transform = "translate3d(0px, 0px, 0px)";
+      } else if (dragRef.current.active) {
+        // While dragging, leave offset untouched; pointer handlers apply transform directly.
       } else {
         const targetScale = hoverRef.current ? hoverSlowdownFactor : 1;
         speedScaleRef.current += (targetScale - speedScaleRef.current) * 0.08;
@@ -449,6 +485,75 @@ function MarqueeRow({
     };
   }, [direction, hoverSlowdownFactor, expandedSlots.length, speed]);
 
+  const wrapOffset = useCallback((next: number) => {
+    const width = widthRef.current;
+    if (!width) return 0;
+    return ((next % width) + width) % width;
+  }, []);
+
+  const onPointerDown = useCallback(
+    (event: ReactPointerEvent<HTMLDivElement>) => {
+      if (!draggable) return;
+      if (event.pointerType === "mouse" && event.button !== 0) return;
+      const target = event.currentTarget;
+      target.setPointerCapture(event.pointerId);
+      dragRef.current = {
+        pointerId: event.pointerId,
+        active: true,
+        moved: false,
+        startX: event.clientX,
+        startOffset: offsetRef.current,
+      };
+      hoverRef.current = true;
+    },
+    [draggable],
+  );
+
+  const onPointerMove = useCallback(
+    (event: ReactPointerEvent<HTMLDivElement>) => {
+      if (!draggable) return;
+      const state = dragRef.current;
+      if (!state.active || event.pointerId !== state.pointerId) return;
+
+      const deltaRaw = event.clientX - state.startX;
+      if (!state.moved && Math.abs(deltaRaw) > DRAG_THRESHOLD_PX) {
+        state.moved = true;
+      }
+
+      const directionSign = direction === "left" ? 1 : -1;
+      offsetRef.current = wrapOffset(state.startOffset - deltaRaw * directionSign);
+      applyTransformRef.current();
+    },
+    [direction, draggable, wrapOffset],
+  );
+
+  const releasePointer = useCallback(
+    (event: ReactPointerEvent<HTMLDivElement>) => {
+      const state = dragRef.current;
+      if (!state.active || event.pointerId !== state.pointerId) return;
+      try {
+        event.currentTarget.releasePointerCapture(event.pointerId);
+      } catch {
+        /* pointer may already be released */
+      }
+      state.active = false;
+      hoverRef.current = false;
+    },
+    [],
+  );
+
+  const onClickCapture = useCallback(
+    (event: React.MouseEvent<HTMLDivElement>) => {
+      if (!draggable) return;
+      if (dragRef.current.moved) {
+        event.preventDefault();
+        event.stopPropagation();
+        dragRef.current.moved = false;
+      }
+    },
+    [draggable],
+  );
+
   if (!expandedSlots.length) {
     return null;
   }
@@ -458,7 +563,16 @@ function MarqueeRow({
   return (
     <div
       ref={containerRef}
-      className={cn("overflow-hidden py-2 bg-transparent", rowClassName)}
+      className={cn(
+        "relative bg-transparent select-none",
+        draggable && "touch-pan-y cursor-grab active:cursor-grabbing",
+        rowClassName,
+      )}
+      onPointerDown={onPointerDown}
+      onPointerMove={onPointerMove}
+      onPointerUp={releasePointer}
+      onPointerCancel={releasePointer}
+      onClickCapture={onClickCapture}
     >
       <div ref={trackRef} className="flex w-max will-change-transform">
         {segmentKeys.map((segmentKey, segmentIndex) => (
@@ -470,7 +584,8 @@ function MarqueeRow({
             style={{ gap: itemGap, paddingInline: edgePadding }}
           >
             {expandedSlots.map((slot, slotIndex) => {
-              const isPriorityIndex = segmentIndex === 0 && rowIndex === 0 && slotIndex < 2;
+              const isPriorityIndex =
+                segmentIndex === 0 && rowIndex === 0 && slotIndex < 2;
 
               if (isClient && slot.kind === "single") {
                 const image = slot.image;
@@ -480,7 +595,8 @@ function MarqueeRow({
                   ? CLIENT_ICON_REGISTRY[image.icon]
                   : undefined;
                 const imageSrc = image.src;
-                const isSvgImage = imageSrc?.toLowerCase().endsWith(".svg") ?? false;
+                const isSvgImage =
+                  imageSrc?.toLowerCase().endsWith(".svg") ?? false;
                 const clientLogoAspectRatio = Math.max(
                   0.85,
                   Math.min(aspectRatio, 7.25),
@@ -493,7 +609,10 @@ function MarqueeRow({
                       "relative flex items-center justify-center",
                       itemClassName,
                     )}
-                    style={{ height, width: image.src ? clientLogoWidth : undefined }}
+                    style={{
+                      height,
+                      width: image.src ? clientLogoWidth : undefined,
+                    }}
                   >
                     {ClientIcon ? (
                       <div
@@ -515,8 +634,10 @@ function MarqueeRow({
                           fill
                           sizes={imageSizes}
                           unoptimized={isSvgImage}
+                          quality={imageQuality}
                           priority={image.priority ?? isPriorityIndex}
-                          className="object-contain opacity-80 drop-shadow-[0_10px_24px_rgba(15,23,42,0.08)] transition-all duration-300 ease-out group-hover:scale-110 group-hover:opacity-100"
+                          draggable={false}
+                          className="object-contain opacity-80 drop-shadow-[0_10px_24px_rgba(15,23,42,0.08)] transition-all duration-300 ease-out group-hover:scale-110 group-hover:opacity-100 select-none pointer-events-none"
                           onLoad={() => {
                             if (image.src) onImageLoad?.(image.src);
                           }}
@@ -533,9 +654,7 @@ function MarqueeRow({
                 return (
                   <article
                     key={`${image.id ?? image.src ?? image.icon ?? image.client ?? "marquee-item"}-${segmentIndex}-${slotIndex}`}
-                    className={cn(
-                      "group relative shrink-0 marquee-logo-reveal",
-                    )}
+                    className="group relative shrink-0 marquee-logo-reveal"
                     style={
                       {
                         "--marquee-logo-delay": `${180 + Math.min(slotIndex, 8) * 52}ms`,
@@ -545,7 +664,7 @@ function MarqueeRow({
                       hoverRef.current = true;
                     }}
                     onPointerLeave={() => {
-                      hoverRef.current = false;
+                      if (!dragRef.current.active) hoverRef.current = false;
                     }}
                   >
                     {image.link ? (
@@ -577,7 +696,7 @@ function MarqueeRow({
                       hoverRef.current = true;
                     }}
                     onPointerLeave={() => {
-                      hoverRef.current = false;
+                      if (!dragRef.current.active) hoverRef.current = false;
                     }}
                     style={{
                       height,
@@ -596,6 +715,8 @@ function MarqueeRow({
                       priority={isPriorityIndex}
                       itemClassName={itemClassName}
                       onImageLoad={onImageLoad}
+                      onTileClick={onTileClick}
+                      imageQuality={imageQuality}
                     />
                     <GalleryTile
                       image={bottomImage}
@@ -606,6 +727,8 @@ function MarqueeRow({
                       priority={isPriorityIndex}
                       itemClassName={itemClassName}
                       onImageLoad={onImageLoad}
+                      onTileClick={onTileClick}
+                      imageQuality={imageQuality}
                     />
                   </article>
                 );
@@ -626,7 +749,7 @@ function MarqueeRow({
                     hoverRef.current = true;
                   }}
                   onPointerLeave={() => {
-                    hoverRef.current = false;
+                    if (!dragRef.current.active) hoverRef.current = false;
                   }}
                 >
                   <GalleryTile
@@ -637,12 +760,88 @@ function MarqueeRow({
                     priority={image.priority ?? isPriorityIndex}
                     itemClassName={itemClassName}
                     onImageLoad={onImageLoad}
+                    onTileClick={onTileClick}
+                    imageQuality={imageQuality}
                   />
                 </article>
               );
             })}
           </div>
         ))}
+      </div>
+    </div>
+  );
+}
+
+interface LightboxOverlayProps {
+  image: ImageMarqueeItem;
+  onClose: () => void;
+  imageQuality: number;
+}
+
+function LightboxOverlay({ image, onClose, imageQuality }: LightboxOverlayProps) {
+  useEffect(() => {
+    const onKey = (event: KeyboardEvent) => {
+      if (event.key === "Escape") onClose();
+    };
+    window.addEventListener("keydown", onKey);
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => {
+      window.removeEventListener("keydown", onKey);
+      document.body.style.overflow = previousOverflow;
+    };
+  }, [onClose]);
+
+  if (!image.src) {
+    return null;
+  }
+
+  const aspectRatio = resolveAspectRatio(image);
+  const intrinsicWidth = typeof image.width === "number" ? image.width : 1920;
+  const intrinsicHeight =
+    typeof image.height === "number"
+      ? image.height
+      : Math.round(intrinsicWidth / aspectRatio);
+
+  return (
+    <div
+      role="dialog"
+      aria-modal="true"
+      aria-label={image.alt ?? image.title ?? "Image preview"}
+      className="marquee-lightbox fixed inset-0 z-[120] flex items-center justify-center bg-black/85 p-4 backdrop-blur-md sm:p-8"
+      onClick={onClose}
+    >
+      <button
+        type="button"
+        aria-label="Close preview"
+        className="absolute right-4 top-4 z-10 inline-flex h-10 w-10 items-center justify-center rounded-full border border-white/20 bg-black/40 text-white transition hover:bg-black/60 sm:right-6 sm:top-6"
+        onClick={(event) => {
+          event.stopPropagation();
+          onClose();
+        }}
+      >
+        <span aria-hidden className="text-xl leading-none">×</span>
+      </button>
+
+      <div
+        className="relative flex items-center justify-center"
+        onClick={(event) => event.stopPropagation()}
+        style={{
+          aspectRatio,
+          width: `min(92vw, calc(92vh * ${aspectRatio}))`,
+        }}
+      >
+        <Image
+          src={image.src}
+          alt={image.alt ?? ""}
+          width={intrinsicWidth}
+          height={intrinsicHeight}
+          quality={imageQuality}
+          priority
+          sizes="92vw"
+          className="h-full w-full object-contain"
+        />
       </div>
     </div>
   );
@@ -663,13 +862,14 @@ export function ImageMarquee({
   imageSizes = DEFAULT_IMAGE_SIZES,
   arrangeAsGrid = false,
   revealOnLoad = false,
+  draggable = false,
+  enableLightbox = false,
+  imageQuality = 100,
 }: ImageMarqueeProps) {
   const resolvedHeight = toCssValue(height, DEFAULT_HEIGHT);
   const resolvedRowGap = toCssValue(rowGap, DEFAULT_GAP);
   const resolvedItemGap = toCssValue(itemGap, DEFAULT_GAP);
 
-  // Grid arrangement is only available for single-row gallery marquees,
-  // so the 3-row portfolio layout and the multi-row client layout never split.
   const gridMode = arrangeAsGrid && type === "gallery" && rows.length === 1;
 
   const expectedSrcs = useMemo(() => {
@@ -686,6 +886,9 @@ export function ImageMarquee({
   const loadedRef = useRef<Set<string>>(new Set());
   const [ready, setReady] = useState(
     () => !revealOnLoad || expectedCount === 0,
+  );
+  const [lightboxImage, setLightboxImage] = useState<ImageMarqueeItem | null>(
+    null,
   );
 
   const handleImageLoad = useCallback(
@@ -712,6 +915,13 @@ export function ImageMarquee({
     return () => window.clearTimeout(fallback);
   }, [expectedCount, revealOnLoad]);
 
+  const handleTileClick = useMemo(() => {
+    if (!enableLightbox || type !== "gallery") return undefined;
+    return (image: ImageMarqueeItem) => {
+      if (image.src) setLightboxImage(image);
+    };
+  }, [enableLightbox, type]);
+
   if (!rows.length) {
     return null;
   }
@@ -719,7 +929,7 @@ export function ImageMarquee({
   return (
     <section
       className={cn(
-        "relative overflow-hidden bg-transparent py-2 [mask-image:linear-gradient(to_right,transparent,black_3%,black_97%,transparent)] [-webkit-mask-image:linear-gradient(to_right,transparent,black_3%,black_97%,transparent)]",
+        "relative overflow-x-clip overflow-y-visible bg-transparent [mask-image:linear-gradient(to_right,transparent,black_3%,black_97%,transparent)] [-webkit-mask-image:linear-gradient(to_right,transparent,black_3%,black_97%,transparent)]",
         fullBleed && "left-1/2 w-screen -translate-x-1/2",
         revealOnLoad && "marquee-pixel-tear",
         revealOnLoad && ready && "is-ready",
@@ -742,9 +952,19 @@ export function ImageMarquee({
             itemClassName={itemClassName}
             gridMode={gridMode}
             onImageLoad={handleImageLoad}
+            onTileClick={handleTileClick}
+            draggable={draggable}
+            imageQuality={imageQuality}
           />
         ))}
       </div>
+      {lightboxImage && (
+        <LightboxOverlay
+          image={lightboxImage}
+          onClose={() => setLightboxImage(null)}
+          imageQuality={imageQuality}
+        />
+      )}
     </section>
   );
 }

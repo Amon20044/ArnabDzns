@@ -56,6 +56,8 @@ export default async function Home() {
             fullBleed
             arrangeAsGrid
             revealOnLoad
+            draggable
+            enableLightbox
           />
         </section>
         <div id="portfolio" data-nav-section="portfolio" className="scroll-target">
@@ -66,9 +68,10 @@ export default async function Home() {
               height="var(--portfolio-marquee-row-height)"
               rowGap="var(--portfolio-marquee-gap)"
               itemGap="var(--portfolio-marquee-gap)"
-              className="home-portfolio-marquee h-full py-0 sm:h-auto sm:py-2"
-              rowClassName="py-0 sm:py-2"
+              className="home-portfolio-marquee h-full sm:h-auto"
               fullBleed
+              draggable
+              enableLightbox
             />
           </section>
         </div>
