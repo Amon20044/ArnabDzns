@@ -746,23 +746,34 @@ function MarqueeRow({
   );
 }
 
-interface GalleryOverlayProps {
+type GalleryLightboxState = {
   images: ImageMarqueeItem[];
-  index: number;
-  onIndexChange: (next: number) => void;
+  activeId: string;
+};
+
+interface GalleryOverlayProps {
+  state: GalleryLightboxState;
+  onActiveIdChange: (nextId: string) => void;
   onClose: () => void;
 }
 
 function GalleryOverlay({
-  images,
-  index,
-  onIndexChange,
+  state,
+  onActiveIdChange,
   onClose,
 }: GalleryOverlayProps) {
-  const total = images.length;
-  const safeIndex = Math.min(Math.max(index, 0), Math.max(total - 1, 0));
-  const image = images[safeIndex];
-  const dragRef = useRef<{ active: boolean; pointerId: number; startX: number; moved: boolean }>({
+  const total = state.images.length;
+  const activeIndex = state.images.findIndex(
+    (entry) => getMarqueeImageKey(entry) === state.activeId,
+  );
+  const safeIndex = activeIndex >= 0 ? activeIndex : 0;
+  const image = state.images[safeIndex];
+  const dragRef = useRef<{
+    active: boolean;
+    pointerId: number;
+    startX: number;
+    moved: boolean;
+  }>({
     active: false,
     pointerId: -1,
     startX: 0,
@@ -771,13 +782,17 @@ function GalleryOverlay({
 
   const goPrev = useCallback(() => {
     if (total < 2) return;
-    onIndexChange((safeIndex - 1 + total) % total);
-  }, [onIndexChange, safeIndex, total]);
+    const nextImage = state.images[(safeIndex - 1 + total) % total];
+    const nextId = nextImage ? getMarqueeImageKey(nextImage) : "";
+    if (nextId) onActiveIdChange(nextId);
+  }, [onActiveIdChange, safeIndex, state.images, total]);
 
   const goNext = useCallback(() => {
     if (total < 2) return;
-    onIndexChange((safeIndex + 1) % total);
-  }, [onIndexChange, safeIndex, total]);
+    const nextImage = state.images[(safeIndex + 1) % total];
+    const nextId = nextImage ? getMarqueeImageKey(nextImage) : "";
+    if (nextId) onActiveIdChange(nextId);
+  }, [onActiveIdChange, safeIndex, state.images, total]);
 
   useEffect(() => {
     const onKey = (event: KeyboardEvent) => {
@@ -787,27 +802,30 @@ function GalleryOverlay({
     };
     window.addEventListener("keydown", onKey);
     const previousOverflow = document.body.style.overflow;
+    const previousDocumentOverflow = document.documentElement.style.overflow;
     document.body.style.overflow = "hidden";
+    document.documentElement.style.overflow = "hidden";
     return () => {
       window.removeEventListener("keydown", onKey);
       document.body.style.overflow = previousOverflow;
+      document.documentElement.style.overflow = previousDocumentOverflow;
     };
   }, [goNext, goPrev, onClose]);
 
   useEffect(() => {
     if (total < 2) return;
     const adjacent = [
-      images[(safeIndex + 1) % total],
-      images[(safeIndex - 1 + total) % total],
+      state.images[(safeIndex + 1) % total],
+      state.images[(safeIndex - 1 + total) % total],
     ];
     adjacent.forEach((adj) => {
       if (!adj?.src) return;
       const preload = new window.Image();
       preload.src = adj.src;
     });
-  }, [images, safeIndex, total]);
+  }, [safeIndex, state.images, total]);
 
-  if (!image?.src) {
+  if (!image?.src || typeof document === "undefined") {
     return null;
   }
 
@@ -823,57 +841,75 @@ function GalleryOverlay({
   };
 
   const onStagePointerMove = (event: ReactPointerEvent<HTMLDivElement>) => {
-    const state = dragRef.current;
-    if (!state.active || event.pointerId !== state.pointerId) return;
-    if (Math.abs(event.clientX - state.startX) > DRAG_THRESHOLD_PX) {
-      state.moved = true;
+    const dragState = dragRef.current;
+    if (!dragState.active || event.pointerId !== dragState.pointerId) return;
+    if (Math.abs(event.clientX - dragState.startX) > DRAG_THRESHOLD_PX) {
+      dragState.moved = true;
     }
   };
 
   const onStagePointerUp = (event: ReactPointerEvent<HTMLDivElement>) => {
-    const state = dragRef.current;
-    if (!state.active || event.pointerId !== state.pointerId) return;
+    const dragState = dragRef.current;
+    if (!dragState.active || event.pointerId !== dragState.pointerId) return;
     try {
       event.currentTarget.releasePointerCapture(event.pointerId);
     } catch {
       /* already released */
     }
-    state.active = false;
-    const delta = event.clientX - state.startX;
+    dragState.active = false;
+    const delta = event.clientX - dragState.startX;
     if (Math.abs(delta) >= 40) {
       if (delta < 0) goNext();
       else goPrev();
     }
   };
 
-  return (
+  const onStagePointerCancel = (event: ReactPointerEvent<HTMLDivElement>) => {
+    const dragState = dragRef.current;
+    if (!dragState.active || event.pointerId !== dragState.pointerId) return;
+    try {
+      event.currentTarget.releasePointerCapture(event.pointerId);
+    } catch {
+      /* already released */
+    }
+    dragState.active = false;
+  };
+
+  return createPortal(
     <div
       role="dialog"
       aria-modal="true"
       aria-label={image.alt ?? image.title ?? "Image gallery"}
-      className="marquee-lightbox fixed inset-0 z-[120] h-[100dvh] w-[100vw] overflow-hidden bg-black"
+      className="marquee-lightbox fixed inset-0 z-[120] h-[100dvh] w-[100dvw] overflow-hidden bg-black/88 backdrop-blur-md"
       onClick={onClose}
     >
       <div
         className="relative h-full w-full select-none touch-pan-y"
-        onClick={(event) => event.stopPropagation()}
+        onClick={(event) => {
+          if (!dragRef.current.moved) return;
+          event.stopPropagation();
+          dragRef.current.moved = false;
+        }}
         onPointerDown={onStagePointerDown}
         onPointerMove={onStagePointerMove}
         onPointerUp={onStagePointerUp}
-        onPointerCancel={onStagePointerUp}
+        onPointerCancel={onStagePointerCancel}
       >
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
-          key={image.src}
-          src={image.src}
-          alt={image.alt ?? ""}
-          loading="eager"
-          decoding="async"
-          fetchPriority="high"
-          draggable={false}
-          referrerPolicy="no-referrer-when-downgrade"
-          className="absolute inset-0 h-full w-full select-none object-contain"
-        />
+        <div className="absolute inset-0 flex items-center justify-center px-3 py-16 sm:px-20 sm:py-20">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            key={image.src}
+            src={image.src}
+            alt={image.alt ?? ""}
+            loading="eager"
+            decoding="async"
+            fetchPriority="high"
+            draggable={false}
+            referrerPolicy="no-referrer-when-downgrade"
+            className="max-h-full max-w-full select-none object-contain shadow-[0_24px_90px_rgba(0,0,0,0.45)]"
+            onClick={(event) => event.stopPropagation()}
+          />
+        </div>
       </div>
 
       <button
@@ -885,7 +921,7 @@ function GalleryOverlay({
           onClose();
         }}
       >
-        <span aria-hidden className="text-xl leading-none">×</span>
+        <XIcon className="size-5" aria-hidden />
       </button>
 
       {total > 1 && (
@@ -899,7 +935,7 @@ function GalleryOverlay({
               goPrev();
             }}
           >
-            <span aria-hidden className="text-2xl leading-none">‹</span>
+            <ChevronLeftIcon className="size-6" aria-hidden />
           </button>
           <button
             type="button"
@@ -910,7 +946,7 @@ function GalleryOverlay({
               goNext();
             }}
           >
-            <span aria-hidden className="text-2xl leading-none">›</span>
+            <ChevronRightIcon className="size-6" aria-hidden />
           </button>
 
           <div
@@ -921,7 +957,8 @@ function GalleryOverlay({
           </div>
         </>
       )}
-    </div>
+    </div>,
+    document.body,
   );
 }
 
@@ -949,7 +986,8 @@ export function ImageMarquee({
   const gridMode = arrangeAsGrid && type === "gallery" && rows.length === 1;
 
   const [ready, setReady] = useState(() => !revealOnLoad);
-  const [galleryIndex, setGalleryIndex] = useState<number | null>(null);
+  const [lightboxState, setLightboxState] =
+    useState<GalleryLightboxState | null>(null);
 
   const galleryImages = useMemo<ImageMarqueeItem[]>(() => {
     if (!enableLightbox || type !== "gallery") return [];
@@ -957,8 +995,9 @@ export function ImageMarquee({
     const flat: ImageMarqueeItem[] = [];
     for (const row of rows) {
       for (const image of row.images) {
-        if (!image.src || seen.has(image.src)) continue;
-        seen.add(image.src);
+        const imageKey = getMarqueeImageKey(image);
+        if (!image.src || !imageKey || seen.has(imageKey)) continue;
+        seen.add(imageKey);
         flat.push(image);
       }
     }
@@ -989,8 +1028,9 @@ export function ImageMarquee({
     }
     return (image: ImageMarqueeItem) => {
       if (!image.src) return;
-      const idx = galleryImages.findIndex((entry) => entry.src === image.src);
-      setGalleryIndex(idx === -1 ? 0 : idx);
+      const activeId = getMarqueeImageKey(image);
+      if (!activeId) return;
+      setLightboxState({ images: galleryImages, activeId });
     };
   }, [enableLightbox, galleryImages, type]);
 
@@ -1027,14 +1067,17 @@ export function ImageMarquee({
           />
         ))}
       </div>
-      {galleryIndex !== null && galleryImages.length > 0 && (
+      {lightboxState ? (
         <GalleryOverlay
-          images={galleryImages}
-          index={galleryIndex}
-          onIndexChange={setGalleryIndex}
-          onClose={() => setGalleryIndex(null)}
+          state={lightboxState}
+          onActiveIdChange={(activeId) => {
+            setLightboxState((current) =>
+              current ? { ...current, activeId } : current,
+            );
+          }}
+          onClose={() => setLightboxState(null)}
         />
-      )}
+      ) : null}
     </section>
   );
 }

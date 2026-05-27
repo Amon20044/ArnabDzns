@@ -127,7 +127,7 @@ export async function convertImageToLosslessWebP(
       lossless: true,
       nearLossless: false,
       quality: 100,
-      effort: 9,
+      effort: 6,
     })
     .toBuffer({ resolveWithObject: true });
 

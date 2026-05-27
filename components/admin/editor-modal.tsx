@@ -55,7 +55,9 @@ export function EditorModal({
     }
 
     const previousBodyOverflow = document.body.style.overflow;
+    const previousDocumentOverflow = document.documentElement.style.overflow;
     document.body.style.overflow = "hidden";
+    document.documentElement.style.overflow = "hidden";
     window.dispatchEvent(
       new CustomEvent(MODAL_SCROLL_LOCK_EVENT, {
         detail: { locked: true },
@@ -69,6 +71,7 @@ export function EditorModal({
 
     return () => {
       document.body.style.overflow = previousBodyOverflow;
+      document.documentElement.style.overflow = previousDocumentOverflow;
       window.dispatchEvent(
         new CustomEvent(MODAL_SCROLL_LOCK_EVENT, {
           detail: { locked: false },
@@ -82,7 +85,7 @@ export function EditorModal({
     <AnimatePresence>
       {open ? (
         <motion.div
-          className="fixed inset-0 z-50 flex items-start justify-center px-2 py-2 sm:px-6 sm:py-8"
+          className="fixed inset-0 z-[80] flex items-stretch justify-center px-2 py-2 sm:items-start sm:px-6 sm:py-8"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
@@ -100,7 +103,7 @@ export function EditorModal({
             aria-labelledby={titleId}
             aria-describedby={description ? descriptionId : undefined}
             className={cn(
-              "relative z-10 flex max-h-[calc(100dvh-1rem)] w-full min-w-0 flex-col overflow-hidden rounded-[1.1rem] border border-white/70 bg-[linear-gradient(180deg,rgba(255,255,255,0.98)_0%,rgba(247,247,250,0.94)_100%)] shadow-[0_30px_90px_rgba(15,23,42,0.2)] ring-1 ring-black/5 sm:max-h-[calc(100dvh-4rem)] sm:rounded-[2rem]",
+              "relative z-10 flex h-full max-h-[calc(100dvh-1rem)] w-full min-w-0 flex-col overflow-hidden rounded-[1.1rem] border border-white/70 bg-[linear-gradient(180deg,rgba(255,255,255,0.98)_0%,rgba(247,247,250,0.94)_100%)] shadow-[0_30px_90px_rgba(15,23,42,0.2)] ring-1 ring-black/5 sm:h-auto sm:max-h-[calc(100dvh-4rem)] sm:rounded-[2rem]",
               SIZE_CLASSNAMES[size],
             )}
             initial={{ opacity: 0, y: 20, scale: 0.98 }}
