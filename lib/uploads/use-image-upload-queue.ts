@@ -61,12 +61,11 @@ export type UploadItem = {
 
 export type UseImageUploadQueueOptions = {
   endpoint?: string;
-  /** When true, the worker re-encodes to webp via OffscreenCanvas before
-   *  upload. Default false — original bytes/mime ship as-is. */
+  /** When true, the worker re-encodes to webp before upload. */
   convert?: boolean;
   /** Max concurrent network uploads. Defaults to 3. */
   maxConcurrentUploads?: number;
-  /** Files larger than this are uploaded one at a time to avoid memory spikes. */
+  /** Files larger than this upload one at a time. Defaults to 16 MiB; set 0 to disable. */
   serialUploadByteThreshold?: number;
   onAssetUploaded?: (asset: UploadedAsset, item: UploadItem) => void;
   onError?: (item: UploadItem) => void;
@@ -75,7 +74,7 @@ export type UseImageUploadQueueOptions = {
 
 export type UseImageUploadQueueReturn = {
   items: UploadItem[];
-  /** Returns the ids assigned to the newly-queued files. */
+  /** Returns the ids assigned to the newly queued files. */
   addFiles: (files: FileList | File[] | null) => string[];
   retry: (id: string) => void;
   remove: (id: string) => void;
@@ -90,6 +89,23 @@ export type UseImageUploadQueueReturn = {
   };
 };
 
+type PreparedUpload = {
+  id: string;
+  blob: Blob;
+  filename: string;
+  mimeType: string;
+  byteLength: number;
+};
+
+const DEFAULT_SERIAL_UPLOAD_BYTE_THRESHOLD = 16 * 1024 * 1024;
+const SUPPORTED_IMAGE_NAME_RE = /\.(svg|heic|heif|avif)$/i;
+
+export function isSupportedImageUploadFile(file: File) {
+  return (
+    file.type.startsWith("image/") || SUPPORTED_IMAGE_NAME_RE.test(file.name)
+  );
+}
+
 function randomId() {
   if (typeof crypto !== "undefined" && "randomUUID" in crypto) {
     return crypto.randomUUID();
@@ -101,6 +117,21 @@ function isTerminalStep(step: UploadStep) {
   return step === "done" || step === "failed";
 }
 
+function readStepProgress(item: UploadItem) {
+  if (item.status === "done") return 1;
+  if (item.status === "uploading") {
+    return 0.6 + Math.max(0, Math.min(1, item.progress)) * 0.4;
+  }
+  if (item.status === "converting") return 0.5;
+  if (item.status === "decoding") return 0.35;
+  if (item.status === "reading") return 0.2;
+  return 0;
+}
+
+function readErrorMessage(error: unknown, fallback: string) {
+  return error instanceof Error ? error.message : fallback;
+}
+
 export function useImageUploadQueue(
   options: UseImageUploadQueueOptions = {},
 ): UseImageUploadQueueReturn {
@@ -108,6 +139,7 @@ export function useImageUploadQueue(
     endpoint = "/api/uploads/imgbb",
     convert = false,
     maxConcurrentUploads = 3,
+    serialUploadByteThreshold = DEFAULT_SERIAL_UPLOAD_BYTE_THRESHOLD,
     onAssetUploaded,
     onError,
     onUnauthorized,
@@ -116,12 +148,59 @@ export function useImageUploadQueue(
   const [items, setItems] = useState<UploadItem[]>([]);
   const itemsRef = useRef<UploadItem[]>([]);
   const poolRef = useRef<WorkerPool | null>(null);
-  const preparedQueueRef = useRef<{ id: string; blob: Blob; filename: string; mimeType: string }[]>([]);
+  const preparedQueueRef = useRef<PreparedUpload[]>([]);
   const uploadInFlightRef = useRef(0);
+  const serialUploadInFlightRef = useRef(false);
+  const pumpUploadsRef = useRef<() => void>(() => {});
   const xhrByIdRef = useRef<Map<string, XMLHttpRequest>>(new Map());
   const objectUrlsRef = useRef<Set<string>>(new Set());
 
   itemsRef.current = items;
+
+  const replaceItems = useCallback((nextItems: UploadItem[]) => {
+    itemsRef.current = nextItems;
+    setItems(nextItems);
+  }, []);
+
+  const patchItem = useCallback(
+    (
+      id: string,
+      patch: Partial<UploadItem> | ((prev: UploadItem) => Partial<UploadItem>),
+    ) => {
+      const current = itemsRef.current;
+      const index = current.findIndex((item) => item.id === id);
+
+      if (index < 0) {
+        return null;
+      }
+
+      const partial =
+        typeof patch === "function" ? patch(current[index]) : patch;
+      const nextItem = { ...current[index], ...partial };
+      const nextItems = current.slice();
+      nextItems[index] = nextItem;
+      replaceItems(nextItems);
+
+      return nextItem;
+    },
+    [replaceItems],
+  );
+
+  const transitionStatus = useCallback(
+    (id: string, status: UploadStep, extra?: Partial<UploadItem>) => {
+      const at = Date.now();
+      return patchItem(id, (prev) => ({
+        status,
+        steps:
+          prev.status === status
+            ? prev.steps
+            : [...prev.steps, { step: status, at }],
+        finishedAt: isTerminalStep(status) ? at : prev.finishedAt,
+        ...(extra ?? {}),
+      }));
+    },
+    [patchItem],
+  );
 
   const ensurePool = useCallback(() => {
     if (poolRef.current) return poolRef.current;
@@ -142,48 +221,23 @@ export function useImageUploadQueue(
     return poolRef.current;
   }, []);
 
-  const patchItem = useCallback(
-    (id: string, patch: Partial<UploadItem> | ((prev: UploadItem) => Partial<UploadItem>)) => {
-      setItems((current) => {
-        const next: UploadItem[] = current.slice();
-        const index = next.findIndex((item) => item.id === id);
-        if (index < 0) return current;
-        const partial = typeof patch === "function" ? patch(next[index]) : patch;
-        next[index] = { ...next[index], ...partial };
-        return next;
-      });
-    },
-    [],
-  );
+  const completeNetworkUpload = useCallback((wasSerial: boolean) => {
+    uploadInFlightRef.current = Math.max(0, uploadInFlightRef.current - 1);
 
-  const transitionStatus = useCallback(
-    (id: string, status: UploadStep, extra?: Partial<UploadItem>) => {
-      const at = Date.now();
-      patchItem(id, (prev) => ({
-        status,
-        steps: prev.status === status ? prev.steps : [...prev.steps, { step: status, at }],
-        finishedAt: isTerminalStep(status) ? at : prev.finishedAt,
-        ...(extra ?? {}),
-      }));
-    },
-    [patchItem],
-  );
-
-  const pumpUploads = useCallback(() => {
-    while (uploadInFlightRef.current < maxConcurrentUploads) {
-      const next = preparedQueueRef.current.shift();
-      if (!next) break;
-      uploadInFlightRef.current += 1;
-      startNetworkUpload(next.id, next.blob, next.filename, next.mimeType);
+    if (wasSerial) {
+      serialUploadInFlightRef.current = false;
     }
-  }, [maxConcurrentUploads]);
+
+    pumpUploadsRef.current();
+  }, []);
 
   const startNetworkUpload = useCallback(
-    (id: string, blob: Blob, filename: string, mimeType: string) => {
-      const item = itemsRef.current.find((entry) => entry.id === id);
+    (entry: PreparedUpload, isSerial: boolean) => {
+      const { id, blob, filename, mimeType } = entry;
+      const item = itemsRef.current.find((candidate) => candidate.id === id);
+
       if (!item) {
-        uploadInFlightRef.current = Math.max(0, uploadInFlightRef.current - 1);
-        pumpUploads();
+        completeNetworkUpload(isSerial);
         return;
       }
 
@@ -210,94 +264,145 @@ export function useImageUploadQueue(
 
       xhr.addEventListener("load", () => {
         xhrByIdRef.current.delete(id);
-        uploadInFlightRef.current = Math.max(0, uploadInFlightRef.current - 1);
 
         if (xhr.status === 401) {
-          transitionStatus(id, "failed", {
+          const failed = transitionStatus(id, "failed", {
             error: "Unauthorized. Please sign in again.",
             progress: 0,
           });
-          const failed = itemsRef.current.find((entry) => entry.id === id);
-          if (failed && onError) onError(failed);
+          if (failed) onError?.(failed);
           onUnauthorized?.();
-          pumpUploads();
+          completeNetworkUpload(isSerial);
           return;
         }
 
         const result = (xhr.response ?? {}) as UploadResponse;
         if (xhr.status < 200 || xhr.status >= 300 || !result.assets?.length) {
-          transitionStatus(id, "failed", {
+          const failed = transitionStatus(id, "failed", {
             error: result.error ?? `Upload failed (${xhr.status}).`,
             progress: 0,
           });
-          const failed = itemsRef.current.find((entry) => entry.id === id);
-          if (failed && onError) onError(failed);
-          pumpUploads();
+          if (failed) onError?.(failed);
+          completeNetworkUpload(isSerial);
           return;
         }
 
         const asset = result.assets[0];
-        transitionStatus(id, "done", { progress: 1, asset });
-        const done = itemsRef.current.find((entry) => entry.id === id);
-        if (done && onAssetUploaded) onAssetUploaded(asset, done);
-        pumpUploads();
+        const done = transitionStatus(id, "done", {
+          asset,
+          progress: 1,
+        });
+        if (done) onAssetUploaded?.(asset, done);
+        completeNetworkUpload(isSerial);
       });
 
       xhr.addEventListener("error", () => {
         xhrByIdRef.current.delete(id);
-        uploadInFlightRef.current = Math.max(0, uploadInFlightRef.current - 1);
-        transitionStatus(id, "failed", {
+        const failed = transitionStatus(id, "failed", {
           error: "Network error while uploading.",
           progress: 0,
         });
-        const failed = itemsRef.current.find((entry) => entry.id === id);
-        if (failed && onError) onError(failed);
-        pumpUploads();
+        if (failed) onError?.(failed);
+        completeNetworkUpload(isSerial);
       });
 
       xhr.addEventListener("abort", () => {
         xhrByIdRef.current.delete(id);
-        uploadInFlightRef.current = Math.max(0, uploadInFlightRef.current - 1);
-        pumpUploads();
+        completeNetworkUpload(isSerial);
       });
 
       xhr.open("POST", endpoint, true);
       xhr.send(formData);
     },
-    [convert, endpoint, onAssetUploaded, onError, onUnauthorized, patchItem, pumpUploads, transitionStatus],
+    [
+      completeNetworkUpload,
+      convert,
+      endpoint,
+      onAssetUploaded,
+      onError,
+      onUnauthorized,
+      patchItem,
+      transitionStatus,
+    ],
   );
+
+  const pumpUploads = useCallback(() => {
+    if (serialUploadInFlightRef.current) {
+      return;
+    }
+
+    const uploadLimit = Math.max(1, Math.floor(maxConcurrentUploads));
+
+    while (uploadInFlightRef.current < uploadLimit) {
+      const next = preparedQueueRef.current[0];
+      if (!next) break;
+
+      const shouldUploadSerially =
+        serialUploadByteThreshold > 0 &&
+        next.byteLength >= serialUploadByteThreshold;
+
+      if (shouldUploadSerially && uploadInFlightRef.current > 0) {
+        break;
+      }
+
+      preparedQueueRef.current.shift();
+      uploadInFlightRef.current += 1;
+
+      if (shouldUploadSerially) {
+        serialUploadInFlightRef.current = true;
+      }
+
+      startNetworkUpload(next, shouldUploadSerially);
+
+      if (shouldUploadSerially) {
+        break;
+      }
+    }
+  }, [maxConcurrentUploads, serialUploadByteThreshold, startNetworkUpload]);
+
+  pumpUploadsRef.current = pumpUploads;
 
   const handleWorkerMessage = useCallback(
     (id: string, file: File, message: ImageWorkerOutput) => {
       if (message.kind === "step") {
-        const step = message.step;
-        if (step === "reading") transitionStatus(id, "reading");
-        else if (step === "decoding") transitionStatus(id, "decoding");
-        else if (step === "converting") transitionStatus(id, "converting");
+        if (message.step === "reading") transitionStatus(id, "reading");
+        else if (message.step === "decoding") transitionStatus(id, "decoding");
+        else if (message.step === "converting") {
+          transitionStatus(id, "converting");
+        }
         return;
       }
 
       if (message.kind === "failed") {
-        transitionStatus(id, "failed", { error: message.error, progress: 0 });
-        const failed = itemsRef.current.find((entry) => entry.id === id);
-        if (failed && onError) onError(failed);
+        const failed = transitionStatus(id, "failed", {
+          error: message.error,
+          progress: 0,
+        });
+        if (failed) onError?.(failed);
         return;
       }
 
       if (message.kind === "ready") {
+        if (!itemsRef.current.some((entry) => entry.id === id)) {
+          return;
+        }
+
         patchItem(id, {
           width: message.width,
           height: message.height,
           byteLength: message.byteLength,
         });
+
         const filename = message.converted
           ? renameExtension(file.name, "webp")
           : file.name;
+
         preparedQueueRef.current.push({
           id,
           blob: message.blob,
           filename,
           mimeType: message.mimeType,
+          byteLength: message.byteLength,
         });
         pumpUploads();
       }
@@ -307,30 +412,43 @@ export function useImageUploadQueue(
 
   const enqueueWorker = useCallback(
     (item: UploadItem) => {
-      const pool = ensurePool();
-      const payload: ImageWorkerInput = {
-        kind: "process",
-        id: item.id,
-        file: item.file,
-        convert,
-      };
-      pool.send({
-        id: item.id,
-        payload,
-        onMessage: (message) => handleWorkerMessage(item.id, item.file, message as ImageWorkerOutput),
-      });
+      try {
+        const pool = ensurePool();
+        const payload: ImageWorkerInput = {
+          kind: "process",
+          id: item.id,
+          file: item.file,
+          convert,
+        };
+
+        pool.send({
+          id: item.id,
+          payload,
+          onMessage: (message) =>
+            handleWorkerMessage(
+              item.id,
+              item.file,
+              message as ImageWorkerOutput,
+            ),
+        });
+      } catch (error) {
+        const failed = transitionStatus(item.id, "failed", {
+          error: readErrorMessage(error, "Image worker could not start."),
+          progress: 0,
+        });
+        if (failed) onError?.(failed);
+      }
     },
-    [convert, ensurePool, handleWorkerMessage],
+    [convert, ensurePool, handleWorkerMessage, onError, transitionStatus],
   );
 
   const addFiles = useCallback(
     (incoming: FileList | File[] | null): string[] => {
       if (!incoming) return [];
-      const list = Array.from(incoming).filter((file) =>
-        file.type.startsWith("image/") ||
-        /\.(svg|heic|heif|avif)$/i.test(file.name),
-      );
+
+      const list = Array.from(incoming).filter(isSupportedImageUploadFile);
       if (!list.length) return [];
+
       const now = Date.now();
       const newItems: UploadItem[] = list.map((file) => {
         const previewUrl = URL.createObjectURL(file);
@@ -345,43 +463,58 @@ export function useImageUploadQueue(
           startedAt: now,
         };
       });
-      setItems((current) => [...current, ...newItems]);
+
+      replaceItems([...itemsRef.current, ...newItems]);
       newItems.forEach((item) => enqueueWorker(item));
       return newItems.map((item) => item.id);
     },
-    [enqueueWorker],
+    [enqueueWorker, replaceItems],
   );
 
   const retry = useCallback(
     (id: string) => {
       const item = itemsRef.current.find((entry) => entry.id === id);
       if (!item || item.status !== "failed") return;
-      transitionStatus(id, "queued", { error: undefined, progress: 0 });
+
+      transitionStatus(id, "queued", {
+        error: undefined,
+        finishedAt: undefined,
+        progress: 0,
+        startedAt: Date.now(),
+      });
       enqueueWorker(item);
     },
     [enqueueWorker, transitionStatus],
   );
 
-  const remove = useCallback((id: string) => {
-    const xhr = xhrByIdRef.current.get(id);
-    if (xhr) {
-      try {
-        xhr.abort();
-      } catch {
-        /* noop */
+  const remove = useCallback(
+    (id: string) => {
+      const xhr = xhrByIdRef.current.get(id);
+      if (xhr) {
+        try {
+          xhr.abort();
+        } catch {
+          /* noop */
+        }
+        xhrByIdRef.current.delete(id);
       }
-      xhrByIdRef.current.delete(id);
-    }
-    preparedQueueRef.current = preparedQueueRef.current.filter((entry) => entry.id !== id);
-    setItems((current) => {
+
+      preparedQueueRef.current = preparedQueueRef.current.filter(
+        (entry) => entry.id !== id,
+      );
+
+      const current = itemsRef.current;
       const target = current.find((entry) => entry.id === id);
+
       if (target?.previewUrl) {
         URL.revokeObjectURL(target.previewUrl);
         objectUrlsRef.current.delete(target.previewUrl);
       }
-      return current.filter((entry) => entry.id !== id);
-    });
-  }, []);
+
+      replaceItems(current.filter((entry) => entry.id !== id));
+    },
+    [replaceItems],
+  );
 
   const clear = useCallback(() => {
     xhrByIdRef.current.forEach((xhr) => {
@@ -392,50 +525,58 @@ export function useImageUploadQueue(
       }
     });
     xhrByIdRef.current.clear();
+    uploadInFlightRef.current = 0;
+    serialUploadInFlightRef.current = false;
     preparedQueueRef.current = [];
-    setItems((current) => {
-      current.forEach((entry) => {
+    poolRef.current?.dispose();
+    poolRef.current = null;
+
+    itemsRef.current.forEach((entry) => {
+      if (entry.previewUrl) {
+        URL.revokeObjectURL(entry.previewUrl);
+        objectUrlsRef.current.delete(entry.previewUrl);
+      }
+    });
+
+    replaceItems([]);
+  }, [replaceItems]);
+
+  const clearCompleted = useCallback(() => {
+    const keep: UploadItem[] = [];
+
+    itemsRef.current.forEach((entry) => {
+      if (entry.status === "done") {
         if (entry.previewUrl) {
           URL.revokeObjectURL(entry.previewUrl);
           objectUrlsRef.current.delete(entry.previewUrl);
         }
-      });
-      return [];
-    });
-  }, []);
+        return;
+      }
 
-  const clearCompleted = useCallback(() => {
-    setItems((current) => {
-      const keep: UploadItem[] = [];
-      current.forEach((entry) => {
-        if (entry.status === "done") {
-          if (entry.previewUrl) {
-            URL.revokeObjectURL(entry.previewUrl);
-            objectUrlsRef.current.delete(entry.previewUrl);
-          }
-          return;
-        }
-        keep.push(entry);
-      });
-      return keep;
+      keep.push(entry);
     });
-  }, []);
+
+    replaceItems(keep);
+  }, [replaceItems]);
 
   useEffect(() => {
+    const xhrMap = xhrByIdRef.current;
+    const objectUrls = objectUrlsRef.current;
+
     return () => {
       poolRef.current?.dispose();
       poolRef.current = null;
-      xhrByIdRef.current.forEach((xhr) => {
+      xhrMap.forEach((xhr) => {
         try {
           xhr.abort();
         } catch {
           /* noop */
         }
       });
-      objectUrlsRef.current.forEach((url) => {
+      objectUrls.forEach((url) => {
         URL.revokeObjectURL(url);
       });
-      objectUrlsRef.current.clear();
+      objectUrls.clear();
     };
   }, []);
 
@@ -449,15 +590,8 @@ export function useImageUploadQueue(
     const overall =
       total === 0
         ? 0
-        : items.reduce((acc, item) => {
-            if (item.status === "done") return acc + 1;
-            if (item.status === "uploading") return acc + 0.5 + item.progress * 0.5;
-            if (item.status === "converting") return acc + 0.45;
-            if (item.status === "decoding") return acc + 0.3;
-            if (item.status === "reading") return acc + 0.15;
-            if (item.status === "failed") return acc + 0;
-            return acc;
-          }, 0) / total;
+        : items.reduce((acc, item) => acc + readStepProgress(item), 0) / total;
+
     return {
       total,
       completed,
