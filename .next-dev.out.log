@@ -9,3 +9,6 @@
 ✓ Ready in 638ms
 Creating turbopack project { dir: 'C:\\Users\\amonk\\OneDrive\\Desktop\\arnab', testMode: true }
 
+✓ Finished writing to filesystem cache in 26.7s
+✓ Finished filesystem cache database compaction in 50s
+✓ Finished filesystem cache database compaction in 35.0s

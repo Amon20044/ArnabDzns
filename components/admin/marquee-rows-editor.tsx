@@ -12,6 +12,7 @@ import {
 } from "react";
 import { UploadQueueView } from "@/components/uploads/image-batch-uploader";
 import {
+  isSupportedImageUploadFile,
   useImageUploadQueue,
   type UploadItem,
   type UploadedAsset,
@@ -79,6 +80,8 @@ type PickerState = {
   replaceIndex?: number;
 } | null;
 
+type PickerTarget = NonNullable<PickerState>;
+
 type SeoState = {
   rowIndex: number;
   itemIndex: number;
@@ -101,11 +104,6 @@ type UploadedMarqueeAsset = {
   alt?: string;
   title?: string;
   desc?: string;
-};
-
-type UploadResponse = {
-  assets?: UploadedMarqueeAsset[];
-  error?: string;
 };
 
 const MARQUEE_DIRECTION_OPTIONS = [
@@ -443,7 +441,13 @@ export function MarqueeRowsEditor({
   const [recentFirst, setRecentFirst] = useState(true);
   const [uploadError, setUploadError] = useState("");
   const [isPersistingRows, setIsPersistingRows] = useState(false);
-  const targetByItemIdRef = useRef<Map<string, PickerState>>(new Map());
+  const targetByItemIdRef = useRef<Map<string, PickerTarget>>(new Map());
+  const insertAssetsIntoTargetRef = useRef<
+    (target: PickerTarget, assets: ImageMarqueeItem[]) => {
+      nextRows: ImageMarqueeRow[] | null;
+      firstInsertedIndex: number | null;
+    }
+  >(() => ({ nextRows: null, firstInsertedIndex: null }));
 
   const redirectToLoginRef = useRef<() => void>(() => {});
 
@@ -486,15 +490,6 @@ export function MarqueeRowsEditor({
     onUnauthorized: handleUnauthorized,
   });
   const isUploading = uploadQueue.summary.inFlight > 0;
-
-  // Forward-declare a stable ref to insertAssetsIntoTarget — it's defined
-  // below in the component scope but the upload callback above needs it.
-  const insertAssetsIntoTargetRef = useRef<
-    (target: PickerState, assets: ImageMarqueeItem[]) => {
-      nextRows: ImageMarqueeRow[] | null;
-      firstInsertedIndex: number | null;
-    }
-  >(() => ({ nextRows: null, firstInsertedIndex: null }));
 
   const pickerRow = pickerState ? rows[pickerState.rowIndex] : undefined;
   const seoItem = seoState
@@ -593,7 +588,7 @@ export function MarqueeRowsEditor({
   }
 
   function insertAssetsIntoTarget(
-    target: NonNullable<PickerState>,
+    target: PickerTarget,
     assets: ImageMarqueeItem[],
   ) {
     if (!assets.length) {
@@ -685,7 +680,7 @@ export function MarqueeRowsEditor({
       return;
     }
 
-    const files = [...fileList].filter((file) => file.type.startsWith("image/"));
+    const files = [...fileList].filter(isSupportedImageUploadFile);
 
     if (!files.length) {
       setUploadError("Choose at least one image file to upload.");
@@ -1026,7 +1021,7 @@ export function MarqueeRowsEditor({
                   queue={uploadQueue}
                   emptyState={
                     <p className="text-[11px] text-muted-foreground">
-                      Files you pick will appear here with per-step progress (reading, decoding, converting, uploading) so you can see exactly what's happening.
+                      Files you pick will appear here with per-step progress (reading, decoding, converting, uploading) so you can see exactly what is happening.
                     </p>
                   }
                 />
