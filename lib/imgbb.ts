@@ -124,10 +124,10 @@ export async function convertImageToLosslessWebP(
   .rotate() // normalize EXIF orientation, keeps original visual dimensions
   .webp({
     lossless: true,
-    effort: 5,
+    effort: 4,
     alphaQuality: 100,
-    smartSubsample: false,
-    nearLossless: false,
+    smartSubsample: true,
+    nearLossless: true,
   })
   .toBuffer({ resolveWithObject: true });
 
