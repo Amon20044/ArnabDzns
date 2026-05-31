@@ -121,15 +121,15 @@ export async function convertImageToLosslessWebP(
   }
 
   const { data, info } = await pipeline
-    // No resize/extract/fitting options are used here. Sharp only normalizes
-    // orientation and encodes the decoded pixels as lossless WebP.
-    .webp({
-      lossless: true,
-      nearLossless: false,
-      quality: 100,
-      effort: 6,
-    })
-    .toBuffer({ resolveWithObject: true });
+  .rotate() // normalize EXIF orientation, keeps original visual dimensions
+  .webp({
+    lossless: true,
+    effort: 5,
+    alphaQuality: 100,
+    smartSubsample: false,
+    nearLossless: false,
+  })
+  .toBuffer({ resolveWithObject: true });
 
   return {
     buffer: data,
