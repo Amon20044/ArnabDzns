@@ -174,8 +174,7 @@ export function ImageBatchUploader({
             Drop images here or click to choose
           </span>
           <span className="max-w-sm text-[11px] leading-5 opacity-70">
-            Multiple files supported / processed off-thread / originals kept by
-            default / uploads never expire
+            Multiple files supported / processed off-thread / WebP before ImgBB
           </span>
           <input
             ref={inputRef}

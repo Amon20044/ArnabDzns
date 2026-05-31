@@ -1,7 +1,7 @@
 /// <reference lib="webworker" />
 
 // Module worker. Reads an image File, decodes its dimensions off the main
-// thread, and (optionally) re-encodes via OffscreenCanvas before handing the
+// thread, and re-encodes via OffscreenCanvas before handing the
 // resulting blob back. Posts step events at each stage so the UI can show
 // per-file progress.
 
@@ -72,7 +72,7 @@ ctx.addEventListener("message", async (event: MessageEvent<ImageWorkerInput>) =>
       }
     } catch (decodeError) {
       // createImageBitmap may fail on SVG/HEIC/AVIF in older browsers.
-      // For a no-conversion upload we still ship the original bytes —
+      // For a no-conversion upload we still ship the original bytes -
       // dimensions just stay undefined.
       if (convert) throw decodeError;
     } finally {

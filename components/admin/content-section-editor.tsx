@@ -8,7 +8,6 @@ import {
   UploadCloudIcon,
 } from "lucide-react";
 import {
-  useEffect,
   useRef,
   useState,
   type ChangeEvent,
@@ -32,6 +31,7 @@ import {
 } from "@/components/admin/content-editor-fields";
 import type { ContactPageContent } from "@/db/content-defaults";
 import type { ContentBlockKey } from "@/db/models/content-block";
+import { uploadImageToImgBBFromClient } from "@/lib/uploads/imgbb-client";
 import {
   Field,
   FieldContent,
@@ -260,23 +260,6 @@ function createTestimonialAvatar(): TestimonialAvatar {
   };
 }
 
-type UploadedImageAsset = {
-  id?: string;
-  src: string;
-  displaySrc?: string;
-  width?: number;
-  height?: number;
-  aspectRatio?: number;
-  alt?: string;
-  title?: string;
-  desc?: string;
-};
-
-type UploadResponse = {
-  assets?: UploadedImageAsset[];
-  error?: string;
-};
-
 function inferAvatarFallback(value: string) {
   const parts = value
     .trim()
@@ -308,16 +291,13 @@ function AvatarPreview({
   size?: number;
   className?: string;
 }) {
-  const [errored, setErrored] = useState(false);
-
-  useEffect(() => {
-    setErrored(false);
-  }, [avatar.src]);
+  const [erroredSrc, setErroredSrc] = useState<string | null>(null);
 
   const fallbackLabel =
     avatar.fallback?.trim() || inferAvatarFallback(avatar.alt) || "NA";
+  const hasErrored = Boolean(avatar.src && erroredSrc === avatar.src);
 
-  if (!avatar.src || errored) {
+  if (!avatar.src || hasErrored) {
     return (
       <span
         aria-label={avatar.alt || label}
@@ -345,7 +325,7 @@ function AvatarPreview({
         alt={avatar.alt || label}
         className="h-full w-full object-cover"
         loading="lazy"
-        onError={() => setErrored(true)}
+        onError={() => setErroredSrc(avatar.src)}
       />
     </span>
   );
@@ -406,25 +386,7 @@ function AvatarImageField({
     setFeedback("");
 
     try {
-      const formData = new FormData();
-      formData.append("file", file);
-
-      const response = await fetch("/api/uploads/imgbb", {
-        method: "POST",
-        credentials: "same-origin",
-        body: formData,
-      });
-      const result = (await response.json()) as UploadResponse;
-
-      if (!response.ok) {
-        throw new Error(result.error ?? "Image upload failed.");
-      }
-
-      const asset = result.assets?.[0];
-
-      if (!asset?.src) {
-        throw new Error("ImgBB did not return an image URL.");
-      }
+      const asset = await uploadImageToImgBBFromClient(file);
 
       applyImage(asset.src, asset.alt ?? asset.title);
       setUrlDraft(asset.src);

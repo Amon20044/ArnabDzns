@@ -12,6 +12,14 @@ import type {
   ImageWorkerInput,
   ImageWorkerOutput,
 } from "./image-upload-worker";
+import {
+  createImgBBUploadFormData,
+  getImgBBClientUploadUrl,
+  imgBBResponseToUploadedAsset,
+  readImgBBClientError,
+  toWebPFilename,
+  type ImgBBClientUploadResponse,
+} from "./imgbb-client";
 
 export type UploadedAsset = {
   id: string;
@@ -60,8 +68,9 @@ export type UploadItem = {
 };
 
 export type UseImageUploadQueueOptions = {
+  /** Leave undefined for direct browser-to-ImgBB uploads. Relative URLs use the legacy server upload route. */
   endpoint?: string;
-  /** @deprecated ImgBB uploads now convert to lossless WebP on the server. */
+  /** @deprecated Images are always converted to WebP in the browser before upload. */
   convert?: boolean;
   /** Max concurrent network uploads. Defaults to 3. */
   maxConcurrentUploads?: number;
@@ -136,7 +145,7 @@ export function useImageUploadQueue(
   options: UseImageUploadQueueOptions = {},
 ): UseImageUploadQueueReturn {
   const {
-    endpoint = "/api/uploads/imgbb",
+    endpoint,
     maxConcurrentUploads = 3,
     serialUploadByteThreshold = DEFAULT_SERIAL_UPLOAD_BYTE_THRESHOLD,
     onAssetUploaded,
@@ -240,16 +249,37 @@ export function useImageUploadQueue(
 
       transitionStatus(id, "uploading", { progress: 0 });
 
-      const formData = new FormData();
-      formData.set(
-        "file",
-        new File([blob], filename, { type: mimeType }),
-        filename,
-      );
+      let uploadUrl: string;
+      let formData: FormData;
+      const useServerUpload = Boolean(endpoint?.startsWith("/"));
+
+      try {
+        uploadUrl = endpoint ?? getImgBBClientUploadUrl();
+        formData = useServerUpload
+          ? new FormData()
+          : createImgBBUploadFormData(blob, filename, mimeType);
+
+        if (useServerUpload) {
+          formData.set(
+            "file",
+            new File([blob], filename, { type: mimeType }),
+            filename,
+          );
+        }
+      } catch (error) {
+        const failed = transitionStatus(id, "failed", {
+          error: readErrorMessage(error, "Image upload could not start."),
+          progress: 0,
+        });
+        if (failed) onError?.(failed);
+        completeNetworkUpload(isSerial);
+        return;
+      }
+
       const xhr = new XMLHttpRequest();
       xhrByIdRef.current.set(id, xhr);
       xhr.responseType = "json";
-      xhr.withCredentials = true;
+      xhr.withCredentials = useServerUpload;
 
       xhr.upload.addEventListener("progress", (event) => {
         if (event.lengthComputable) {
@@ -271,10 +301,39 @@ export function useImageUploadQueue(
           return;
         }
 
-        const result = (xhr.response ?? {}) as UploadResponse;
-        if (xhr.status < 200 || xhr.status >= 300 || !result.assets?.length) {
+        const result = xhr.response ?? {};
+        let asset: UploadedAsset | undefined;
+        let uploadError = "";
+
+        if (useServerUpload) {
+          const serverResult = result as UploadResponse;
+          asset = serverResult.assets?.[0];
+          uploadError = serverResult.error ?? "";
+        } else {
+          try {
+            asset = imgBBResponseToUploadedAsset(
+              result as ImgBBClientUploadResponse,
+              {
+                filename,
+                mimeType,
+                byteLength: entry.byteLength,
+                converted: true,
+              },
+            );
+          } catch (error) {
+            uploadError =
+              error instanceof Error
+                ? error.message
+                : readImgBBClientError(
+                    result as ImgBBClientUploadResponse,
+                    xhr.status,
+                  );
+          }
+        }
+
+        if (xhr.status < 200 || xhr.status >= 300 || !asset) {
           const failed = transitionStatus(id, "failed", {
-            error: result.error ?? `Upload failed (${xhr.status}).`,
+            error: uploadError || `Upload failed (${xhr.status}).`,
             progress: 0,
           });
           if (failed) onError?.(failed);
@@ -282,7 +341,6 @@ export function useImageUploadQueue(
           return;
         }
 
-        const asset = result.assets[0];
         const done = transitionStatus(id, "done", {
           asset,
           progress: 1,
@@ -306,7 +364,7 @@ export function useImageUploadQueue(
         completeNetworkUpload(isSerial);
       });
 
-      xhr.open("POST", endpoint, true);
+      xhr.open("POST", uploadUrl, true);
       xhr.send(formData);
     },
     [
@@ -392,7 +450,7 @@ export function useImageUploadQueue(
         preparedQueueRef.current.push({
           id,
           blob: message.blob,
-          filename: file.name,
+          filename: message.converted ? toWebPFilename(file.name) : file.name,
           mimeType: message.mimeType,
           byteLength: message.byteLength,
         });
@@ -410,7 +468,7 @@ export function useImageUploadQueue(
           kind: "process",
           id: item.id,
           file: item.file,
-          convert: false,
+          convert: true,
         };
 
         pool.send({
