@@ -8,6 +8,26 @@ import { resolveImpactAccent } from "./impact-theme";
 
 const ease = [0.22, 1, 0.36, 1] as const;
 
+/* Catmull-Rom → cubic-bézier smoothing for a flowing, organic sparkline. */
+function buildSmoothPath(coords: readonly (readonly [number, number])[]): string {
+  if (coords.length === 0) return "";
+  if (coords.length === 1) return `M${coords[0][0]},${coords[0][1]}`;
+
+  const d = [`M${coords[0][0]},${coords[0][1]}`];
+  for (let i = 0; i < coords.length - 1; i++) {
+    const p0 = coords[i - 1] ?? coords[i];
+    const p1 = coords[i];
+    const p2 = coords[i + 1];
+    const p3 = coords[i + 2] ?? p2;
+    const cp1x = p1[0] + (p2[0] - p0[0]) / 6;
+    const cp1y = p1[1] + (p2[1] - p0[1]) / 6;
+    const cp2x = p2[0] - (p3[0] - p1[0]) / 6;
+    const cp2y = p2[1] - (p3[1] - p1[1]) / 6;
+    d.push(`C${cp1x},${cp1y} ${cp2x},${cp2y} ${p2[0]},${p2[1]}`);
+  }
+  return d.join(" ");
+}
+
 /* --------------------------------------------------------------------------
    CountUp — eases a numeric value from 0 to `value` when `isActive` is true.
    Formats with `format` so callers can show "120M+", "+18.4%", "3.2x".
@@ -100,16 +120,19 @@ export function Sparkline({
     const range = max - min || 1;
     const step = width / Math.max(1, points.length - 1);
 
+    // Leave a touch of vertical breathing room so the peak/trough never clip.
+    const top = strokeWidth + 1;
+    const usable = height - top - strokeWidth;
+
     const coords = points.map((point, index) => {
       const x = index * step;
-      const y = height - ((point.value - min) / range) * (height - strokeWidth * 2) - strokeWidth;
+      const y = top + (1 - (point.value - min) / range) * usable;
       return [x, y] as const;
     });
 
-    const path = coords
-      .map(([x, y], index) => (index === 0 ? `M${x},${y}` : `L${x},${y}`))
-      .join(" ");
+    const path = buildSmoothPath(coords);
 
+    // Carry the fill all the way to the bottom edge so it bleeds continuously.
     const area = `${path} L${width},${height} L0,${height} Z`;
 
     return { path, area, width };
@@ -124,8 +147,13 @@ export function Sparkline({
     >
       <defs>
         <linearGradient id={gradientId} x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stopColor={tokens.solid} stopOpacity="0.42" />
+          <stop offset="0%" stopColor={tokens.solid} stopOpacity="0.55" />
+          <stop offset="45%" stopColor={tokens.solid} stopOpacity="0.22" />
           <stop offset="100%" stopColor={tokens.solid} stopOpacity="0" />
+        </linearGradient>
+        <linearGradient id={`${gradientId}-stroke`} x1="0" y1="0" x2="1" y2="0">
+          <stop offset="0%" stopColor={tokens.solid} />
+          <stop offset="100%" stopColor={tokens.foreground} />
         </linearGradient>
       </defs>
 
@@ -142,14 +170,15 @@ export function Sparkline({
       <motion.path
         d={geometry.path}
         fill="none"
-        stroke={tokens.foreground}
+        stroke={`url(#${gradientId}-stroke)`}
         strokeWidth={strokeWidth}
         strokeLinecap="round"
         strokeLinejoin="round"
+        vectorEffect="non-scaling-stroke"
         initial={{ pathLength: 0 }}
         animate={{ pathLength: isActive ? 1 : 0 }}
         transition={{ duration: 1.1, ease, delay: 0.15 }}
-        style={{ filter: `drop-shadow(0 0 6px ${tokens.soft})` }}
+        style={{ filter: `drop-shadow(0 1px 6px ${tokens.soft})` }}
       />
     </svg>
   );

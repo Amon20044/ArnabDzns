@@ -3,7 +3,7 @@
 import { motion, useInView } from "framer-motion";
 import { useRef } from "react";
 import { cn } from "@/lib/utils";
-import type { ImpactCardConfig, ImpactCardSize } from "@/types";
+import type { ImpactCardConfig, ImpactCardSize, ImpactChartPoint } from "@/types";
 import { resolveImpactAccent } from "./impact-theme";
 import {
   Bars,
@@ -195,9 +195,7 @@ function CardBody({ card, inView }: { card: ImpactCardConfig; inView: boolean })
         <div className="flex h-full flex-col justify-between gap-4">
           <HeadlineBlock card={card} inView={inView} />
           {card.chart?.kind === "sparkline" ? (
-            <div className="h-14">
-              <Sparkline points={card.chart.points} accent={card.accent} isActive={inView} />
-            </div>
+            <BleedSparkline points={card.chart.points} accent={card.accent} inView={inView} />
           ) : null}
         </div>
       );
@@ -218,9 +216,7 @@ function CardBody({ card, inView }: { card: ImpactCardConfig; inView: boolean })
               />
             </div>
           ) : card.chart?.kind === "sparkline" ? (
-            <div className="h-14">
-              <Sparkline points={card.chart.points} accent={card.accent} isActive={inView} />
-            </div>
+            <BleedSparkline points={card.chart.points} accent={card.accent} inView={inView} />
           ) : null}
         </div>
       );
@@ -236,13 +232,13 @@ function FeaturedBody({ card, inView }: { card: ImpactCardConfig; inView: boolea
   return (
     <div className="relative flex h-full flex-col justify-between gap-4">
       {card.chart?.kind === "area" || card.chart?.kind === "sparkline" ? (
-        <div className="pointer-events-none absolute inset-x-0 bottom-0 h-36 opacity-70">
+        <div className="pointer-events-none absolute -bottom-5 -left-5 -right-5 h-44 opacity-80 sm:-bottom-6 sm:-left-6 sm:-right-6">
           <Sparkline
             points={card.chart.points}
             accent={card.accent}
             isActive={inView}
-            strokeWidth={2.25}
-            height={56}
+            strokeWidth={2.5}
+            height={72}
           />
         </div>
       ) : null}
@@ -358,5 +354,33 @@ function PartnerStack({
         </motion.li>
       ))}
     </ul>
+  );
+}
+
+/* --------------------------------------------------------------------------
+   BleedSparkline — area chart that runs full-width to the card edges and
+   spills continuously into the card's bottom. Negative margins cancel the
+   card padding; the card's `overflow-hidden` + rounded corners clip it clean.
+   -------------------------------------------------------------------------- */
+
+function BleedSparkline({
+  points,
+  accent,
+  inView,
+}: {
+  points: ImpactChartPoint[];
+  accent: string;
+  inView: boolean;
+}) {
+  return (
+    <div className="pointer-events-none relative -mx-5 -mb-5 mt-1 h-24 sm:-mx-6 sm:-mb-6">
+      <Sparkline
+        points={points}
+        accent={accent}
+        isActive={inView}
+        strokeWidth={2.5}
+        height={72}
+      />
+    </div>
   );
 }
