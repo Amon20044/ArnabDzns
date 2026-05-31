@@ -1,11 +1,23 @@
 import "server-only";
 
 import { readFile } from "node:fs/promises";
+import os from "node:os";
 import { basename, parse } from "node:path";
 import sharp from "sharp";
 
 const IMGBB_UPLOAD_URL = "https://api.imgbb.com/1/upload";
 const WEBP_MIME_TYPE = "image/webp";
+
+function getDeviceSharpConcurrency() {
+  const cores =
+    typeof os.availableParallelism === "function"
+      ? os.availableParallelism()
+      : os.cpus().length;
+
+  return Math.max(1, Math.min(cores, 8));
+}
+
+sharp.concurrency(getDeviceSharpConcurrency());
 
 export type ImgBBImageInput =
   | string
@@ -121,15 +133,13 @@ export async function convertImageToLosslessWebP(
   }
 
   const { data, info } = await pipeline
-  .rotate() // normalize EXIF orientation, keeps original visual dimensions
-  .webp({
-    lossless: true,
-    effort: 4,
-    alphaQuality: 100,
-    smartSubsample: true,
-    nearLossless: true,
-  })
-  .toBuffer({ resolveWithObject: true });
+    .webp({
+      lossless: true,
+      nearLossless: false,
+      effort: 6,
+      alphaQuality: 100,
+    })
+    .toBuffer({ resolveWithObject: true });
 
   return {
     buffer: data,

@@ -5,7 +5,7 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "start": "next start",
+    "start": "cross-env UV_THREADPOOL_SIZE=8 MALLOC_ARENA_MAX=2 next start",
     "lint": "eslint",
     "db:seed": "tsx scripts/seed-mongo-content.ts",
     "db:seed:missing": "tsx scripts/seed-mongo-content.ts --no-overwrite",
@@ -22,6 +22,7 @@
     "canvas-confetti": "^1.9.4",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
+    "cross-env": "^10.1.0",
     "framer-motion": "^12.38.0",
     "gsap": "^3.14.2",
     "locomotive-scroll": "^5.0.1",
