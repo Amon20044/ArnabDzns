@@ -151,10 +151,6 @@ export function Sparkline({
           <stop offset="45%" stopColor={tokens.solid} stopOpacity="0.22" />
           <stop offset="100%" stopColor={tokens.solid} stopOpacity="0" />
         </linearGradient>
-        <linearGradient id={`${gradientId}-stroke`} x1="0" y1="0" x2="1" y2="0">
-          <stop offset="0%" stopColor={tokens.solid} />
-          <stop offset="100%" stopColor={tokens.foreground} />
-        </linearGradient>
       </defs>
 
       {fill ? (
@@ -170,11 +166,10 @@ export function Sparkline({
       <motion.path
         d={geometry.path}
         fill="none"
-        stroke={`url(#${gradientId}-stroke)`}
+        stroke={tokens.foreground}
         strokeWidth={strokeWidth}
         strokeLinecap="round"
         strokeLinejoin="round"
-        vectorEffect="non-scaling-stroke"
         initial={{ pathLength: 0 }}
         animate={{ pathLength: isActive ? 1 : 0 }}
         transition={{ duration: 1.1, ease, delay: 0.15 }}
