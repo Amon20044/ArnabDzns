@@ -219,7 +219,7 @@ function UploadRow({ item, onRetry, onRemove }: UploadRowProps) {
           <img
             src={item.previewUrl}
             alt=""
-            loading="lazy"
+            loading="eager"
             decoding="async"
             className="h-full w-full object-cover"
             draggable={false}

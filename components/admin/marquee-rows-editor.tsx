@@ -265,6 +265,8 @@ function MarqueeAssetPreview({
             width={item.width ?? 280}
             height={item.height ?? 112}
             sizes="(max-width: 768px) 45vw, 180px"
+            loading="eager"
+            decoding="async"
             className="h-12 w-full object-contain"
           />
         ) : ClientIcon ? (
@@ -295,6 +297,8 @@ function MarqueeAssetPreview({
           alt={item.alt ?? label}
           fill
           sizes="(max-width: 768px) 70vw, 200px"
+          loading="eager"
+          decoding="async"
           className="object-cover"
         />
       </div>
@@ -351,6 +355,8 @@ function MarqueeImageTile({
             alt={item.alt ?? label}
             fill
             sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 220px"
+            loading="eager"
+            decoding="async"
             className={type === "clients" ? "object-contain p-4" : "object-cover"}
           />
         ) : ClientIcon ? (

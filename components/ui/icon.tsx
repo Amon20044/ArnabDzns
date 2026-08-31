@@ -150,6 +150,8 @@ function SvgAssetIcon({
         {...getAriaProps(title, decorative)}
         src={src}
         alt={title ?? ""}
+        loading="eager"
+        decoding="async"
         className={cn("inline-block shrink-0 object-contain", className)}
         style={style}
       />

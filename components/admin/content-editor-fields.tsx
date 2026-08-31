@@ -230,12 +230,6 @@ export function ColorField({
   const [open, setOpen] = useState(false);
   const [draftValue, setDraftValue] = useState(value ?? "");
 
-  useEffect(() => {
-    if (!open) {
-      setDraftValue(value ?? "");
-    }
-  }, [open, value]);
-
   const colorInputValue = normalizeHexColor(draftValue) ?? "#18181b";
 
   return (
@@ -253,7 +247,10 @@ export function ColorField({
             <button
               type="button"
               aria-label={`Open ${label} picker`}
-              onClick={() => setOpen(true)}
+              onClick={() => {
+                setDraftValue(value ?? "");
+                setOpen(true);
+              }}
               className="absolute inset-y-1.5 right-1.5 inline-flex w-9 items-center justify-center rounded-md border border-black/10 bg-white/90 transition hover:bg-white"
             >
               <span
@@ -377,22 +374,10 @@ export function IconField({
 
   useEffect(() => {
     if (!open) {
-      setDraftValue(value ?? "");
-      setIconPack(resolveInitialIconPack(value));
-      setReactIconQuery("");
-      setPackError("");
-    }
-  }, [open, value]);
-
-  useEffect(() => {
-    if (!open) {
       return;
     }
 
     let active = true;
-    setIsPackLoading(true);
-    setPackError("");
-
     reactIconPackLoaders[iconPack]()
       .then((module) => {
         if (!active) {
@@ -473,7 +458,14 @@ export function IconField({
             <button
               type="button"
               aria-label={`Open ${label} picker`}
-              onClick={() => setOpen(true)}
+              onClick={() => {
+                setDraftValue(value ?? "");
+                setIconPack(resolveInitialIconPack(value));
+                setReactIconQuery("");
+                setPackError("");
+                setIsPackLoading(true);
+                setOpen(true);
+              }}
               className="absolute inset-y-1.5 right-1.5 inline-flex w-9 items-center justify-center rounded-md border border-black/10 bg-white/90 text-muted-foreground transition hover:bg-white hover:text-foreground"
             >
               <SearchIcon className="size-4" />
@@ -577,7 +569,11 @@ export function IconField({
               </div>
               <select
                 value={iconPack}
-                onChange={(event) => setIconPack(event.target.value as ReactIconPack)}
+                onChange={(event) => {
+                  setPackError("");
+                  setIsPackLoading(true);
+                  setIconPack(event.target.value as ReactIconPack);
+                }}
                 className="h-9 rounded-lg border border-input bg-white px-3 text-sm outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50"
               >
                 {Object.keys(reactIconPackLoaders).map((pack) => (

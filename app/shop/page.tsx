@@ -51,7 +51,9 @@ export default function ShopPage() {
                     src={item.image}
                     alt={`${item.title} preview`}
                     fill
-                    priority={index === 0}
+                    loading="eager"
+                    decoding="async"
+                    fetchPriority={index === 0 ? "high" : "auto"}
                     sizes="(min-width: 1024px) 28vw, (min-width: 640px) 45vw, 94vw"
                     className="object-cover transition-transform duration-500 ease-out group-hover:scale-[1.035]"
                   />

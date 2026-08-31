@@ -348,6 +348,8 @@ export function PasswordChangePanel() {
                     height={220}
                     alt="Authenticator QR code"
                     unoptimized
+                    loading="eager"
+                    decoding="async"
                     className="size-56"
                   />
                 ) : setupStatus === "error" ? (

@@ -7,7 +7,6 @@ import { generateTotpSecret } from "./totp";
 
 export const SEEDED_ADMIN_EMAIL =
   process.env.AUTH_SEED_EMAIL?.toLowerCase() ?? "arnabdzns@gmail.com";
-export const SEEDED_ADMIN_PASSWORD = process.env.AUTH_SEED_PASSWORD ?? "Arnab@2026";
 
 /** The single admin account permitted to use the password-reset flow. */
 export const ALLOWED_ADMIN_EMAIL = SEEDED_ADMIN_EMAIL;
@@ -40,7 +39,15 @@ export async function ensureSeedAdminUser() {
     return existing;
   }
 
-  const password = await hashPassword(SEEDED_ADMIN_PASSWORD);
+  const seedPassword = process.env.AUTH_SEED_PASSWORD;
+
+  if (!seedPassword) {
+    throw new Error(
+      "AUTH_SEED_PASSWORD must be set before creating the initial admin user.",
+    );
+  }
+
+  const password = await hashPassword(seedPassword);
 
   return AdminUserModel.create({
     email: SEEDED_ADMIN_EMAIL,

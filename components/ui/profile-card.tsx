@@ -63,8 +63,9 @@ export function ProfileCard({
           alt={imageAlt}
           fill
           sizes="(max-width: 640px) 90vw, 340px"
+          loading="eager"
+          decoding="async"
           className="select-none object-cover"
-          priority={false}
           draggable={false}
         />
 

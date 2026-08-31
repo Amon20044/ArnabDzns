@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { AnimatePresence, motion, type PanInfo } from "framer-motion";
 import { Quote, Star } from "lucide-react";
 import { Hero } from "@/components/sections/hero";
@@ -74,11 +74,8 @@ function Avatar({
   size?: number;
   className?: string;
 }) {
-  const [errored, setErrored] = useState(false);
-
-  useEffect(() => {
-    setErrored(false);
-  }, [avatar.src]);
+  const [erroredSrc, setErroredSrc] = useState<string | null>(null);
+  const errored = Boolean(avatar.src && erroredSrc === avatar.src);
 
   if (errored || !avatar.src) {
     return (
@@ -107,8 +104,9 @@ function Avatar({
         src={avatar.src}
         alt={avatar.alt}
         className="h-full w-full object-cover"
-        loading="lazy"
-        onError={() => setErrored(true)}
+        loading="eager"
+        decoding="async"
+        onError={() => setErroredSrc(avatar.src)}
       />
     </span>
   );

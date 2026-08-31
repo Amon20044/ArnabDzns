@@ -1,7 +1,6 @@
 import type { CSSProperties } from "react";
 import { BookCallSection } from "@/components/sections/book-call";
 import { FAQ } from "@/components/sections/faq";
-import { Hero } from "@/components/sections/hero";
 import { HomeLandingHero } from "@/components/sections/home-landing-hero";
 import { ImpactSection } from "@/components/impact/impact-section";
 import { ProcessRoadmap } from "@/components/sections/process-roadmap";
@@ -23,8 +22,6 @@ const homeHeroToClientsGapStyle = {
 
 export default async function Home() {
   const content = await getHomeContent();
-  const portfolioMarqueeRows = content.portfolioMarquee.slice(0, 3);
-
   return (
     <div className="flex">
       <div className="page-section-stack mx-auto flex w-full max-w-6xl flex-1 flex-col px-2 pb-32 pt-4 md:px-10 md:pb-40">
@@ -55,26 +52,11 @@ export default async function Home() {
             itemGap="1rem"
             fullBleed
             arrangeAsGrid
-            revealOnLoad
             draggable
             enableLightbox
           />
         </section>
-        <div id="portfolio" data-nav-section="portfolio" className="scroll-target">
-          <Hero content={content.portfolio} />
-          <section className="home-portfolio-marquee-viewport page-reveal">
-            <ImageMarquee
-              rows={portfolioMarqueeRows}
-              height="var(--portfolio-marquee-row-height)"
-              rowGap="var(--portfolio-marquee-gap)"
-              itemGap="var(--portfolio-marquee-gap)"
-              className="home-portfolio-marquee h-full sm:h-auto"
-              fullBleed
-              draggable
-              enableLightbox
-            />
-          </section>
-        </div>
+
         <div
           id="testimonials"
           data-nav-section="testimonials"

@@ -90,6 +90,8 @@ export const Header = ({ content = headerConfig }: HeaderProps) => {
               alt={brand.logoAlt}
               fill
               loading="eager"
+              decoding="async"
+              fetchPriority="high"
               sizes="44px"
               className="object-cover"
             />

@@ -133,6 +133,8 @@ function ExperienceCard({ item }: { item: AboutExperienceItem }) {
                 alt={`${item.company} logo`}
                 fill
                 sizes="(max-width: 640px) 60vw, 220px"
+                loading="eager"
+                decoding="async"
                 className="object-contain"
               />
             </div>

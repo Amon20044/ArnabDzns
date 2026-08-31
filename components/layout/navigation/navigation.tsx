@@ -37,10 +37,6 @@ function getMobileSectionOrder(item: NavItemConfig, fallbackIndex: number) {
 }
 
 function resolveCTAIcon(config: CTAConfig) {
-  if (config.Icon) {
-    return config.Icon;
-  }
-
   switch (config.icon) {
     case "phone-call":
     default:

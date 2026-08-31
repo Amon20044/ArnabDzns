@@ -6,16 +6,12 @@ import { RouteAwareSiteFrame } from "@/components/layout/route-aware-site-frame"
 import { LocomotiveScrollProvider } from "@/components/providers/locomotive-scroll-provider";
 import { StructuredData } from "@/components/site/structured-data";
 import { LiquidGlassDefs } from "@/components/ui/liquid-glass-defs";
-import { aeonik, caveat, poppins } from "@/config/fonts";
+import { aeonik } from "@/config/fonts";
 import { getLayoutContent } from "@/db/content";
 import { getRootMetadata } from "@/lib/seo";
 import { getSiteJsonLd } from "@/lib/structured-data";
 import { liquidGlassCssVariables } from "@/lib/liquid-glass";
 import "./globals.css";
-import { Geist } from "next/font/google";
-import { cn } from "@/lib/utils";
-
-const geist = Geist({subsets:['latin'],variable:'--font-sans'});
 
 export const metadata = getRootMetadata();
 export const viewport: Viewport = {
@@ -36,7 +32,7 @@ export default async function RootLayout({
   return (
     <html
       lang={content.site.seo.language}
-      className={cn("h-full", "antialiased", aeonik.variable, poppins.variable, caveat.variable, "font-sans", geist.variable)}
+      className={`h-full antialiased font-sans ${aeonik.variable}`}
     >
       <body
         className="min-h-full flex flex-col overflow-x-hidden bg-transparent text-foreground"
@@ -44,11 +40,7 @@ export default async function RootLayout({
       >
         <StructuredData data={getSiteJsonLd()} />
         <LiquidGlassDefs />
-        {/* The boot wrapper (.site-boot-content) keeps a non-none transform/filter
-            during and after its animation, which makes it the containing block for
-            any position: fixed descendant. So the background AND the fixed chrome
-            (header + bottom nav) live OUTSIDE it; only the scrolling page content is
-            wrapped (inside RouteAwareSiteFrame) so the boot reveal still applies. */}
+        {/* Keep fixed chrome outside the brief startup reveal wrapper. */}
         <IridescenceBackground color={[0.93, 0.88, 0.99]} mouseReact amplitude={0.08} speed={0.9} />
         <LocomotiveScrollProvider>
           <RouteAwareSiteFrame

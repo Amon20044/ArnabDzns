@@ -89,8 +89,8 @@ export const siteConfig: SiteConfig = {
   contact: {
     inquiryPath: "/contact",
     bookingPath: "/contact",
-    bookingUrl: "https://connect.arnabdzns.com",
-    bookingDisplay: "connect.arnabdzns.com",
+    bookingUrl: "https://www.arnabdzns.com/contact",
+    bookingDisplay: "arnabdzns.com/contact",
     primaryCtaLabel: "Contact",
     emailAddress: "arnabdzns@gmail.com",
     callLabel: `WhatsApp ${whatsappDisplay}`,

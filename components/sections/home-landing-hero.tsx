@@ -1,6 +1,6 @@
 "use client";
 
-import { motion, type Variants } from "framer-motion";
+import { motion, type Variants } from "motion/react";
 import { ArrowRight } from "lucide-react";
 import { useEffect, useState } from "react";
 import { PrimaryButton } from "@/components/ui/primary-button";
@@ -18,14 +18,13 @@ interface HomeLandingHeroProps {
 const ease = [0.22, 1, 0.36, 1] as const;
 
 const blurUp: Variants = {
-  hidden: { opacity: 0, y: 28, filter: "blur(18px)" },
+  hidden: { opacity: 0, y: 8 },
   visible: (i: number = 0) => ({
     opacity: 1,
     y: 0,
-    filter: "blur(0px)",
     transition: {
-      duration: 0.95,
-      delay: 0.08 + i * 0.12,
+      duration: 0.28,
+      delay: 0.02 + i * 0.04,
       ease,
     },
   }),
@@ -69,9 +68,9 @@ export function HomeLandingHero({
   className,
 }: HomeLandingHeroProps) {
   const badges = content.badges ?? [];
-  const ctas = [content.cta, content.secondaryCta].filter(
-    (cta): cta is HeroCTAConfig => Boolean(cta),
-  );
+  const ctas = [content.cta, content.secondaryCta].flatMap((cta) =>
+    cta ? [cta] : [],
+  ) as HeroCTAConfig[];
   const titleLines = resolveTitleLines(content.title);
   const [isDesktop, setIsDesktop] = useState<boolean | null>(null);
   const ctaSize = isDesktop ? "default" : "compact";

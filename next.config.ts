@@ -10,6 +10,7 @@ const nextConfig: NextConfig = {
   images: {
     dangerouslyAllowSVG: true,
     contentDispositionType: "inline",
+    minimumCacheTTL: 2_678_400,
     qualities: [50, 75, 90, 100],
     remotePatterns: [
       {

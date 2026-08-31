@@ -24,9 +24,7 @@ export function RouteAwareSiteFrame({
 
   return (
     <>
-      {/* Header + Navigation are fixed; they MUST stay outside .site-boot-content,
-          whose boot transform/filter would otherwise become their containing block
-          and break position: fixed. Only the scrolling content carries the reveal. */}
+      {/* Fixed chrome stays outside the brief startup content fade. */}
       {hideChrome ? null : <Header content={header} />}
       <div className="site-boot-content flex flex-1 flex-col">
         <div className={cn("flex flex-1 flex-col", hideChrome ? "" : "pt-24")}>

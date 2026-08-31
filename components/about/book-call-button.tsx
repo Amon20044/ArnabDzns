@@ -7,10 +7,9 @@ import { Input } from "@/components/ui/input";
 import { PrimaryButton } from "@/components/ui/primary-button";
 import { renderStatusBadgeLeading } from "@/components/ui/status-badge-leading";
 import { StatusBadge } from "@/components/ui/status-badge";
-import { Heading, Text } from "@/components/ui/typography";
+import { Heading } from "@/components/ui/typography";
 import { buildWhatsAppUrl } from "@/data/site";
 
-const ease = [0.22, 1, 0.36, 1] as const;
 const spring = { type: "spring", stiffness: 260, damping: 24 } as const;
 
 interface BookCallButtonProps {

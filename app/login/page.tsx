@@ -1,4 +1,3 @@
-import { ShieldCheckIcon } from "lucide-react";
 import { LoginForm } from "@/components/login-form";
 
 type LoginPageProps = {

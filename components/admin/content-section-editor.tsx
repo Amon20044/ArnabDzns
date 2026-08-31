@@ -324,7 +324,8 @@ function AvatarPreview({
         src={avatar.src}
         alt={avatar.alt || label}
         className="h-full w-full object-cover"
-        loading="lazy"
+        loading="eager"
+        decoding="async"
         onError={() => setErroredSrc(avatar.src)}
       />
     </span>

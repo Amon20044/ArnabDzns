@@ -6,10 +6,10 @@ import {
   useMemo,
   useRef,
   useState,
-  type CSSProperties,
   type PointerEvent as ReactPointerEvent,
 } from "react";
 import { createPortal } from "react-dom";
+import Image from "next/image";
 import { ChevronLeftIcon, ChevronRightIcon, XIcon } from "lucide-react";
 import type { IconType } from "react-icons";
 import {
@@ -79,8 +79,6 @@ export interface ImageMarqueeProps {
    * odd-leftover landscape render full-height. Disabled for multi-row.
    */
   arrangeAsGrid?: boolean;
-  /** Hide the marquee until all images have loaded, then play a pixel-tear reveal. */
-  revealOnLoad?: boolean;
   /**
    * Allow pointer/touch drag to manually scrub the rows. While dragging, the
    * auto-animation pauses. A click that exceeds the drag threshold is
@@ -122,7 +120,6 @@ const DEFAULT_ASPECT_RATIO = 16 / 9;
 const DEFAULT_HEIGHT = "clamp(8.25rem, 18vw, 13rem)";
 const DEFAULT_GAP = "1rem";
 const DEFAULT_SPEED = 52;
-const REVEAL_KICKOFF_MS = 220;
 const DRAG_THRESHOLD_PX = 6;
 
 export const CLIENT_ICON_REGISTRY: Record<ClientMarqueeIconId, IconType> = {
@@ -238,7 +235,6 @@ function GalleryTile({
   itemClassName,
   onTileClick,
 }: GalleryTileProps) {
-  const [loaded, setLoaded] = useState(false);
   const imageSrc = image.src;
 
   if (!imageSrc) {
@@ -265,24 +261,19 @@ function GalleryTile({
           : undefined
       }
     >
-      <div
-        className={cn(
-          "absolute inset-0 transition-[opacity,filter] duration-[420ms] ease-out",
-          loaded ? "opacity-100 blur-0" : "opacity-0 blur-lg",
-        )}
-      >
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
+      <div className="absolute inset-0">
+        <Image
           src={imageSrc}
           alt={image.alt ?? ""}
-          loading={priority ? "eager" : "lazy"}
+          fill
+          sizes="(max-width: 640px) 82vw, (max-width: 1200px) 42vw, 34vw"
+          quality={75}
+          loading="eager"
           decoding="async"
           fetchPriority={priority ? "high" : "auto"}
           draggable={false}
           referrerPolicy="no-referrer-when-downgrade"
-          className="absolute inset-0 h-full w-full object-cover transition-transform duration-500 ease-out group-hover:scale-[1.035] select-none pointer-events-none"
-          onLoad={() => setLoaded(true)}
-          onError={() => setLoaded(true)}
+          className="object-cover transition-transform duration-300 ease-out group-hover:scale-[1.025] select-none pointer-events-none"
         />
       </div>
     </div>
@@ -311,7 +302,6 @@ function MarqueeRow({
   const widthRef = useRef(0);
   const speedScaleRef = useRef(1);
   const frameRef = useRef<number | null>(null);
-  const nextSegmentKeyRef = useRef(2);
   const dragRef = useRef({
     pointerId: -1,
     active: false,
@@ -394,9 +384,13 @@ function MarqueeRow({
           return current.slice(0, nextSegmentCopies);
         }
 
+        const highestKey = current.reduce(
+          (highest, key) => Math.max(highest, key),
+          -1,
+        );
         const appendedKeys = Array.from(
           { length: nextSegmentCopies - current.length },
-          () => nextSegmentKeyRef.current++,
+          (_, index) => highestKey + index + 1,
         );
 
         return [...current, ...appendedKeys];
@@ -406,6 +400,8 @@ function MarqueeRow({
     };
 
     const animate = (time: number) => {
+      frameRef.current = null;
+
       if (!previousTime) {
         previousTime = time;
       }
@@ -437,7 +433,25 @@ function MarqueeRow({
         applyTransform();
       }
 
-      frameRef.current = window.requestAnimationFrame(animate);
+      startAnimation();
+    };
+
+    const stopAnimation = () => {
+      if (frameRef.current !== null) {
+        window.cancelAnimationFrame(frameRef.current);
+        frameRef.current = null;
+      }
+      previousTime = 0;
+    };
+
+    const startAnimation = () => {
+      if (
+        frameRef.current === null &&
+        !document.hidden &&
+        !mediaQuery.matches
+      ) {
+        frameRef.current = window.requestAnimationFrame(animate);
+      }
     };
 
     const handleMotionChange = () => {
@@ -446,9 +460,20 @@ function MarqueeRow({
 
       if (mediaQuery.matches) {
         offsetRef.current = 0;
+        stopAnimation();
+      } else {
+        startAnimation();
       }
 
       applyTransform();
+    };
+
+    const handleVisibilityChange = () => {
+      if (document.hidden) {
+        stopAnimation();
+      } else {
+        startAnimation();
+      }
     };
 
     const resizeObserver = new ResizeObserver(updateMetrics);
@@ -457,15 +482,14 @@ function MarqueeRow({
     updateMetrics();
 
     mediaQuery.addEventListener("change", handleMotionChange);
-    frameRef.current = window.requestAnimationFrame(animate);
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+    startAnimation();
 
     return () => {
       resizeObserver.disconnect();
       mediaQuery.removeEventListener("change", handleMotionChange);
-
-      if (frameRef.current !== null) {
-        window.cancelAnimationFrame(frameRef.current);
-      }
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
+      stopAnimation();
     };
   }, [direction, hoverSlowdownFactor, expandedSlots.length, speed]);
 
@@ -603,26 +627,26 @@ function MarqueeRow({
                       >
                         <ClientIcon
                           aria-hidden
-                          className="size-[2.275rem] shrink-0 opacity-80 transition-all duration-300 ease-out group-hover:scale-110 group-hover:opacity-100 md:size-[2.6rem]"
+                          className="size-[2.275rem] shrink-0 opacity-80 transition-[transform,opacity] duration-200 ease-out group-hover:scale-105 group-hover:opacity-100 md:size-[2.6rem]"
                           style={{ color: image.iconColor ?? "currentColor" }}
                         />
                       </div>
                     ) : image.src ? (
                       <div className="relative h-full w-full">
-                        {/* eslint-disable-next-line @next/next/no-img-element */}
-                        <img
+                        <Image
                           src={image.src}
                           alt={clientLabel}
-                          loading={
-                            image.priority ?? isPriorityIndex ? "eager" : "lazy"
-                          }
+                          fill
+                          sizes="(max-width: 640px) 120px, 180px"
+                          quality={75}
+                          loading="eager"
                           decoding="async"
                           fetchPriority={
                             image.priority ?? isPriorityIndex ? "high" : "auto"
                           }
                           draggable={false}
                           referrerPolicy="no-referrer-when-downgrade"
-                          className="absolute inset-0 h-full w-full object-contain opacity-80 drop-shadow-[0_10px_24px_rgba(15,23,42,0.08)] transition-all duration-300 ease-out group-hover:scale-110 group-hover:opacity-100 select-none pointer-events-none"
+                          className="object-contain opacity-80 drop-shadow-[0_10px_24px_rgba(15,23,42,0.08)] transition-[transform,opacity] duration-200 ease-out group-hover:scale-105 group-hover:opacity-100 select-none pointer-events-none"
                         />
                       </div>
                     ) : (
@@ -636,12 +660,7 @@ function MarqueeRow({
                 return (
                   <article
                     key={`${image.id ?? image.src ?? image.icon ?? image.client ?? "marquee-item"}-${segmentIndex}-${slotIndex}`}
-                    className="group relative shrink-0 marquee-logo-reveal"
-                    style={
-                      {
-                        "--marquee-logo-delay": `${180 + Math.min(slotIndex, 8) * 52}ms`,
-                      } as CSSProperties
-                    }
+                    className="group relative shrink-0"
                     onPointerEnter={() => {
                       hoverRef.current = true;
                     }}
@@ -896,17 +915,19 @@ function GalleryOverlay({
         onPointerCancel={onStagePointerCancel}
       >
         <div className="absolute inset-0 flex items-center justify-center px-3 py-16 sm:px-20 sm:py-20">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
+          <Image
             key={image.src}
             src={image.src}
             alt={image.alt ?? ""}
+            fill
+            sizes="100vw"
+            quality={90}
             loading="eager"
             decoding="async"
             fetchPriority="high"
             draggable={false}
             referrerPolicy="no-referrer-when-downgrade"
-            className="max-h-full max-w-full select-none object-contain shadow-[0_24px_90px_rgba(0,0,0,0.45)]"
+            className="select-none object-contain p-3 shadow-[0_24px_90px_rgba(0,0,0,0.45)] sm:p-20"
             onClick={(event) => event.stopPropagation()}
           />
         </div>
@@ -975,7 +996,6 @@ export function ImageMarquee({
   hoverSlowdownFactor = 0.28,
   minItemsPerRow = 8,
   arrangeAsGrid = false,
-  revealOnLoad = false,
   draggable = false,
   enableLightbox = false,
 }: ImageMarqueeProps) {
@@ -985,7 +1005,6 @@ export function ImageMarquee({
 
   const gridMode = arrangeAsGrid && type === "gallery" && rows.length === 1;
 
-  const [ready, setReady] = useState(() => !revealOnLoad);
   const [lightboxState, setLightboxState] =
     useState<GalleryLightboxState | null>(null);
 
@@ -1003,24 +1022,6 @@ export function ImageMarquee({
     }
     return flat;
   }, [enableLightbox, rows, type]);
-
-  useEffect(() => {
-    if (!revealOnLoad) return;
-
-    // Kick off the reveal on a short skeleton-style timeout. This animates
-    // all tiles at once without waiting for any image load — images keep
-    // streaming in behind the same animation, then per-tile blur-up handles
-    // any that arrive late.
-    let frame = 0;
-    const timer = window.setTimeout(() => {
-      frame = window.requestAnimationFrame(() => setReady(true));
-    }, REVEAL_KICKOFF_MS);
-
-    return () => {
-      window.clearTimeout(timer);
-      if (frame) window.cancelAnimationFrame(frame);
-    };
-  }, [revealOnLoad]);
 
   const handleTileClick = useMemo(() => {
     if (!enableLightbox || type !== "gallery" || galleryImages.length === 0) {
@@ -1043,8 +1044,6 @@ export function ImageMarquee({
       className={cn(
         "image-marquee-edge-fade relative overflow-x-clip overflow-y-visible bg-transparent",
         fullBleed && "image-marquee-full-bleed",
-        revealOnLoad && "marquee-pixel-tear",
-        revealOnLoad && ready && "is-ready",
         className,
       )}
     >

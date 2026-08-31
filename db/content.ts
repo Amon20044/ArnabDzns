@@ -53,6 +53,9 @@ const CONTENT_REVALIDATE_SECONDS =
     ? parsedContentRevalidateSeconds
     : SITE_REVALIDATE_SECONDS;
 
+const CONTACT_PAGE_URL = "https://www.arnabdzns.com/contact";
+const CONTACT_PAGE_DISPLAY = "arnabdzns.com/contact";
+
 export type ContentBlockRecord = ContentBlockSeed & {
   createdAt?: string;
   updatedAt?: string;
@@ -427,6 +430,13 @@ function resolveImpactBlock(block: ContentBlockSeed) {
     ...data,
     hero: applyHeroOverrides(data.hero, block),
     cards: exactCards?.length ? exactCards : data.cards,
+    modalCTA: data.modalCTA
+      ? {
+          ...data.modalCTA,
+          href: CONTACT_PAGE_URL,
+          external: false,
+        }
+      : undefined,
   } satisfies ImpactSectionConfig;
 }
 
@@ -447,6 +457,15 @@ function resolveBookCallBlock(block: ContentBlockSeed) {
   return {
     ...data,
     hero: applyHeroOverrides(data.hero, block),
+    panel: {
+      ...data.panel,
+      primaryAction: {
+        ...data.panel.primaryAction,
+        value: CONTACT_PAGE_DISPLAY,
+        href: CONTACT_PAGE_URL,
+        external: false,
+      },
+    },
   } satisfies BookCallSectionConfig;
 }
 
@@ -464,6 +483,13 @@ function resolveSiteBlock(block: ContentBlockSeed) {
       logoSrc: brandImage?.src ?? data.brand.logoSrc,
       logoAlt: brandImage?.alt ?? data.brand.logoAlt,
       role: brandImage?.desc ?? data.brand.role,
+    },
+    contact: {
+      ...data.contact,
+      inquiryPath: "/contact",
+      bookingPath: "/contact",
+      bookingUrl: CONTACT_PAGE_URL,
+      bookingDisplay: CONTACT_PAGE_DISPLAY,
     },
   } satisfies SiteConfig;
 }
