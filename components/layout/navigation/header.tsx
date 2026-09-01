@@ -28,21 +28,36 @@ export const Header = ({ content = headerConfig }: HeaderProps) => {
   const [isVisible, setIsVisible] = useState(true);
   const [brandHovered, setBrandHovered] = useState(false);
   const lastScrollYRef = useRef(0);
+  const scrollFrameRef = useRef<number | null>(null);
   const isVisibleRef = useRef(true);
   const brandHref = brand.path === "/" ? "/about" : brand.path;
 
   const handleScroll = useEffectEvent(() => {
-    const currentScrollY = window.scrollY;
-    const isNearTop = currentScrollY < 24;
-    const isScrollingUp = currentScrollY <= lastScrollYRef.current;
-    const nextVisible = isNearTop || isScrollingUp;
-
-    if (nextVisible !== isVisibleRef.current) {
-      isVisibleRef.current = nextVisible;
-      startTransition(() => setIsVisible(nextVisible));
+    if (scrollFrameRef.current !== null) {
+      return;
     }
 
-    lastScrollYRef.current = currentScrollY;
+    scrollFrameRef.current = window.requestAnimationFrame(() => {
+      scrollFrameRef.current = null;
+
+      const currentScrollY = Math.max(0, window.scrollY);
+      const scrollDelta = currentScrollY - lastScrollYRef.current;
+      const isNearTop = currentScrollY < 24;
+      const nextVisible = isNearTop
+        ? true
+        : scrollDelta < -4
+          ? true
+          : scrollDelta > 4
+            ? false
+            : isVisibleRef.current;
+
+      if (nextVisible !== isVisibleRef.current) {
+        isVisibleRef.current = nextVisible;
+        startTransition(() => setIsVisible(nextVisible));
+      }
+
+      lastScrollYRef.current = currentScrollY;
+    });
   });
 
   useEffect(() => {
@@ -50,7 +65,15 @@ export const Header = ({ content = headerConfig }: HeaderProps) => {
     isVisibleRef.current = true;
 
     window.addEventListener("scroll", handleScroll, { passive: true });
-    return () => window.removeEventListener("scroll", handleScroll);
+
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+
+      if (scrollFrameRef.current !== null) {
+        window.cancelAnimationFrame(scrollFrameRef.current);
+        scrollFrameRef.current = null;
+      }
+    };
   }, []);
 
   return (
