@@ -201,6 +201,21 @@ body {
   align-items: stretch;
 }
 
+/* Static ambient backdrop replaces the WebGL shader: same bright iridescent
+   family, with no canvas, animation loop, pointer listener, or GPU shader. */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -10;
+  pointer-events: none;
+  background:
+    radial-gradient(72rem 46rem at 5% -12%, rgba(231, 216, 255, 0.86) 0%, rgba(243, 235, 255, 0.44) 35%, transparent 70%),
+    radial-gradient(58rem 42rem at 96% 8%, rgba(204, 226, 255, 0.62) 0%, rgba(235, 227, 255, 0.30) 42%, transparent 72%),
+    radial-gradient(54rem 40rem at 52% 105%, rgba(249, 221, 255, 0.50) 0%, transparent 68%),
+    linear-gradient(135deg, #ffffff 0%, #fbf9ff 38%, #f7f4ff 70%, #ffffff 100%);
+}
+
 body > :is(div, main) {
   width: 100%;
 }
@@ -713,26 +728,18 @@ body > :is(div, main) {
     0 1px 3px rgba(0, 0, 0, 0.15);
 }
 
-/*
- * SVG backdrop filters are retained for desktop's liquid refraction. On
- * tablets and phones, use native CSS blur only: it keeps the glass language
- * while avoiding the expensive SVG compositing path during scroll and motion.
- */
+/* Tablet and phone glass stays native: no SVG filter compositing on touch
+   devices, but the same blur, tint, border, and shadow language remains. */
 @media (max-width: 1023px) {
-  :is(
-    .liquid-glass,
-    .liquid-glass-header,
-    .liquid-glass-shell,
-    .glass-capsule,
-    .glass-capsule-primary
-  ) {
-    --lg-backdrop: brightness(1.04) saturate(1.18) blur(12px);
-    --lg-backdrop-webkit: brightness(1.04) saturate(1.18) blur(12px);
-    backdrop-filter: brightness(1.04) saturate(1.18) blur(12px) !important;
-    -webkit-backdrop-filter: brightness(1.04) saturate(1.18) blur(12px) !important;
+  :is(.liquid-glass, .liquid-glass-header, .liquid-glass-shell, .nav-shell-backdrop) {
+    --lg-backdrop: var(--lg-backdrop-webkit);
   }
 
-  /* Covers shared inline glass styles that reference the global SVG filter. */
+  :is(.glass-capsule, .glass-capsule-primary) {
+    backdrop-filter: brightness(1.04) saturate(1.18) blur(12px);
+    -webkit-backdrop-filter: brightness(1.04) saturate(1.18) blur(12px);
+  }
+
   [style*="url(#lg-distort)"] {
     backdrop-filter: brightness(1.04) saturate(1.18) blur(12px) !important;
     -webkit-backdrop-filter: brightness(1.04) saturate(1.18) blur(12px) !important;

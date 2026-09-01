@@ -21,6 +21,8 @@ type ElementSize = {
   height: number;
 };
 
+const DESKTOP_GLASS_QUERY = "(min-width: 1024px)";
+
 const clamp = (value: number, min: number, max: number) =>
   Math.min(max, Math.max(min, value));
 
@@ -139,6 +141,7 @@ export function LiquidGlassBackdrop({
 }: LiquidGlassBackdropProps) {
   const elementRef = useRef<HTMLDivElement>(null);
   const [size, setSize] = useState<ElementSize | null>(null);
+  const [usesSvgRefraction, setUsesSvgRefraction] = useState(false);
   const reactId = useId();
   const filterId = useMemo(
     () => `liquid-glass-${variant}-${reactId.replace(/:/g, "")}`,
@@ -149,6 +152,21 @@ export function LiquidGlassBackdrop({
     variant === "header" ? "liquid-glass-header" : "liquid-glass-shell";
 
   useEffect(() => {
+    const mediaQuery = window.matchMedia(DESKTOP_GLASS_QUERY);
+    const syncMediaQuery = () => setUsesSvgRefraction(mediaQuery.matches);
+
+    syncMediaQuery();
+    mediaQuery.addEventListener("change", syncMediaQuery);
+
+    return () => mediaQuery.removeEventListener("change", syncMediaQuery);
+  }, []);
+
+  useEffect(() => {
+    if (!usesSvgRefraction) {
+      setSize(null);
+      return;
+    }
+
     const element = elementRef.current;
 
     if (!element) {
@@ -185,19 +203,23 @@ export function LiquidGlassBackdrop({
     resizeObserver.observe(element);
 
     return () => resizeObserver.disconnect();
-  }, []);
+  }, [usesSvgRefraction]);
 
   const displacementMap = useMemo(
     () =>
-      size
+      usesSvgRefraction && size
         ? createDisplacementMap(size.width, size.height, config)
         : null,
-    [config, size]
+    [config, size, usesSvgRefraction]
   );
 
   const backdropFilter = useMemo(
-    () => formatBackdropFilter(displacementMap ? filterId : null, config),
-    [config, displacementMap, filterId]
+    () =>
+      formatBackdropFilter(
+        usesSvgRefraction && displacementMap ? filterId : null,
+        config,
+      ),
+    [config, displacementMap, filterId, usesSvgRefraction]
   );
 
   return (

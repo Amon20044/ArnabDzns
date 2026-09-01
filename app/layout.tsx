@@ -1,7 +1,6 @@
 import type { CSSProperties } from "react";
 import type { Viewport } from "next";
 import "lenis/dist/lenis.css";
-import { IridescenceBackground } from "@/components/background/iridescence";
 import { RouteAwareSiteFrame } from "@/components/layout/route-aware-site-frame";
 import { SmoothScrollProvider } from "@/components/providers/smooth-scroll-provider";
 import { StructuredData } from "@/components/site/structured-data";
@@ -40,8 +39,6 @@ export default async function RootLayout({
       >
         <StructuredData data={getSiteJsonLd()} />
         <LiquidGlassDefs />
-        {/* Keep fixed chrome outside the brief startup reveal wrapper. */}
-        <IridescenceBackground color={[0.93, 0.88, 0.99]} mouseReact amplitude={0.08} speed={0.9} />
         <SmoothScrollProvider>
           <RouteAwareSiteFrame
             header={content.header}
