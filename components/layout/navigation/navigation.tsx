@@ -17,6 +17,7 @@ import { navigationConfig } from "@/data/navigation";
 import type { CTAConfig, NavigationConfig, NavItemConfig } from "@/types";
 import { LiquidGlassBackdrop } from "@/components/ui/liquid-glass-backdrop";
 import { ShinyIconLink } from "@/components/ui/shiny-icon-link";
+import { useSmoothScroll } from "@/components/providers/smooth-scroll-provider";
 import { CTAButton } from "./cta-button";
 import { iconRegistry } from "./icon-registry";
 import { NavItem } from "./nav-item";
@@ -82,6 +83,7 @@ function useVisualViewportBottomOffset() {
 
 export const Navigation = ({ content = navigationConfig }: NavigationProps) => {
   const pathname = usePathname();
+  const { scrollTo } = useSmoothScroll();
   const navbarRef = useRef<HTMLElement>(null);
   const mobileTooltipTimeoutRef = useRef<number | null>(null);
   const [hovered, setHovered] = useState(false);
@@ -151,14 +153,9 @@ export const Navigation = ({ content = navigationConfig }: NavigationProps) => {
 
   const scrollToSection = useCallback(
     (sectionId: string) => {
-      const prefersReducedMotion = window.matchMedia(
-        "(prefers-reduced-motion: reduce)",
-      ).matches;
-      const behavior = prefersReducedMotion ? "auto" : "smooth";
-
       if (sectionId === "home") {
         syncHashForSection(sectionId);
-        window.scrollTo({ top: 0, behavior });
+        scrollTo(0, { lerp: 0.16 });
         return;
       }
 
@@ -171,9 +168,9 @@ export const Navigation = ({ content = navigationConfig }: NavigationProps) => {
       }
 
       syncHashForSection(sectionId);
-      target.scrollIntoView({ behavior, block: "start" });
+      scrollTo(target, { offset: -92, lerp: 0.16 });
     },
-    [syncHashForSection],
+    [scrollTo, syncHashForSection],
   );
 
   const handleNavClick = useCallback(

@@ -185,7 +185,7 @@ html {
   max-width: 100%;
   overflow-x: hidden;
   background-color: var(--background);
-  scroll-behavior: smooth;
+  scroll-behavior: auto;
   scroll-padding-top: calc(72px + 1.25rem);
 }
 
@@ -326,28 +326,6 @@ body > :is(div, main) {
     margin-left: calc(50% - 50dvw);
     margin-right: calc(50% - 50dvw);
   }
-}
-
-.image-marquee-edge-fade {
-  --image-marquee-edge-fade: clamp(2rem, 8vw, 4.75rem);
-  -webkit-mask-image: linear-gradient(
-    to right,
-    transparent 0,
-    black var(--image-marquee-edge-fade),
-    black calc(100% - var(--image-marquee-edge-fade)),
-    transparent 100%
-  );
-  mask-image: linear-gradient(
-    to right,
-    transparent 0,
-    black var(--image-marquee-edge-fade),
-    black calc(100% - var(--image-marquee-edge-fade)),
-    transparent 100%
-  );
-}
-
-.home-portfolio-marquee {
-  --image-marquee-edge-fade: clamp(2rem, 9vw, 4.75rem);
 }
 
 @media (min-width: 40rem) {
@@ -733,6 +711,32 @@ body > :is(div, main) {
     inset 0 0 14px rgba(168, 85, 247, 0.22),
     0 4px 20px rgba(0, 0, 0, 0.25),
     0 1px 3px rgba(0, 0, 0, 0.15);
+}
+
+/*
+ * SVG backdrop filters are retained for desktop's liquid refraction. On
+ * tablets and phones, use native CSS blur only: it keeps the glass language
+ * while avoiding the expensive SVG compositing path during scroll and motion.
+ */
+@media (max-width: 1023px) {
+  :is(
+    .liquid-glass,
+    .liquid-glass-header,
+    .liquid-glass-shell,
+    .glass-capsule,
+    .glass-capsule-primary
+  ) {
+    --lg-backdrop: brightness(1.04) saturate(1.18) blur(12px);
+    --lg-backdrop-webkit: brightness(1.04) saturate(1.18) blur(12px);
+    backdrop-filter: brightness(1.04) saturate(1.18) blur(12px) !important;
+    -webkit-backdrop-filter: brightness(1.04) saturate(1.18) blur(12px) !important;
+  }
+
+  /* Covers shared inline glass styles that reference the global SVG filter. */
+  [style*="url(#lg-distort)"] {
+    backdrop-filter: brightness(1.04) saturate(1.18) blur(12px) !important;
+    -webkit-backdrop-filter: brightness(1.04) saturate(1.18) blur(12px) !important;
+  }
 }
 
 /* Smooth scrollbar */

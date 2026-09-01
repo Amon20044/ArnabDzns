@@ -132,7 +132,7 @@ export function IridescenceBackground({
         alpha: false,
         antialias: false,
         depth: false,
-        dpr: Math.min(window.devicePixelRatio || 1, 1.5),
+        dpr: Math.min(window.devicePixelRatio || 1, 1.25),
         powerPreference: "low-power",
         stencil: false,
       });
@@ -166,6 +166,7 @@ export function IridescenceBackground({
 
       const mesh = new Mesh(gl, { geometry, program });
       let frameId = 0;
+      let previousRenderTime = 0;
 
       const resize = () => {
         renderer.setSize(window.innerWidth, window.innerHeight);
@@ -182,8 +183,36 @@ export function IridescenceBackground({
       };
 
       const tick = (time: number) => {
-        renderFrame(time);
+        const isScrolling = document.documentElement.classList.contains(
+          "lenis-scrolling",
+        );
+        const frameInterval = isScrolling ? 1000 / 30 : 1000 / 60;
+
+        if (time - previousRenderTime >= frameInterval) {
+          renderFrame(time);
+          previousRenderTime = time;
+        }
+
         frameId = window.requestAnimationFrame(tick);
+      };
+
+      const stopAnimation = () => {
+        if (frameId) {
+          window.cancelAnimationFrame(frameId);
+          frameId = 0;
+        }
+      };
+
+      const startAnimation = () => {
+        if (!frameId && !document.hidden && !reducedMotion) {
+          previousRenderTime = 0;
+          frameId = window.requestAnimationFrame(tick);
+        }
+      };
+
+      const handleVisibilityChange = () => {
+        if (document.hidden) stopAnimation();
+        else startAnimation();
       };
 
       const handlePointerMove = (event: PointerEvent) => {
@@ -200,17 +229,17 @@ export function IridescenceBackground({
       if (reducedMotion) {
         renderFrame(performance.now());
       } else {
-        frameId = window.requestAnimationFrame(tick);
+        startAnimation();
       }
 
       window.addEventListener("resize", resize, { passive: true });
+      document.addEventListener("visibilitychange", handleVisibilityChange);
 
       teardown = () => {
-        if (frameId) {
-          window.cancelAnimationFrame(frameId);
-        }
+        stopAnimation();
 
         window.removeEventListener("resize", resize);
+        document.removeEventListener("visibilitychange", handleVisibilityChange);
 
         if (mouseReact) {
           window.removeEventListener("pointermove", handlePointerMove);

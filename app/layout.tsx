@@ -1,9 +1,9 @@
 import type { CSSProperties } from "react";
 import type { Viewport } from "next";
-import "locomotive-scroll/locomotive-scroll.css";
+import "lenis/dist/lenis.css";
 import { IridescenceBackground } from "@/components/background/iridescence";
 import { RouteAwareSiteFrame } from "@/components/layout/route-aware-site-frame";
-import { LocomotiveScrollProvider } from "@/components/providers/locomotive-scroll-provider";
+import { SmoothScrollProvider } from "@/components/providers/smooth-scroll-provider";
 import { StructuredData } from "@/components/site/structured-data";
 import { LiquidGlassDefs } from "@/components/ui/liquid-glass-defs";
 import { aeonik } from "@/config/fonts";
@@ -42,7 +42,7 @@ export default async function RootLayout({
         <LiquidGlassDefs />
         {/* Keep fixed chrome outside the brief startup reveal wrapper. */}
         <IridescenceBackground color={[0.93, 0.88, 0.99]} mouseReact amplitude={0.08} speed={0.9} />
-        <LocomotiveScrollProvider>
+        <SmoothScrollProvider>
           <RouteAwareSiteFrame
             header={content.header}
             navigation={content.navigation}
@@ -50,7 +50,7 @@ export default async function RootLayout({
           >
             {children}
           </RouteAwareSiteFrame>
-        </LocomotiveScrollProvider>
+        </SmoothScrollProvider>
         <div className="site-boot-loader" aria-label="Loading site" role="status">
           <div className="site-loader-card">
             <span className="site-loader-mark" />

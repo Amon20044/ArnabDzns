@@ -111,13 +111,12 @@ export function ServiceMarquee({
     };
 
     const animate = (time: number) => {
+      frameRef.current = null;
       if (!previousTime) previousTime = time;
       const deltaSeconds = Math.min((time - previousTime) / 1000, 0.05);
       previousTime = time;
 
-      if (mediaQuery.matches || widthRef.current === 0) {
-        track.style.transform = "translate3d(0px, 0px, 0px)";
-      } else {
+      if (widthRef.current > 0) {
         offsetRef.current += speed * deltaSeconds;
         if (offsetRef.current >= widthRef.current) {
           offsetRef.current %= widthRef.current;
@@ -125,18 +124,55 @@ export function ServiceMarquee({
         applyTransform();
       }
 
-      frameRef.current = window.requestAnimationFrame(animate);
+      startAnimation();
+    };
+
+    const stopAnimation = () => {
+      if (frameRef.current !== null) {
+        window.cancelAnimationFrame(frameRef.current);
+        frameRef.current = null;
+      }
+      previousTime = 0;
+    };
+
+    const startAnimation = () => {
+      if (
+        frameRef.current === null &&
+        !document.hidden &&
+        !mediaQuery.matches
+      ) {
+        frameRef.current = window.requestAnimationFrame(animate);
+      }
+    };
+
+    const handleMotionChange = () => {
+      if (mediaQuery.matches) {
+        offsetRef.current = 0;
+        stopAnimation();
+        applyTransform();
+      } else {
+        startAnimation();
+      }
+    };
+
+    const handleVisibilityChange = () => {
+      if (document.hidden) stopAnimation();
+      else startAnimation();
     };
 
     const resizeObserver = new ResizeObserver(updateWidth);
     resizeObserver.observe(segment);
     updateWidth();
 
-    frameRef.current = window.requestAnimationFrame(animate);
+    mediaQuery.addEventListener("change", handleMotionChange);
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+    startAnimation();
 
     return () => {
       resizeObserver.disconnect();
-      if (frameRef.current !== null) window.cancelAnimationFrame(frameRef.current);
+      mediaQuery.removeEventListener("change", handleMotionChange);
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
+      stopAnimation();
     };
   }, [direction, items.length, speed]);
 
@@ -145,7 +181,7 @@ export function ServiceMarquee({
   return (
     <div
       className={cn(
-        "relative left-1/2 w-screen -translate-x-1/2 overflow-hidden [mask-image:linear-gradient(to_right,transparent,black_8%,black_92%,transparent)] [-webkit-mask-image:linear-gradient(to_right,transparent,black_8%,black_92%,transparent)]",
+        "relative left-1/2 w-screen -translate-x-1/2 overflow-hidden",
         className,
       )}
     >

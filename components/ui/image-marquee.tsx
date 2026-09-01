@@ -375,26 +375,11 @@ function MarqueeRow({
           ? Math.max(2, Math.ceil(containerWidth / widthRef.current) + 1)
           : 2;
 
-      setSegmentKeys((current) => {
-        if (current.length === nextSegmentCopies) {
-          return current;
-        }
-
-        if (current.length > nextSegmentCopies) {
-          return current.slice(0, nextSegmentCopies);
-        }
-
-        const highestKey = current.reduce(
-          (highest, key) => Math.max(highest, key),
-          -1,
-        );
-        const appendedKeys = Array.from(
-          { length: nextSegmentCopies - current.length },
-          (_, index) => highestKey + index + 1,
-        );
-
-        return [...current, ...appendedKeys];
-      });
+      setSegmentKeys((current) =>
+        current.length === nextSegmentCopies
+          ? current
+          : Array.from({ length: nextSegmentCopies }, (_, index) => index),
+      );
 
       applyTransform();
     };
@@ -415,19 +400,13 @@ function MarqueeRow({
         // While dragging, leave offset untouched; pointer handlers apply transform directly.
       } else {
         const targetScale = hoverRef.current ? hoverSlowdownFactor : 1;
-        speedScaleRef.current += (targetScale - speedScaleRef.current) * 0.08;
+        const smoothing = 1 - Math.exp(-8 * deltaSeconds);
+        speedScaleRef.current +=
+          (targetScale - speedScaleRef.current) * smoothing;
         offsetRef.current += speed * speedScaleRef.current * deltaSeconds;
 
         if (offsetRef.current >= widthRef.current) {
           offsetRef.current %= widthRef.current;
-          setSegmentKeys((current) => {
-            if (current.length < 2) {
-              return current;
-            }
-
-            const [first, ...rest] = current;
-            return [...rest, first];
-          });
         }
 
         applyTransform();
@@ -1042,7 +1021,7 @@ export function ImageMarquee({
   return (
     <section
       className={cn(
-        "image-marquee-edge-fade relative overflow-x-clip overflow-y-visible bg-transparent",
+        "relative overflow-x-clip overflow-y-visible bg-transparent",
         fullBleed && "image-marquee-full-bleed",
         className,
       )}
