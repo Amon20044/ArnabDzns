@@ -339,9 +339,9 @@ export const Navigation = ({ content = navigationConfig }: NavigationProps) => {
       <motion.nav
         role="navigation"
         aria-label="Main navigation"
-        className="absolute left-1/2 z-30 w-fit max-w-[calc(100vw-1rem)] -translate-x-1/2 sm:hidden"
+        className="fixed left-1/2 z-50 w-fit max-w-[calc(100vw-1rem)] -translate-x-1/2 sm:hidden"
         style={{
-          top: "calc(100svh - 3.5rem - env(safe-area-inset-bottom))",
+          bottom: "calc(0.75rem + env(safe-area-inset-bottom))",
         }}
         initial={{ y: 24, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
@@ -495,7 +495,7 @@ export const Navigation = ({ content = navigationConfig }: NavigationProps) => {
         ref={navbarRef}
         role="navigation"
         aria-label="Main navigation"
-        className="fixed bottom-4 left-[50vw] z-50 hidden w-[min(calc(100vw-1.25rem),31rem)] -translate-x-1/2 items-center justify-between gap-2 rounded-[1.75rem] border border-transparent bg-transparent px-2 py-2 shadow-none sm:bottom-5 sm:flex sm:w-auto sm:justify-start sm:gap-1 sm:rounded-full"
+        className="fixed bottom-[calc(1rem+env(safe-area-inset-bottom))] left-1/2 z-50 hidden max-w-[calc(100vw-1.25rem)] w-auto -translate-x-1/2 items-center justify-start gap-1 rounded-full border border-transparent bg-transparent px-2 py-2 shadow-none sm:bottom-[calc(1.25rem+env(safe-area-inset-bottom))] sm:flex"
         initial={{ y: 24, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ type: "spring", stiffness: 320, damping: 26, delay: 0.1 }}
