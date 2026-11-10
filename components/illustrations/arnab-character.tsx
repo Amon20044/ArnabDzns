@@ -35,7 +35,7 @@ const SHELL_SHADE = "#d9d3ea";
  */
 export function ArnabCharacter({
   className,
-  title = "Illustration of Arnab wearing a headset and holding a game controller",
+  title = "Illustration of Arnab wearing a headset and playing on a game controller",
 }: ArnabCharacterProps) {
   const reduce = useReducedMotion();
   const still = Boolean(reduce);
@@ -224,121 +224,162 @@ export function ArnabCharacter({
         <path d="M222 229q18 6 36 0q-18 9-36 0Z" fill="#ffffff" />
       </motion.g>
 
-      {/* ---------- Arms + controller ---------- */}
+      {/* ---------- Arms + controller ----------
+          We see the pad from behind, the way you would facing someone who is
+          playing: triggers and bumpers along the top edge, the light bar
+          between them, the back shell, and fingers wrapped round the grips.
+          Thumbs are out of sight on the far side. */}
+      <ellipse cx="240" cy="506" rx="118" ry="13" fill="#0b0910" opacity="0.4" />
       <motion.g
         style={{ transformBox: "fill-box", transformOrigin: "50% 40%" }}
         animate={still ? undefined : { rotate: [-2.5, 2.5, -2.5], y: [0, -3, 0] }}
         transition={loop(3.4)}
       >
-        {/* sleeves: shoulder, elbow out, wrist in at the grips */}
+        {/* sleeves: shoulder, elbow out, wrist at the outside of each grip */}
         <path
-          d="M152 318c-38 30-58 86-42 120 8 16 22 26 38 28"
+          d="M152 318c-40 28-66 82-56 126"
           fill="none"
           stroke="url(#arnab-sleeve)"
           strokeWidth="46"
           strokeLinecap="round"
         />
         <path
-          d="M328 318c38 30 58 86 42 120-8 16-22 26-38 28"
+          d="M328 318c40 28 66 82 56 126"
           fill="none"
           stroke="url(#arnab-sleeve)"
           strokeWidth="46"
           strokeLinecap="round"
         />
         {/* cuffs */}
-        <path
-          d="M133 462l16 4M347 462l-16 4"
-          fill="none"
-          stroke="#a855f7"
-          strokeWidth="46"
-        />
-        {/* palms sit behind the grips, the way a held pad hides the fingers */}
-        <ellipse cx="160" cy="476" rx="25" ry="24" fill={SKIN} />
-        <ellipse cx="320" cy="476" rx="25" ry="24" fill={SKIN} />
+        <path d="M94 434l3 16M386 434l-3 16" fill="none" stroke="#a855f7" strokeWidth="48" />
 
-        <g transform="translate(0 16)">
-          {/* light bar glow */}
-          <motion.ellipse
-            cx="240"
-            cy="366"
-            rx="78"
-            ry="24"
-            fill="url(#arnab-lightbar)"
-            animate={still ? undefined : { opacity: [0.35, 1, 0.35] }}
-            transition={loop(2.2)}
-          />
-          <path
-            d="M136 392c0-22 18-32 44-32h120c26 0 44 10 44 32l14 76c6 30-28 44-44 16l-14-26H180l-14 26c-16 28-50 14-44-16Z"
-            fill="url(#arnab-shell)"
-          />
-          <path
-            d="M180 458h120l14 26c16 28 50 14 44-16l-4-20c2 22-22 30-34 10l-12-22H172l-12 22c-12 20-36 12-34-10l-4 20c-6 30 28 44 44 16Z"
-            fill="#c4b9de"
-            opacity="0.7"
-          />
-          {/* touchpad */}
-          <rect x="204" y="368" width="72" height="40" rx="10" fill={INK} />
-          <rect x="204" y="368" width="72" height="5" rx="2.5" fill="#c084fc" />
-          {/* d-pad */}
-          <g fill={INK}>
-            <rect x="158" y="392" width="34" height="12" rx="4" />
-            <rect x="169" y="381" width="12" height="34" rx="4" />
-          </g>
-          {/* face buttons: generic shape set, lit in sequence */}
-          {[
-            { cx: 308, cy: 380, fill: "#3ddc97" },
-            { cx: 326, cy: 398, fill: "#ff5d5d" },
-            { cx: 308, cy: 416, fill: "#4f7bff" },
-            { cx: 290, cy: 398, fill: "#ff7fb5" },
-          ].map((button, index) => (
-            <motion.circle
-              key={button.fill}
-              cx={button.cx}
-              cy={button.cy}
-              r="9"
-              fill={button.fill}
-              style={{ transformBox: "fill-box", transformOrigin: "50% 50%" }}
-              animate={still ? undefined : { scale: [1, 1, 1.28, 1, 1] }}
-              transition={{
-                duration: 3.2,
-                times: [0, 0.1 + index * 0.2, 0.16 + index * 0.2, 0.24 + index * 0.2, 1],
-                repeat: Number.POSITIVE_INFINITY,
-              }}
-            />
-          ))}
-          {/* sticks */}
-          <circle cx="214" cy="436" r="15" fill={INK} />
-          <circle cx="266" cy="436" r="15" fill={INK} />
-          <circle cx="214" cy="434" r="9" fill="#3a3348" />
-          <circle cx="266" cy="434" r="9" fill="#3a3348" />
-        </g>
+        {/* light bar glow, thrown up onto the hoodie */}
+        <motion.ellipse
+          cx="240"
+          cy="368"
+          rx="86"
+          ry="26"
+          fill="url(#arnab-lightbar)"
+          animate={still ? undefined : { opacity: [0.35, 1, 0.35] }}
+          transition={loop(2.2)}
+        />
 
-        {/* thumbs rest on top of the pad */}
-        <motion.path
-          d="M156 464l12-24"
-          fill="none"
-          stroke={SKIN}
-          strokeWidth="17"
-          strokeLinecap="round"
-          animate={still ? undefined : { x: [0, 4, -2, 0], y: [0, -3, 2, 0] }}
-          transition={loop(1.5)}
+        {/* triggers sit behind the top edge and dip when pressed */}
+        <motion.rect
+          x="152"
+          y="350"
+          width="58"
+          height="36"
+          rx="13"
+          fill="#2f2940"
+          animate={still ? undefined : { y: [350, 355, 350, 350] }}
+          transition={{ duration: 1.6, times: [0, 0.18, 0.4, 1], repeat: Number.POSITIVE_INFINITY }}
         />
-        <motion.path
-          d="M324 464l-10-22"
-          fill="none"
-          stroke={SKIN}
-          strokeWidth="17"
-          strokeLinecap="round"
-          animate={still ? undefined : { x: [0, -4, 2, 0], y: [0, 3, -3, 0] }}
-          transition={loop(1.1, 0.2)}
+        <motion.rect
+          x="270"
+          y="350"
+          width="58"
+          height="36"
+          rx="13"
+          fill="#2f2940"
+          animate={still ? undefined : { y: [350, 350, 355, 350] }}
+          transition={{ duration: 1.6, times: [0, 0.5, 0.68, 1], repeat: Number.POSITIVE_INFINITY }}
         />
+
+        {/* back shell */}
         <path
-          d="M150 470q6 6 14 4M330 470q-6 6-14 4"
+          d="M134 404c0-22 18-32 44-32h124c26 0 44 10 44 32l14 74c6 30-28 44-44 16l-14-26H178l-14 26c-16 28-50 14-44-16Z"
+          fill="url(#arnab-shell)"
+        />
+        {/* underside turning away from the light: this is what gives it depth */}
+        <path
+          d="M178 468h124l14 26c16 28 50 14 44-16l-5-26c4 26-22 36-35 14l-13-24H173l-13 24c-13 22-39 12-35-14l-5 26c-6 30 28 44 44 16Z"
+          fill="#b9add6"
+        />
+        {/* top edge catching the light */}
+        <path
+          d="M146 388c6-12 18-16 32-16h124c14 0 26 4 32 16-10-5-20-7-32-7H178c-12 0-22 2-32 7Z"
+          fill="#ffffff"
+        />
+        {/* bumpers */}
+        <rect x="148" y="368" width="66" height="15" rx="7.5" fill={INK} />
+        <rect x="266" y="368" width="66" height="15" rx="7.5" fill={INK} />
+        {/* light bar */}
+        <rect x="219" y="370" width="42" height="10" rx="5" fill="#c084fc" />
+        <rect x="224" y="372" width="32" height="3" rx="1.5" fill="#f3e8ff" />
+        {/* back plate: recess, seam, screws, port */}
+        <rect x="204" y="398" width="72" height="34" rx="11" fill="#e4ddf3" />
+        <rect x="204" y="398" width="72" height="6" rx="3" fill="#d2c8ea" />
+        <path
+          d="M180 452c22-8 98-8 120 0"
           fill="none"
-          stroke={SKIN_SHADE}
+          stroke="#cfc5e8"
           strokeWidth="3"
           strokeLinecap="round"
         />
+        <circle cx="188" cy="414" r="3.2" fill="#b9add6" />
+        <circle cx="292" cy="414" r="3.2" fill="#b9add6" />
+        <rect x="232" y="440" width="16" height="6" rx="3" fill="#b9add6" />
+
+        {/* ---------- Left hand (viewer's left) ---------- */}
+        {/* back of the hand, tucked against the outside of the grip */}
+        <path d="M100 420c-8 20-6 46 8 62 14 8 26 2 30-12l2-52c-12-10-30-10-40 2Z" fill={SKIN} />
+        <path d="M104 470c6 10 18 14 28 8" fill="none" stroke={SKIN_SHADE} strokeWidth="3" strokeLinecap="round" />
+        {/* three fingers wrap the grip; each has a darker edge so they read apart */}
+        <g fill="none" strokeLinecap="round">
+          <path d="M122 472l40 2" stroke={SKIN_SHADE} strokeWidth="21" />
+          <path d="M122 471l40 2" stroke={SKIN} strokeWidth="17" />
+          <path d="M120 451l50-2" stroke={SKIN_SHADE} strokeWidth="22" />
+          <path d="M120 450l50-2" stroke={SKIN} strokeWidth="18" />
+          <path d="M122 430l52-6" stroke={SKIN_SHADE} strokeWidth="22" />
+          <path d="M122 429l52-6" stroke={SKIN} strokeWidth="18" />
+        </g>
+        {/* knuckle creases */}
+        <path
+          d="M146 420v10M144 443v10M142 465v9"
+          fill="none"
+          stroke={SKIN_SHADE}
+          strokeWidth="2.4"
+          strokeLinecap="round"
+          opacity="0.7"
+        />
+        {/* index finger reaches over the top onto the trigger */}
+        <motion.g
+          animate={still ? undefined : { y: [0, 5, 0, 0] }}
+          transition={{ duration: 1.6, times: [0, 0.18, 0.4, 1], repeat: Number.POSITIVE_INFINITY }}
+        >
+          <path d="M116 412c4-28 24-46 58-50" fill="none" stroke={SKIN_SHADE} strokeWidth="22" strokeLinecap="round" />
+          <path d="M116 411c4-28 24-46 58-50" fill="none" stroke={SKIN} strokeWidth="18" strokeLinecap="round" />
+          <path d="M146 372l4 9" fill="none" stroke={SKIN_SHADE} strokeWidth="2.4" strokeLinecap="round" opacity="0.7" />
+        </motion.g>
+
+        {/* ---------- Right hand ---------- */}
+        <path d="M380 420c8 20 6 46-8 62-14 8-26 2-30-12l-2-52c12-10 30-10 40 2Z" fill={SKIN} />
+        <path d="M376 470c-6 10-18 14-28 8" fill="none" stroke={SKIN_SHADE} strokeWidth="3" strokeLinecap="round" />
+        <g fill="none" strokeLinecap="round">
+          <path d="M358 472l-40 2" stroke={SKIN_SHADE} strokeWidth="21" />
+          <path d="M358 471l-40 2" stroke={SKIN} strokeWidth="17" />
+          <path d="M360 451l-50-2" stroke={SKIN_SHADE} strokeWidth="22" />
+          <path d="M360 450l-50-2" stroke={SKIN} strokeWidth="18" />
+          <path d="M358 430l-52-6" stroke={SKIN_SHADE} strokeWidth="22" />
+          <path d="M358 429l-52-6" stroke={SKIN} strokeWidth="18" />
+        </g>
+        <path
+          d="M334 420v10M336 443v10M338 465v9"
+          fill="none"
+          stroke={SKIN_SHADE}
+          strokeWidth="2.4"
+          strokeLinecap="round"
+          opacity="0.7"
+        />
+        <motion.g
+          animate={still ? undefined : { y: [0, 0, 5, 0] }}
+          transition={{ duration: 1.6, times: [0, 0.5, 0.68, 1], repeat: Number.POSITIVE_INFINITY }}
+        >
+          <path d="M364 412c-4-28-24-46-58-50" fill="none" stroke={SKIN_SHADE} strokeWidth="22" strokeLinecap="round" />
+          <path d="M364 411c-4-28-24-46-58-50" fill="none" stroke={SKIN} strokeWidth="18" strokeLinecap="round" />
+          <path d="M334 372l-4 9" fill="none" stroke={SKIN_SHADE} strokeWidth="2.4" strokeLinecap="round" opacity="0.7" />
+        </motion.g>
       </motion.g>
     </svg>
   );
