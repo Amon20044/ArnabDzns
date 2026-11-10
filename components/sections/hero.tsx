@@ -5,7 +5,6 @@ import { motion, type Variants } from "framer-motion";
 import { ArrowRight } from "lucide-react";
 import { PrimaryButton } from "@/components/ui/primary-button";
 import { renderStatusBadgeLeading } from "@/components/ui/status-badge-leading";
-import { StatusBadge } from "@/components/ui/status-badge";
 import { Heading, Text } from "@/components/ui/typography";
 import type { HeroCTAConfig, HeroSectionConfig } from "@/types";
 import { cn } from "@/lib/utils";
@@ -13,11 +12,10 @@ import { cn } from "@/lib/utils";
 const ease = [0.22, 1, 0.36, 1] as const;
 
 const blurUp: Variants = {
-  hidden: { opacity: 0, y: 28, filter: "blur(18px)" },
+  hidden: { opacity: 0, y: 28 },
   visible: (i: number = 0) => ({
     opacity: 1,
     y: 0,
-    filter: "blur(0px)",
     transition: {
       duration: 0.95,
       delay: 0.08 + i * 0.12,
@@ -78,29 +76,23 @@ export const Hero = ({
   const descriptionStep = titleStep + 1;
   const ctaStep = descriptionStep + (content.description ? 1 : 0);
   const childrenStep = ctaStep + (ctas.length ? 1 : 0);
-  const titleSpacingClassName = badges.length || content.eyebrow ? "mt-4" : undefined;
+  const titleSpacingClassName = badges.length || content.eyebrow ? "mt-5" : undefined;
 
   return (
     <section
       className={cn(
-        "relative flex min-h-[10vh] w-full flex-col items-center justify-center py-2 text-center sm:py-14",
+        "relative flex min-h-[10vh] w-full flex-col items-center justify-center py-2 text-center sm:py-10",
         className,
       )}
     >
       {content.eyebrow ? (
         <motion.div custom={0} initial={false} animate="visible" variants={blurUp}>
-          <Text
-            as="span"
-            variant="p3"
-            className="eyebrow-chip text-accent-dark"
-          >
-            {content.eyebrow}
-          </Text>
+          <span className="section-tag">{content.eyebrow}</span>
         </motion.div>
       ) : null}
 
       {badges.length ? (
-        <div className={cn("flex flex-wrap items-center justify-center gap-3", content.eyebrow && "mt-5")}>
+        <div className={cn("flex flex-wrap items-center justify-center gap-2", content.eyebrow && "mt-4")}>
           {badges.map((badge, index) => (
             <motion.div
               key={badge.id ?? `${badge.label}-${index}`}
@@ -110,17 +102,14 @@ export const Hero = ({
               variants={blurUp}
               className={cn(badge.showInMobile === false && "hidden sm:block")}
             >
-              <StatusBadge
-                tone={badge.tone}
-                textColor={badge.textColor}
-                iconColor={badge.iconColor}
-                indicatorColor={badge.indicatorColor}
-                showIndicator={badge.icon === "indicator"}
-                pulse={badge.pulse}
-                leading={renderStatusBadgeLeading(badge)}
-              >
+              <span className="section-tag">
+                {badge.icon === "indicator" ? (
+                  <span className="size-2 rounded-full bg-[#22c55e]" />
+                ) : (
+                  renderStatusBadgeLeading(badge)
+                )}
                 {badge.label}
-              </StatusBadge>
+              </span>
             </motion.div>
           ))}
         </div>
@@ -149,9 +138,9 @@ export const Hero = ({
           initial={false}
           animate="visible"
           variants={blurUp}
-          className="mt-5 max-w-md"
+          className="mt-4 max-w-xl"
         >
-          <Text variant="p1">{content.description}</Text>
+          <Text variant="p1" className="text-pretty">{content.description}</Text>
         </motion.div>
       ) : null}
 
@@ -190,12 +179,6 @@ export const Hero = ({
         </motion.div>
       ) : null}
 
-      <div
-        aria-hidden
-        className="pointer-events-none absolute inset-0 -z-10"
-      >
-        <div className="absolute left-1/2 top-1/2 size-[640px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[radial-gradient(circle,rgba(168,85,247,0.10)_0%,transparent_60%)] blur-2xl" />
-      </div>
     </section>
   );
 };

@@ -8,6 +8,9 @@ const siteUrl = normalizeUrl(
   process.env.NEXT_PUBLIC_SITE_URL || "https://arnab-dzns.vercel.app",
 );
 
+/** The storefront lives on its own subdomain; `/shop` redirects here. */
+export const storeUrl = "https://store.arnabdzns.com";
+
 type WhatsAppPrefillInput = {
   name?: string;
   brand?: string;

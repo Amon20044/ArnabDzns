@@ -11,6 +11,7 @@ export const aeonik = localFont({
 
 export const caveat = Caveat({
   subsets: ["latin"],
-  weight: ["700"],
+  weight: ["600", "700"],
+  variable: "--font-caveat",
   display: "swap",
 });

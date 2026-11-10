@@ -248,7 +248,9 @@ function GalleryTile({
   return (
     <div
       className={cn(
-        "relative overflow-hidden rounded-[0.5rem] transition-transform duration-300 ease-out group-hover:-translate-y-1",
+        // Embossed tray: the bezel is drawn with padding so the tile keeps the
+        // exact outer size the row layout computed for it.
+        "tray tray-tight relative transition-transform duration-300 ease-out group-hover:-translate-y-1",
         clickable && "cursor-zoom-in",
         itemClassName,
       )}
@@ -263,7 +265,7 @@ function GalleryTile({
           : undefined
       }
     >
-      <div className="absolute inset-0">
+      <div className="tray-card absolute inset-[0.4rem] overflow-hidden">
         <Image
           src={imageSrc}
           alt={image.alt || image.title || "Portfolio artwork by Arnab Shaw"}
@@ -275,7 +277,7 @@ function GalleryTile({
           fetchPriority={priority ? "high" : "auto"}
           draggable={false}
           referrerPolicy="no-referrer-when-downgrade"
-          className="object-cover transition-transform duration-300 ease-out group-hover:scale-[1.025] select-none pointer-events-none"
+          className="object-cover transition-transform duration-500 ease-out group-hover:scale-[1.04] select-none pointer-events-none"
         />
       </div>
     </div>

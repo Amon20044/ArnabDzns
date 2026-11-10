@@ -2,7 +2,6 @@
 
 import { motion } from "framer-motion";
 import type { ReactNode } from "react";
-import { createMetallicSurface } from "@/lib/metallic-surface";
 import { cn } from "@/lib/utils";
 
 interface StatusBadgeProps {
@@ -14,13 +13,17 @@ interface StatusBadgeProps {
   interactive?: boolean;
   showIndicator?: boolean;
   pulse?: boolean;
+  /**
+   * Kept for content compatibility. Badges are neutral paper tags now, so the
+   * stored tone no longer paints the chip; it is accepted and ignored.
+   */
   tone?: string;
   textColor?: string;
   iconColor?: string;
   indicatorColor?: string;
 }
 
-const spring = { type: "spring", stiffness: 320, damping: 22, mass: 0.55 } as const;
+const spring = { type: "spring", stiffness: 420, damping: 24, mass: 0.5 } as const;
 
 export const StatusBadge = ({
   children,
@@ -31,64 +34,35 @@ export const StatusBadge = ({
   interactive = true,
   showIndicator = false,
   pulse = false,
-  tone,
-  textColor,
-  iconColor,
-  indicatorColor,
 }: StatusBadgeProps) => {
-  const theme = createMetallicSurface({ tone, textColor, iconColor, indicatorColor });
-  const rootClassName = compact
-    ? "gap-1.5 px-3 py-1.5 sm:gap-2 sm:px-3.5 sm:py-[7px]"
-    : "gap-2 px-3.5 py-2 sm:gap-2.5 sm:px-4 sm:py-2.5";
-  const contentTypographyClassName = compact
-    ? "text-[12px] leading-[1.05] sm:text-[12.5px]"
-    : "text-[12.5px] leading-[1.1] sm:text-[13px]";
-
-  const indicator =
-    leading ??
-    (showIndicator ? (
-      <LiveIndicator pulse={pulse} color={theme.indicatorColor} pulseColor={theme.indicatorPulseColor} />
-    ) : null);
+  const indicator = leading ?? (showIndicator ? <LiveIndicator pulse={pulse} /> : null);
 
   return (
     <motion.div
       className={cn(
-        "group relative inline-flex w-fit max-w-full items-center justify-center overflow-hidden rounded-full text-center select-none",
-        rootClassName,
+        "inline-flex w-fit max-w-full select-none items-center justify-center bg-white text-text-primary",
+        "shadow-[0_0_0_1px_rgba(var(--shade-rgb),0.1),0_2px_0_var(--paper-line)]",
+        compact
+          ? "gap-1.5 rounded-[0.6rem] px-2.5 py-1.5"
+          : "gap-2 rounded-[0.7rem] px-3 py-2",
         className,
       )}
-      whileHover={interactive ? { y: -2, scale: 1.03 } : undefined}
-      whileTap={interactive ? { scale: 0.985 } : undefined}
+      whileHover={interactive ? { y: -2, rotate: -1.5 } : undefined}
+      whileTap={interactive ? { y: 1 } : undefined}
       transition={spring}
     >
-      <span
-        aria-hidden
-        className="pointer-events-none absolute inset-0 rounded-full"
-        style={theme.surfaceStyle}
-      />
-      <span
-        aria-hidden
-        className="pointer-events-none absolute inset-px rounded-full opacity-70 transition-opacity duration-300 group-hover:opacity-95"
-        style={theme.glowStyle}
-      />
-
-
       {indicator ? (
-        <span
-          className="relative z-10 inline-flex shrink-0 self-center"
-          style={{ color: theme.iconColor }}
-        >
+        <span className="inline-flex shrink-0 items-center self-center text-accent">
           {indicator}
         </span>
       ) : null}
 
       <span
         className={cn(
-          "relative z-10 whitespace-nowrap text-center font-semibold tracking-[-0.01em]",
-          contentTypographyClassName,
+          "whitespace-nowrap text-center font-semibold tracking-[-0.01em]",
+          compact ? "text-[12px] leading-none" : "text-[12.5px] leading-none sm:text-[13px]",
           contentClassName,
         )}
-        style={{ color: theme.textColor }}
       >
         {children}
       </span>
@@ -96,27 +70,17 @@ export const StatusBadge = ({
   );
 };
 
-const LiveIndicator = ({
-  pulse,
-  color,
-  pulseColor,
-}: {
-  pulse: boolean;
-  color: string;
-  pulseColor: string;
-}) => (
+const LiveIndicator = ({ pulse }: { pulse: boolean }) => (
   <span className="relative flex size-2.5 shrink-0">
     {pulse ? (
       <span
         aria-hidden
-        className="absolute inset-0 rounded-full animate-ping"
-        style={{ backgroundColor: pulseColor }}
+        className="absolute inset-0 animate-ping rounded-full bg-[#22c55e]/60"
       />
     ) : null}
     <span
       aria-hidden
-      className="relative size-2.5 rounded-full shadow-[0_0_0_2px_rgba(255,255,255,0.18)]"
-      style={{ backgroundColor: color }}
+      className="relative size-2.5 rounded-full bg-[#22c55e] shadow-[0_0_0_2px_rgba(34,197,94,0.22)]"
     />
   </span>
 );

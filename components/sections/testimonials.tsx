@@ -3,11 +3,10 @@
 import { useMemo, useState } from "react";
 import Image from "@/components/ui/site-image";
 import { AnimatePresence, motion, type PanInfo } from "framer-motion";
-import { Quote, Star } from "lucide-react";
+import { ArrowLeft, ArrowRight, Star } from "lucide-react";
 import { Hero } from "@/components/sections/hero";
 import { Heading, Text } from "@/components/ui/typography";
 import { testimonialsSection } from "@/data/testimonials";
-import { createMetallicSurface } from "@/lib/metallic-surface";
 import { cn } from "@/lib/utils";
 import type {
   HeroSectionConfig,
@@ -24,32 +23,24 @@ interface TestimonialsProps {
 
 const cardEase = [0.22, 1, 0.36, 1] as const;
 
-const cardVariants = {
-  enter: (direction: number) => ({
-    opacity: 0,
-    x: direction > 0 ? 36 : -36,
-    filter: "blur(10px)",
-  }),
-  center: {
-    opacity: 1,
-    x: 0,
-    filter: "blur(0px)",
-    transition: { duration: 0.55, ease: cardEase },
-  },
-  exit: (direction: number) => ({
-    opacity: 0,
-    x: direction > 0 ? -36 : 36,
-    filter: "blur(10px)",
-    transition: { duration: 0.35, ease: cardEase },
-  }),
-};
+const deckSpring = { type: "spring", stiffness: 260, damping: 28, mass: 0.8 } as const;
+
+/**
+ * Split a quote into its opening sentence and the rest, so the opener can be
+ * run over with the highlighter. Quotes with no sentence break stay whole.
+ */
+function splitLead(message: string) {
+  const match = message.trim().match(/^([\s\S]{24,160}?[.!?])\s+([\s\S]+)$/);
+
+  return match ? { lead: match[1], rest: match[2] } : { lead: message.trim(), rest: "" };
+}
 
 function StarRow({ rating }: { rating: number }) {
   const filled = Math.max(0, Math.min(5, Math.round(rating)));
 
   return (
     <div
-      className="flex items-center gap-1 text-text-primary"
+      className="flex items-center gap-0.5"
       aria-label={`Rated ${filled} out of 5 stars`}
     >
       {Array.from({ length: 5 }, (_, index) => (
@@ -57,7 +48,9 @@ function StarRow({ rating }: { rating: number }) {
           key={index}
           className={cn(
             "size-4",
-            index < filled ? "fill-text-primary stroke-text-primary" : "stroke-text-secondary/40",
+            index < filled
+              ? "fill-[var(--sticker-sun)] stroke-[var(--sticker-sun)]"
+              : "stroke-text-secondary/40",
           )}
           strokeWidth={1.5}
         />
@@ -83,7 +76,7 @@ function Avatar({
       <span
         aria-label={avatar.alt}
         className={cn(
-          "flex shrink-0 items-center justify-center rounded-full bg-accent-muted text-[0.72rem] font-semibold uppercase tracking-wide text-accent-dark ring-2 ring-white",
+          "flex shrink-0 items-center justify-center rounded-[0.9rem] bg-purple-600 text-[0.8rem] font-semibold uppercase tracking-wide text-white",
           className,
         )}
         style={{ width: size, height: size }}
@@ -96,7 +89,7 @@ function Avatar({
   return (
     <span
       className={cn(
-        "relative inline-block shrink-0 overflow-hidden rounded-full bg-white ring-2 ring-white",
+        "relative inline-block shrink-0 overflow-hidden rounded-[0.9rem] bg-white",
         className,
       )}
       style={{ width: size, height: size }}
@@ -116,59 +109,43 @@ function Avatar({
 }
 
 
-const metaBadgeTheme = createMetallicSurface({ tone: "#a855f7" });
-
-function MetaBadge({ label }: { label: string }) {
-  return (
-    <span className="relative inline-flex items-center overflow-hidden rounded-full px-3 py-1">
-      <span
-        aria-hidden
-        className="pointer-events-none absolute inset-0 rounded-full"
-        style={metaBadgeTheme.surfaceStyle}
-      />
-      <span
-        aria-hidden
-        className="pointer-events-none absolute inset-px rounded-full opacity-70"
-        style={metaBadgeTheme.glowStyle}
-      />
-      <span
-        className="relative z-10 whitespace-nowrap text-[11px] font-semibold tracking-tight"
-        style={{ color: metaBadgeTheme.textColor }}
-      >
-        {label}
-      </span>
-    </span>
-  );
-}
-
 function TestimonialCard({ testimonial }: { testimonial: TestimonialItem }) {
+  const { lead, rest } = splitLead(testimonial.message);
+
   return (
-    <article className="relative flex h-full flex-col gap-6 rounded-[1.75rem] border border-border bg-white/95 p-6 text-left max-md:!shadow-none sm:p-8">
-      <Quote
-        aria-hidden
-        className="absolute right-6 top-6 size-10 text-accent/20 sm:right-8 sm:top-8 sm:size-12"
-        strokeWidth={1.5}
-      />
-
-      <header className="flex items-center gap-4">
-        <Avatar avatar={testimonial.avatar} size={56} />
-        <div className="min-w-0">
-          <Heading variant="h4" as="h3" className="truncate text-text-primary">
-            {testimonial.name}
-          </Heading>
-          <div className="mt-1.5">
-            <MetaBadge label={testimonial.metaLabel} />
-          </div>
+    <article className="tray text-left shadow-[inset_0_1px_0_rgba(255,255,255,0.9),0_0_0_1px_rgba(var(--shade-rgb),0.07),0_30px_50px_-30px_rgba(var(--shade-rgb),0.55)]">
+      <div className="tray-card flex min-h-[19rem] flex-col p-6 sm:p-9">
+        <div className="flex items-start justify-between gap-4">
+          <span
+            aria-hidden
+            className="font-sans text-[4.5rem] font-bold leading-[0.7] text-purple-300"
+          >
+            &ldquo;
+          </span>
+          <StarRow rating={testimonial.rating} />
         </div>
-      </header>
 
-      <Text variant="p2" className="text-pretty leading-7 text-text-primary/85">
-        {testimonial.message}
-      </Text>
+        <blockquote className="mt-2 text-pretty text-[clamp(1.1rem,1rem+0.6vw,1.4rem)] font-medium leading-[1.5] tracking-[-0.015em] text-text-primary">
+          <span className="marker marker-sweep">{lead}</span>
+          {rest ? <span className="text-text-primary/55"> {rest}</span> : null}
+        </blockquote>
 
-      <footer className="mt-auto pt-2">
-        <StarRow rating={testimonial.rating} />
-      </footer>
+        <footer className="mt-auto flex items-center gap-3.5 pt-8">
+          <Avatar avatar={testimonial.avatar} size={52} />
+          <div className="min-w-0">
+            <Heading
+              variant="h5"
+              as="h3"
+              className="truncate text-[1.05rem] leading-tight text-text-primary"
+            >
+              {testimonial.name}
+            </Heading>
+            <p className="mt-0.5 truncate text-[0.85rem] text-text-secondary">
+              {testimonial.metaLabel}
+            </p>
+          </div>
+        </footer>
+      </div>
     </article>
   );
 }
@@ -185,18 +162,26 @@ export function Testimonials({ content = testimonialsSection, className }: Testi
   const safeIndex = allTestimonials.length ? cardIndex % allTestimonials.length : 0;
   const activeTestimonial = allTestimonials[safeIndex];
 
+  // Up to three cards are mounted: previous, active, next.
+  const deck = useMemo(() => {
+    const count = allTestimonials.length;
+
+    if (!count) {
+      return [];
+    }
+
+    const offsets = count >= 3 ? [-1, 0, 1] : count === 2 ? [0, 1] : [0];
+
+    return offsets.map((offset) => ({
+      offset,
+      testimonial: allTestimonials[(safeIndex + offset + count) % count],
+    }));
+  }, [allTestimonials, safeIndex]);
+
   const handleStep = (step: number) => {
     if (allTestimonials.length <= 1) return;
     setDirection(step);
     setCardIndex((current) => (current + step + allTestimonials.length) % allTestimonials.length);
-  };
-
-  const handleJumpTo = (nextIndex: number) => {
-    if (allTestimonials.length <= 1 || nextIndex === safeIndex) return;
-    const forward = (nextIndex - safeIndex + allTestimonials.length) % allTestimonials.length;
-    const backward = (safeIndex - nextIndex + allTestimonials.length) % allTestimonials.length;
-    setDirection(forward <= backward ? 1 : -1);
-    setCardIndex(nextIndex);
   };
 
   const handleDragEnd = (_: unknown, info: PanInfo) => {
@@ -215,8 +200,6 @@ export function Testimonials({ content = testimonialsSection, className }: Testi
         id: "testimonials",
         label: content.eyebrow,
         icon: "quote",
-        tone: "#a855f7",
-        iconColor: "#f5e1ff",
       },
     ],
     title: content.title,
@@ -227,15 +210,11 @@ export function Testimonials({ content = testimonialsSection, className }: Testi
   return (
     <section
       className={cn(
-        "page-section-frame page-surface page-reveal relative overflow-hidden",
-        "max-md:!rounded-none max-md:!border-transparent max-md:!bg-none max-md:!shadow-none max-md:!backdrop-blur-none max-md:!p-0",
+        "page-section-frame page-reveal relative",
+        "max-md:!p-0",
         className,
       )}
     >
-      <div
-        aria-hidden
-        className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(168,85,247,0.10),transparent_46%)] max-md:hidden"
-      />
 
       <Hero
         content={heroContent}
@@ -246,36 +225,82 @@ export function Testimonials({ content = testimonialsSection, className }: Testi
           <div className="w-full">
             {activeTestimonial ? (
               <div className="relative mx-auto w-full max-w-3xl">
-                <motion.div
-                  className="relative overflow-hidden touch-pan-y select-none"
-                  drag="x"
-                  dragConstraints={{ left: 0, right: 0 }}
-                  dragElastic={0.18}
-                  dragMomentum={false}
-                  onDragEnd={handleDragEnd}
-                  whileTap={{ cursor: "grabbing" }}
-                  style={{ cursor: allTestimonials.length > 1 ? "grab" : "default" }}
-                >
-                  <AnimatePresence mode="wait" custom={direction} initial={false}>
-                    <motion.div
-                      key={activeTestimonial.id}
-                      custom={direction}
-                      variants={cardVariants}
-                      initial="enter"
-                      animate="center"
-                      exit="exit"
-                    >
-                      <TestimonialCard testimonial={activeTestimonial} />
-                    </motion.div>
+                {/* Deck: the active card sits forward, its neighbours fan out
+                    behind it and can be clicked to bring them up. */}
+                <div className="relative grid place-items-center">
+                  <AnimatePresence initial={false} custom={direction}>
+                    {deck.map(({ testimonial, offset }) => {
+                      const isFront = offset === 0;
+
+                      return (
+                        <motion.div
+                          key={testimonial.id}
+                          custom={direction}
+                          className={cn(
+                            "w-full [grid-area:1/1]",
+                            isFront
+                              ? "touch-pan-y select-none"
+                              : "cursor-pointer max-lg:hidden",
+                          )}
+                          style={{ zIndex: isFront ? 3 : 1 }}
+                          aria-hidden={isFront ? undefined : true}
+                          initial={{ opacity: 0, x: `${direction * 90}%`, scale: 0.8, rotate: direction * 8 }}
+                          animate={{
+                            opacity: isFront ? 1 : 0.5,
+                            x: `${offset * 58}%`,
+                            scale: isFront ? 1 : 0.84,
+                            rotate: offset * 4,
+                          }}
+                          exit={{
+                            opacity: 0,
+                            x: `${-direction * 90}%`,
+                            scale: 0.8,
+                            rotate: -direction * 8,
+                            transition: { duration: 0.25, ease: cardEase },
+                          }}
+                          transition={deckSpring}
+                          whileHover={isFront ? undefined : { opacity: 0.85, scale: 0.87 }}
+                          onClick={isFront ? undefined : () => handleStep(offset)}
+                          drag={isFront && allTestimonials.length > 1 ? "x" : false}
+                          dragConstraints={{ left: 0, right: 0 }}
+                          dragElastic={0.2}
+                          dragMomentum={false}
+                          onDragEnd={isFront ? handleDragEnd : undefined}
+                        >
+                          <TestimonialCard testimonial={testimonial} />
+                        </motion.div>
+                      );
+                    })}
                   </AnimatePresence>
-                </motion.div>
+                </div>
 
                 {allTestimonials.length > 1 ? (
-                  <TestimonialDots
-                    count={allTestimonials.length}
-                    activeIndex={safeIndex}
-                    onSelect={handleJumpTo}
-                  />
+                  <div className="mt-6 flex items-center gap-4">
+                    <span aria-hidden className="h-px flex-1 bg-[rgba(var(--shade-rgb),0.14)]" />
+                    <button
+                      type="button"
+                      onClick={() => handleStep(-1)}
+                      className="press press--white press--compact press--icon"
+                      aria-label="Previous testimonial"
+                    >
+                      <ArrowLeft aria-hidden className="size-4" strokeWidth={2.4} />
+                    </button>
+                    <span
+                      aria-live="polite"
+                      className="min-w-[3.5rem] text-center text-[0.8rem] font-semibold tracking-[0.08em] text-text-secondary tabular-nums"
+                    >
+                      {String(safeIndex + 1).padStart(2, "0")} / {String(allTestimonials.length).padStart(2, "0")}
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() => handleStep(1)}
+                      className="press press--compact press--icon"
+                      aria-label="Next testimonial"
+                    >
+                      <ArrowRight aria-hidden className="size-4" strokeWidth={2.4} />
+                    </button>
+                    <span aria-hidden className="h-px flex-1 bg-[rgba(var(--shade-rgb),0.14)]" />
+                  </div>
                 ) : null}
               </div>
             ) : (
@@ -287,48 +312,5 @@ export function Testimonials({ content = testimonialsSection, className }: Testi
         </div>
       </Hero>
     </section>
-  );
-}
-
-function TestimonialDots({
-  count,
-  activeIndex,
-  onSelect,
-}: {
-  count: number;
-  activeIndex: number;
-  onSelect: (index: number) => void;
-}) {
-  const maxSize = 10;
-  const minSize = 3;
-  const decay = 0.55;
-
-  return (
-    <div
-      aria-label="Testimonial pagination"
-      className="mt-6 flex items-center justify-center gap-2"
-    >
-      {Array.from({ length: count }, (_, index) => {
-        const raw = Math.abs(index - activeIndex);
-        const distance = Math.min(raw, count - raw);
-        const falloff = Math.exp(-distance * decay);
-        const size = minSize + (maxSize - minSize) * falloff;
-        const opacity = 0.22 + 0.78 * falloff;
-        const isActive = index === activeIndex;
-
-        return (
-          <motion.button
-            key={index}
-            type="button"
-            aria-current={isActive ? "true" : undefined}
-            aria-label={`Go to testimonial ${index + 1}`}
-            onClick={() => onSelect(index)}
-            animate={{ width: size, height: size, opacity }}
-            transition={{ duration: 0.32, ease: [0.22, 1, 0.36, 1] }}
-            className="shrink-0 rounded-full bg-text-primary"
-          />
-        );
-      })}
-    </div>
   );
 }

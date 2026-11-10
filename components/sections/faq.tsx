@@ -2,17 +2,13 @@
 
 import { useState } from "react";
 import { ArrowRight } from "lucide-react";
-import { Hero } from "@/components/sections/hero";
+import { ArnabCharacter } from "@/components/illustrations/arnab-character";
+import { ShapeGlyph } from "@/components/illustrations/stickers";
 import { PrimaryButton } from "@/components/ui/primary-button";
 import { Heading, Text } from "@/components/ui/typography";
 import { faqSection } from "@/data/faq";
 import { cn } from "@/lib/utils";
-import type {
-  FAQItem,
-  FAQSectionConfig,
-  HeroCTAConfig,
-  HeroSectionConfig,
-} from "@/types";
+import type { FAQItem, FAQSectionConfig, HeroCTAConfig } from "@/types";
 
 interface FAQProps {
   /** Override the default static content (e.g. when wired to a CMS later). */
@@ -55,8 +51,8 @@ function FAQAccordionItem({
   return (
     <div
       className={cn(
-        "group/faq relative overflow-hidden rounded-[2rem] border border-border-accent/60 bg-white/92 shadow-[0_18px_44px_rgba(24,24,27,0.06)] backdrop-blur-sm transition-[transform,box-shadow,border-color] duration-200 ease-out hover:-translate-y-0.5 hover:scale-[1.005] hover:shadow-[0_22px_52px_rgba(24,24,27,0.08)] max-md:!shadow-none max-md:hover:!shadow-none",
-        isOpen && "border-border-accent/80 shadow-[0_22px_52px_rgba(24,24,27,0.08)]",
+        "tray-card group/faq overflow-hidden transition-shadow duration-200",
+        isOpen && "ring-2 ring-purple-300",
       )}
     >
       <button
@@ -65,12 +61,12 @@ function FAQAccordionItem({
         aria-expanded={isOpen}
         aria-controls={panelId}
         onClick={onToggle}
-        className="flex w-full items-center justify-between gap-4 px-6 py-5 text-left transition-colors duration-200 hover:bg-white/98 sm:px-8 sm:py-6"
+        className="flex w-full items-center justify-between gap-4 px-5 py-4 text-left sm:px-6 sm:py-5"
       >
         <Heading
           variant="h5"
           as="h3"
-          className="text-text-primary text-base font-semibold leading-snug sm:text-[1.05rem]"
+          className="text-[1rem] font-medium leading-snug text-text-primary sm:text-[1.08rem]"
         >
           {item.question}
         </Heading>
@@ -78,15 +74,15 @@ function FAQAccordionItem({
         <span
           aria-hidden
           className={cn(
-            "relative flex size-10 shrink-0 items-center justify-center rounded-full border border-border-accent/60 bg-white text-text-primary shadow-[0_6px_18px_rgba(24,24,27,0.08)] transition-[transform,background-color,border-color,color] duration-200 group-hover/faq:scale-105 max-md:!shadow-none",
-            isOpen && "bg-accent-muted/60 text-accent-dark",
+            "relative flex size-7 shrink-0 items-center justify-center rounded-full bg-black text-white transition-[transform,background-color] duration-300 ease-out group-hover/faq:scale-110",
+            isOpen && "rotate-180 bg-purple-600",
           )}
         >
-          <span className="relative block size-4">
-            <span className="absolute left-0 top-1/2 h-px w-4 -translate-y-1/2 bg-current" />
+          <span className="relative block size-3">
+            <span className="absolute left-0 top-1/2 h-[2px] w-3 -translate-y-1/2 rounded-full bg-current" />
             <span
               className={cn(
-                "absolute left-1/2 top-0 h-4 w-px -translate-x-1/2 bg-current transition-transform duration-200",
+                "absolute left-1/2 top-0 h-3 w-[2px] -translate-x-1/2 rounded-full bg-current transition-transform duration-300",
                 isOpen && "scale-y-0",
               )}
             />
@@ -100,16 +96,15 @@ function FAQAccordionItem({
         aria-labelledby={buttonId}
         aria-hidden={!isOpen}
         className={cn(
-          "grid transition-[grid-template-rows,opacity] duration-200 ease-out",
+          "grid transition-[grid-template-rows,opacity] duration-300 ease-out",
           isOpen ? "grid-rows-[1fr] opacity-100" : "grid-rows-[0fr] opacity-0",
         )}
       >
         <div className="overflow-hidden">
-          <div className="mx-6 h-px bg-border-accent/65 sm:mx-8" />
-          <div className="px-6 pb-6 pt-5 sm:px-8 sm:pb-7 sm:pt-6">
+          <div className="px-5 pb-5 sm:px-6 sm:pb-6">
             <Text
               variant="p2"
-              className="whitespace-pre-line text-pretty text-text-secondary"
+              className="max-w-[62ch] whitespace-pre-line text-pretty text-text-secondary"
             >
               {item.answer}
             </Text>
@@ -128,77 +123,78 @@ export function FAQ({ content = faqSection, className }: FAQProps) {
 
   const [openId, setOpenId] = useState<string | null>(initialOpen);
 
-  // Project the FAQ header onto the shared HeroSectionConfig shape so we
-  // reuse the exact same eyebrow/title/description treatment as the rest
-  // of the site, rendered through the Hero component.
-  const heroContent: HeroSectionConfig = {
-    badges: [
-      {
-        id: "faq",
-        label: content.eyebrow,
-        icon: "help-circle",
-        tone: "#18181b",
-        iconColor: "#fafafa",
-      },
-    ],
-    title: content.title,
-    description: content.description,
-    cta: false,
-  };
-
   const ctaIcon = resolveCTAIcon(content.cta);
+  const titleLines = Array.isArray(content.title) ? content.title : [content.title];
 
   return (
-    <section
-      className={cn(
-        "page-section-frame page-surface page-reveal relative overflow-hidden",
-        "max-md:!rounded-none max-md:!border-transparent max-md:!bg-none max-md:!shadow-none max-md:!backdrop-blur-none max-md:!p-0",
-        className,
-      )}
-    >
-      <div
-        aria-hidden
-        className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(168,85,247,0.10),transparent_46%)] max-md:hidden"
-      />
+    <section className={cn("page-section-frame page-reveal relative", "max-md:!p-0", className)}>
+      {/* Two columns on desktop: the question sits beside the answers instead
+          of stacked above them, with the "still stuck?" card pinned under it. */}
+      <div className="grid gap-x-12 gap-y-10 lg:grid-cols-[minmax(0,0.8fr)_minmax(0,1.2fr)] lg:items-start">
+        <div className="flex flex-col items-center text-center lg:sticky lg:top-28 lg:items-start lg:text-left">
+          <span className="section-tag">
+            <ShapeGlyph shape="circle" className="text-accent" />
+            {content.eyebrow}
+          </span>
+          <Heading variant="h2" className="mt-5">
+            {titleLines.map((line, index) => (
+              <span key={`${line}-${index}`} className="block">
+                {line}
+              </span>
+            ))}
+          </Heading>
+          {content.description ? (
+            <Text variant="p1" className="mt-4 max-w-md text-pretty">
+              {content.description}
+            </Text>
+          ) : null}
 
-      <Hero
-        content={heroContent}
-        className="min-h-0 py-0 sm:py-0"
-        childrenClassName="mt-12"
-      >
-        <div className="mx-auto flex w-full max-w-3xl flex-col gap-3">
+          {content.helperText || content.cta ? (
+            <div className="tray mt-8 w-full max-w-sm">
+              <div className="tray-card flex items-center gap-4 p-4 text-left">
+                <span
+                  aria-hidden
+                  className="relative block size-16 shrink-0 -rotate-6 overflow-hidden rounded-2xl bg-[radial-gradient(circle_at_50%_30%,#c084fc,#7e22ce)] shadow-[0_4px_0_var(--color-purple-900)]"
+                >
+                  <span className="absolute left-1/2 top-[6%] block w-[185%] -translate-x-1/2">
+                    <ArnabCharacter title="" />
+                  </span>
+                </span>
+                <div className="min-w-0">
+                  {content.helperText ? (
+                    <p className="text-[0.95rem] font-medium leading-snug text-text-primary">
+                      {content.helperText}
+                    </p>
+                  ) : null}
+                  {content.cta ? (
+                    <PrimaryButton
+                      label={content.cta.label}
+                      href={content.cta.href}
+                      external={content.cta.external}
+                      Icon={ctaIcon}
+                      iconVisibility="hover"
+                      tone="accent"
+                      size="compact"
+                      className="mt-3"
+                    />
+                  ) : null}
+                </div>
+              </div>
+            </div>
+          ) : null}
+        </div>
+
+        <div className="tray flex w-full flex-col gap-2.5 text-left">
           {content.items.map((item) => (
             <FAQAccordionItem
               key={item.id}
               item={item}
               isOpen={openId === item.id}
-              onToggle={() =>
-                setOpenId((current) => (current === item.id ? null : item.id))
-              }
+              onToggle={() => setOpenId((current) => (current === item.id ? null : item.id))}
             />
           ))}
         </div>
-
-        {content.helperText || content.cta ? (
-          <div className="mt-12 flex flex-col items-center gap-4">
-            {content.helperText ? (
-              <Text variant="p3" className="text-text-secondary">
-                {content.helperText}
-              </Text>
-            ) : null}
-
-            {content.cta ? (
-              <PrimaryButton
-                label={content.cta.label}
-                href={content.cta.href}
-                external={content.cta.external}
-                Icon={ctaIcon}
-                iconVisibility={content.cta.iconVisibility}
-              />
-            ) : null}
-          </div>
-        ) : null}
-      </Hero>
+      </div>
     </section>
   );
 }

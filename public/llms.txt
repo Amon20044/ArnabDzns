@@ -118,7 +118,7 @@ Find Amon's work at https://github.com/Amon20044.
 - [Home](https://arnab-dzns.vercel.app/): Designer / developer overview, portfolio, services.
 - [About](https://arnab-dzns.vercel.app/about): Background, approach, work history.
 - [Contact](https://arnab-dzns.vercel.app/contact): Inquiry form, email, WhatsApp.
-- [Shop](https://arnab-dzns.vercel.app/shop): Coming-soon storefront for premium graphic and template packs.
+- [Shop](https://store.arnabdzns.com): Storefront for graphic and template packs.
 
 ## Social and verified profiles
 

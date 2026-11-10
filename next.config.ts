@@ -7,6 +7,19 @@ const withMDX = createMDX({
 
 const nextConfig: NextConfig = {
   pageExtensions: ["js", "jsx", "md", "mdx", "ts", "tsx"],
+  async redirects() {
+    return [
+      // The storefront moved to its own subdomain. Temporary (307) so the
+      // target can change later without browsers having cached it forever.
+      {
+        source: "/shop/:path*",
+        destination: "https://store.arnabdzns.com/:path*",
+        permanent: false,
+      },
+      // The profile page was replaced by the bio bubble in the header.
+      { source: "/about", destination: "/", permanent: false },
+    ];
+  },
   async headers() {
     return [{
       source: "/media/:path*",

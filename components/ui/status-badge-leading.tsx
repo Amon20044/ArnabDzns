@@ -28,7 +28,7 @@ export function renderStatusBadgeLeading(input: BadgeLeadingInput): ReactNode {
           {Array.from({ length: starCount }, (_, index) => (
             <Star
               key={`badge-star-${index}`}
-              className="size-[14px] fill-current stroke-current"
+              className="size-[11px] fill-current stroke-current text-accent"
               strokeWidth={1.5}
             />
           ))}
@@ -41,7 +41,7 @@ export function renderStatusBadgeLeading(input: BadgeLeadingInput): ReactNode {
     default:
       return (
         <span className="inline-flex shrink-0 items-center justify-center">
-          <Icon name={icon} className="size-[14px]" strokeWidth={2.2} />
+          <Icon name={icon} className="size-[13px] text-accent" strokeWidth={2.2} />
         </span>
       );
   }

@@ -32,32 +32,6 @@ export const sitePages: SitePagesConfig = {
       priority: 1,
     },
   },
-  about: {
-    path: "/about",
-    navLabel: "About",
-    seo: {
-      title:
-        "About Arnab Shaw — Graphic & UI/UX Designer",
-      description:
-        "Meet Arnab Shaw, a Bangalore-based graphic and UI/UX designer creating brand identities, esports visuals, and digital experiences for clients worldwide.",
-      keywords: [
-        "about Arnab Shaw",
-        "Arnab Shaw biography",
-        "Arnab Designs about",
-        "Arnab designer Bangalore",
-        "graphic designer Bengaluru",
-        "UI UX designer West Bengal",
-        "esports designer India",
-        "creative director Bengaluru",
-      ],
-      pageType: "AboutPage",
-      openGraphType: "website",
-    },
-    sitemap: {
-      changeFrequency: "monthly",
-      priority: 0.9,
-    },
-  },
   contact: {
     path: "/contact",
     navLabel: "Contact",
@@ -82,31 +56,6 @@ export const sitePages: SitePagesConfig = {
     sitemap: {
       changeFrequency: "monthly",
       priority: 0.85,
-    },
-  },
-  shop: {
-    path: "/shop",
-    navLabel: "Shop",
-    seo: {
-      title:
-        "Design Templates — Coming Soon",
-      description:
-        "A coming-soon storefront for premium ecommerce graphics, launch page templates, esports/livestream packs, and creator-ready digital design templates by Arnab Shaw (arnabdzns).",
-      keywords: [
-        "Arnab Designs shop",
-        "premium graphic templates India",
-        "ecommerce design templates",
-        "esports livestream template pack",
-        "launch page templates",
-        "creator graphics pack",
-        "buy graphic design templates",
-      ],
-      pageType: "CollectionPage",
-      openGraphType: "website",
-    },
-    sitemap: {
-      changeFrequency: "monthly",
-      priority: 0.7,
     },
   },
 };

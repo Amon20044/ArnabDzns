@@ -98,7 +98,7 @@ export const leading = {
   relaxed: "leading-[1.45]", //  h5
   loose: "leading-[1.55]", //    h6 / small labels
   body: "leading-[1.65]", //     p2 / default body
-  prose: "leading-[1.78]", //    p1 / long-form reading
+  prose: "leading-[1.6]", //     p1 / long-form reading
 } as const;
 
 /**
@@ -109,9 +109,9 @@ export const leading = {
  * keeps them legible at low x-heights.
  */
 export const tracking = {
-  display: "tracking-[-0.040em]", //  h1
-  tight: "tracking-[-0.028em]", //    h2
-  snug: "tracking-[-0.018em]", //     h3 / h4
+  display: "tracking-[-0.045em]", //  h1
+  tight: "tracking-[-0.038em]", //    h2
+  snug: "tracking-[-0.025em]", //     h3 / h4
   normal: "tracking-[-0.005em]", //   h5
   body: "tracking-[0em]", //          p1 / p2 / p3
   wide: "tracking-[0.04em]", //       small caps
@@ -144,7 +144,7 @@ export const typography = {
       fontSize["8xl"],
       leading.display,
       tracking.display,
-      fontWeight.bold,
+      fontWeight.medium,
       wrap.balance,
     ),
     /** Page / section headers (30 → 60 px fluid) */
@@ -153,7 +153,7 @@ export const typography = {
       fontSize["6xl"],
       leading.tight,
       tracking.tight,
-      fontWeight.bold,
+      fontWeight.medium,
       wrap.balance,
     ),
     /** Subsections (28 → 44 px fluid) */
@@ -162,7 +162,7 @@ export const typography = {
       fontSize["4xl"],
       leading.snug,
       tracking.snug,
-      fontWeight.semibold,
+      fontWeight.medium,
       wrap.balance,
     ),
     /** Card titles (24 → 34 px fluid) */
@@ -171,7 +171,7 @@ export const typography = {
       fontSize["3xl"],
       leading.normal,
       tracking.snug,
-      fontWeight.semibold,
+      fontWeight.medium,
     ),
     /** Inline / list headings (18 → 20 px fluid) */
     h5: compose(

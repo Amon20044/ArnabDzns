@@ -1,7 +1,4 @@
-"use client";
-
-import { motion, useScroll, useTransform } from "framer-motion";
-import { useRef } from "react";
+import { ShapeGlyph } from "@/components/illustrations/stickers";
 import { Hero } from "@/components/sections/hero";
 import { Icon } from "@/components/ui/icon";
 import { Heading, Text } from "@/components/ui/typography";
@@ -9,52 +6,68 @@ import { servicesSection } from "@/data/services";
 import { cn } from "@/lib/utils";
 import type { ServiceCardItem, ServicesSectionConfig } from "@/types";
 
-function ServiceCard({
-  item,
-  index,
-}: {
-  item: ServiceCardItem;
-  index: number;
-}) {
-  const cardRef = useRef<HTMLElement>(null);
+const SHAPES = ["triangle", "circle", "cross", "square"] as const;
 
-  const { scrollYProgress } = useScroll({
-    target: cardRef,
-    offset: ["start end", "end 0.85"],
-  });
+const SHAPE_INK: Record<(typeof SHAPES)[number], string> = {
+  triangle: "var(--sticker-mint)",
+  circle: "var(--sticker-red)",
+  cross: "var(--sticker-cobalt)",
+  square: "var(--sticker-pink)",
+};
 
-  const y = useTransform(scrollYProgress, [0, 1], [60 + index * 12, 0]);
-  const opacity = useTransform(scrollYProgress, [0, 0.4], [0, 1]);
-  const scale = useTransform(scrollYProgress, [0, 1], [0.92, 1]);
+/**
+ * Rows alternate narrow + wide, then wide + narrow, so the grid zig-zags
+ * instead of sitting in three equal columns.
+ */
+const isWide = (index: number) => index % 4 === 1 || index % 4 === 2;
+
+function ServiceCard({ item, index }: { item: ServiceCardItem; index: number }) {
+  const wide = isWide(index);
+  const shape = SHAPES[index % SHAPES.length];
 
   return (
-    <motion.article
-      ref={cardRef}
-      style={{ y, opacity, scale }}
-      className="liquid-glass group relative flex h-full min-h-[15rem] flex-col overflow-hidden rounded-[1.75rem] border border-white/70 p-6 max-md:[--lg-shadow:none] max-md:!shadow-none sm:p-7"
+    <article
+      className={cn(
+        "tray page-reveal group transition-transform duration-300 ease-out hover:-translate-y-1",
+        wide ? "lg:col-span-3" : "lg:col-span-2",
+      )}
     >
-      <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(180deg,rgba(168,85,247,0.24)_0%,rgba(168,85,247,0.14)_24%,rgba(168,85,247,0.06)_52%,transparent_100%)]" />
-      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(216,180,254,0.46),transparent_34%)]" />
-      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(255,255,255,0.62),transparent_24%)]" />
+      <div
+        className={cn(
+          "tray-card relative flex h-full flex-col overflow-hidden p-6 text-left sm:p-7",
+          wide && "lg:pr-40",
+        )}
+      >
+        <div className="flex items-center justify-between gap-4">
+          <span className="flex size-14 -rotate-6 items-center justify-center rounded-2xl bg-purple-100 text-purple-700 shadow-[0_3px_0_var(--color-purple-200)] transition-transform duration-300 ease-out group-hover:rotate-6 group-hover:scale-110">
+            <Icon name={item.icon} strokeWidth={1.8} className="size-7" />
+          </span>
+          <span className="flex items-center gap-2 text-[0.72rem] font-semibold uppercase tracking-[0.14em] text-text-secondary tabular-nums">
+            <ShapeGlyph shape={shape} className="size-3.5" style={{ color: SHAPE_INK[shape] }} />
+            {String(index + 1).padStart(2, "0")}
+          </span>
+        </div>
 
-      <Icon
-        name={item.icon}
-        strokeWidth={1.6}
-        className="pointer-events-none absolute right-[-1.25rem] top-[-1rem] z-0 size-40 text-[#CBADE7] transition-transform duration-500 ease-out group-hover:scale-105 group-hover:-rotate-3 sm:size-44"
-      />
-
-      <div className="relative z-[1] mt-auto pt-28 text-left sm:pt-32">
-        <Heading variant="h4" as="h3" className="text-left text-text-primary">
+        <Heading
+          variant="h4"
+          as="h3"
+          className="mt-10 text-balance text-left text-[clamp(1.4rem,1.2rem+0.8vw,1.75rem)] leading-[1.12]"
+        >
           {item.title}
         </Heading>
-        <Text
-          variant="p3"
-          className="mt-2 text-pretty text-left leading-relaxed text-text-secondary"
-        >
+        <Text variant="p2" className="mt-2.5 max-w-[42ch] text-pretty text-left">
           {item.description}
         </Text>
+
+        {wide ? (
+          <Icon
+            name={item.icon}
+            strokeWidth={1.2}
+            className="pointer-events-none absolute -bottom-6 -right-4 hidden size-44 -rotate-12 text-purple-200/70 transition-transform duration-500 ease-out group-hover:-rotate-6 group-hover:scale-105 lg:block"
+          />
+        ) : null}
       </div>
-    </motion.article>
+    </article>
   );
 }
 
@@ -63,26 +76,11 @@ interface ToolkitProps {
   className?: string;
 }
 
-export function Toolkit({
-  content = servicesSection,
-  className,
-}: ToolkitProps) {
+export function Toolkit({ content = servicesSection, className }: ToolkitProps) {
   return (
-    <section
-      className={cn(
-        "page-section-frame page-surface page-reveal relative overflow-hidden",
-        "max-md:!rounded-none max-md:!border-transparent max-md:!bg-none max-md:!shadow-none max-md:!backdrop-blur-none max-md:!p-0",
-        className,
-      )}
-    >
-      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(168,85,247,0.14),transparent_42%)] max-md:hidden" />
-
-      <Hero
-        content={content.hero}
-        className="min-h-0 py-0 sm:py-0"
-        childrenClassName="mt-10"
-      >
-        <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+    <section className={cn("page-section-frame relative", "max-md:!p-0", className)}>
+      <Hero content={content.hero} className="min-h-0 py-0 sm:py-0" childrenClassName="mt-10">
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
           {content.services.map((item, index) => (
             <ServiceCard key={item.id} item={item} index={index} />
           ))}

@@ -2,7 +2,6 @@
 
 import { motion } from "framer-motion";
 import { renderStatusBadgeLeading } from "@/components/ui/status-badge-leading";
-import { StatusBadge } from "@/components/ui/status-badge";
 import { Heading, Text } from "@/components/ui/typography";
 import { impactSection } from "@/data/impact";
 import type { ImpactSectionConfig } from "@/types";
@@ -30,59 +29,27 @@ export function ImpactSection({
         .filter(Boolean);
 
   return (
-    <section
-      className={cn(
-        "page-reveal relative overflow-hidden rounded-[2.25rem] border border-border-accent/45 bg-[linear-gradient(180deg,rgba(255,255,255,0.92)_0%,rgba(248,247,252,0.96)_100%)] text-text-primary shadow-[0_34px_110px_rgba(88,28,135,0.12)]",
-        "max-md:!rounded-none max-md:!border-transparent max-md:!bg-none max-md:!shadow-none",
-        className,
-      )}
-    >
-        <div
-          aria-hidden
-          className="pointer-events-none absolute inset-0 opacity-95 max-md:hidden"
-          style={{
-            background:
-              "radial-gradient(circle at 16% 14%, rgba(168,85,247,0.14) 0%, transparent 26%), radial-gradient(circle at 82% 12%, rgba(14,165,233,0.12) 0%, transparent 22%), radial-gradient(circle at 76% 78%, rgba(244,63,94,0.1) 0%, transparent 24%)",
-          }}
-        />
-        <div
-          aria-hidden
-          className="pointer-events-none absolute inset-x-12 top-0 h-px bg-gradient-to-r from-transparent via-white to-transparent max-md:hidden"
-        />
-        <div
-          aria-hidden
-          className="pointer-events-none absolute inset-0 bg-[linear-gradient(180deg,rgba(255,255,255,0.36)_0%,transparent_18%)] max-md:hidden"
-        />
-
-        <div className="relative z-10 px-5 py-6 sm:px-7 sm:py-8 md:px-10 md:py-10 max-md:!px-0 max-md:!py-0">
+    <section className={cn("page-reveal relative text-text-primary", className)}>
+        <div className="relative z-10 px-0 py-2 md:px-10 md:py-10">
           <header className="flex flex-col items-center text-center">
             <div className="flex w-full flex-col items-center">
-              <div className="flex flex-wrap justify-center gap-3">
+              <div className="flex flex-wrap justify-center gap-2">
                 {content.hero.badges?.map((badge, index) => (
-                  <StatusBadge
+                  <span
                     key={badge.id ?? `${badge.label}-${index}`}
-                    className={cn(badge.showInMobile === false && "hidden sm:inline-flex")}
-                    interactive={false}
-                    tone={badge.tone}
-                    textColor={badge.textColor}
-                    iconColor={badge.iconColor}
-                    indicatorColor={badge.indicatorColor}
-                    pulse={badge.pulse}
-                    showIndicator={badge.icon === "indicator"}
-                    leading={renderStatusBadgeLeading(badge)}
+                    className={cn("section-tag", badge.showInMobile === false && "hidden sm:inline-flex")}
                   >
+                    {badge.icon === "indicator" ? (
+                      <span className="size-2 rounded-full bg-[#22c55e]" />
+                    ) : (
+                      renderStatusBadgeLeading(badge)
+                    )}
                     {badge.label}
-                  </StatusBadge>
+                  </span>
                 ))}
               </div>
 
-              {/* {content.hero.eyebrow ? (
-                <p className="mt-6 text-[11px] font-semibold uppercase tracking-[0.22em] text-accent-dark/58">
-                  {content.hero.eyebrow}
-                </p>
-              ) : null} */}
-
-              <Heading variant="h2" className="mt-4 max-w-4xl text-text-primary">
+              <Heading variant="h2" className="mt-5 max-w-4xl text-text-primary">
                 {titleLines.map((line, index) => (
                   <span key={`${line}-${index}`}>
                     {index > 0 ? <br /> : null}
@@ -92,7 +59,7 @@ export function ImpactSection({
               </Heading>
 
               {content.hero.description ? (
-                <Text variant="p1" className="mt-5 max-w-2xl text-text-secondary">
+                <Text variant="p1" className="mt-4 max-w-xl text-pretty text-text-secondary">
                   {content.hero.description}
                 </Text>
               ) : null}

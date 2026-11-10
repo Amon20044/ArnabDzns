@@ -41,7 +41,7 @@ export interface MetallicSurfaceTheme {
   indicatorPulseColor: string;
 }
 
-const defaultTone = "#a855f7";
+const defaultTone = "#0d0d14";
 const white: RGB = { r: 255, g: 255, b: 255 };
 const black: RGB = { r: 9, g: 9, b: 11 };
 const nearBlack: RGB = { r: 18, g: 18, b: 22 };
@@ -51,7 +51,7 @@ export const createMetallicSurface = (
 ): MetallicSurfaceTheme => {
   const { tone = defaultTone, textColor, iconColor, indicatorColor } = options;
 
-  const base = parseColor(tone) ?? parseColor(defaultTone) ?? { r: 168, g: 85, b: 247 };
+  const base = parseColor(tone) ?? parseColor(defaultTone) ?? { r: 13, g: 13, b: 20 };
   const surfaceStart = mix(base, black, 0.8);
   const surfaceEnd = mix(base, nearBlack, 0.56);
   const averageSurface = mix(surfaceStart, surfaceEnd, 0.5);
@@ -62,21 +62,18 @@ export const createMetallicSurface = (
   const parsedIndicator = parseColor(resolvedIndicator) ?? mix(base, white, 0.16);
   const pulseColor = rgbaString(parsedIndicator, 0.38);
 
+  // Flat fill with a hard base edge. No backdrop-filter: these chips sit on
+  // an opaque page, so there is nothing behind them worth refracting.
   const surfaceStyle: CSSProperties = {
-    background: `linear-gradient(135deg, ${rgbaString(surfaceStart, 0.93)} 0%, ${rgbaString(surfaceEnd, 0.88)} 100%)`,
-    border: `1px solid ${rgbaString(mix(base, white, 0.28), 0.38)}`,
+    background: rgbaString(averageSurface, 1),
     boxShadow: [
-      "inset 1px 1px 0 rgba(255,255,255,0.18)",
-      `inset 0 0 14px ${rgbaString(base, 0.22)}`,
-      `0 4px 20px ${rgbaString(mix(base, black, 0.48), 0.25)}`,
-      "0 1px 3px rgba(0,0,0,0.15)",
+      "inset 0 1px 0 rgba(255,255,255,0.16)",
+      `0 2px 0 ${rgbaString(mix(base, black, 0.9), 1)}`,
     ].join(", "),
-    backdropFilter: "brightness(0.88) blur(12px) saturate(1.5) url(#lg-distort)",
-    WebkitBackdropFilter: "brightness(0.88) blur(12px) saturate(1.5)",
   };
 
   const glowStyle: CSSProperties = {
-    background: `radial-gradient(circle at 20% 18%, ${rgbaString(mix(base, white, 0.52), 0.72)} 0%, ${rgbaString(mix(base, white, 0.18), 0.28)} 34%, ${rgbaString(mix(base, black, 0.34), 0.1)} 60%, transparent 82%)`,
+    background: `linear-gradient(180deg, ${rgbaString(mix(base, white, 0.3), 0.22)} 0%, transparent 60%)`,
   };
 
   return {

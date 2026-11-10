@@ -1,20 +1,20 @@
 import { PhoneCall } from "lucide-react";
 import type { HeaderConfig, NavigationConfig } from "@/types";
-import { siteConfig } from "@/data/site";
+import { siteConfig, storeUrl } from "@/data/site";
 
 export const headerConfig: HeaderConfig = {
   brand: {
     name: siteConfig.name,
     role: siteConfig.brand.role,
     bio: siteConfig.brand.bio,
-    path: "/about",
+    path: "/",
     logoSrc: siteConfig.brand.logoSrc,
     logoAlt: siteConfig.brand.logoAlt,
   },
   availabilityLabel: "Available",
   shop: {
     label: "Shop",
-    path: "/shop",
+    path: storeUrl,
   },
   socials: siteConfig.social
     .filter((social) =>

@@ -37,28 +37,25 @@ export function ImpactCard({ card }: ImpactCardProps) {
   return (
     <motion.div
       ref={rootRef}
-      initial={{ opacity: 0, y: 24, filter: "blur(10px)" }}
-      whileInView={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+      initial={{ opacity: 0, y: 24 }}
+      whileInView={{ opacity: 1, y: 0 }}
       viewport={viewport}
       transition={{ duration: 0.55, ease }}
       whileHover={{ y: -4, scale: 1.01 }}
       className={cn(
-        "group relative flex min-h-[11rem] flex-col overflow-hidden rounded-[1.75rem] text-left",
-        "bg-[linear-gradient(180deg,rgba(255,255,255,0.94)_0%,rgba(248,247,252,0.98)_100%)]",
-        "border border-border-accent/55",
-        "shadow-[0_24px_60px_rgba(88,28,135,0.10),0_4px_12px_rgba(15,23,42,0.06)]",
-        "max-md:!shadow-none",
+        "group relative flex min-h-[11rem] flex-col overflow-hidden rounded-[1.5rem] bg-white text-left",
+        "shadow-[0_0_0_1px_rgba(var(--shade-rgb),0.08),0_0_0_6px_var(--paper-deep),0_0_0_7px_rgba(255,255,255,0.8),0_18px_30px_-18px_rgba(var(--shade-rgb),0.35)]",
         sizeSpanClass[card.size],
       )}
     >
       <motion.span
         aria-hidden
-        className="pointer-events-none absolute inset-0 rounded-[1.75rem] opacity-80 transition-opacity duration-500 group-hover:opacity-100"
+        className="pointer-events-none absolute inset-0 rounded-[1.5rem] opacity-0 transition-opacity duration-500 group-hover:opacity-70"
         style={{ background: tokens.gradient }}
       />
       <motion.span
         aria-hidden
-        className="pointer-events-none absolute inset-0 rounded-[1.75rem] opacity-0 transition-opacity duration-500 group-hover:opacity-100"
+        className="pointer-events-none absolute inset-0 rounded-[1.5rem] opacity-0 transition-opacity duration-500 group-hover:opacity-100"
         style={{
           boxShadow: `inset 0 0 0 1px ${tokens.ring}`,
         }}
@@ -244,7 +241,7 @@ function FeaturedBody({ card, inView }: { card: ImpactCardConfig; inView: boolea
       ) : null}
 
       <div className="relative z-10 flex flex-col gap-2">
-        <h3 className="text-[clamp(2.5rem,5vw,4.5rem)] font-bold leading-none tracking-[-0.04em] text-text-primary">
+        <h3 className="text-[clamp(2.5rem,5vw,4.5rem)] font-medium leading-none tracking-[-0.05em] text-text-primary">
           <CountUp
             value={card.metric.value}
             display={card.metric.display}

@@ -1,15 +1,12 @@
-import type { CSSProperties } from "react";
 import type { Viewport } from "next";
 import "lenis/dist/lenis.css";
 import { RouteAwareSiteFrame } from "@/components/layout/route-aware-site-frame";
 import { SmoothScrollProvider } from "@/components/providers/smooth-scroll-provider";
 import { StructuredData } from "@/components/site/structured-data";
-import { LiquidGlassDefs } from "@/components/ui/liquid-glass-defs";
-import { aeonik } from "@/config/fonts";
+import { aeonik, caveat } from "@/config/fonts";
 import { getLayoutContent } from "@/db/content";
 import { getRootMetadata } from "@/lib/seo";
 import { getSiteJsonLd } from "@/lib/structured-data";
-import { liquidGlassCssVariables } from "@/lib/liquid-glass";
 import "./globals.css";
 
 export const metadata = getRootMetadata();
@@ -31,14 +28,10 @@ export default async function RootLayout({
   return (
     <html
       lang={content.site.seo.language}
-      className={`h-full antialiased font-sans ${aeonik.variable}`}
+      className={`h-full antialiased font-sans ${aeonik.variable} ${caveat.variable}`}
     >
-      <body
-        className="min-h-full flex flex-col overflow-x-hidden bg-transparent text-foreground"
-        style={liquidGlassCssVariables as CSSProperties}
-      >
+      <body className="min-h-full flex flex-col overflow-x-hidden bg-transparent text-foreground">
         <StructuredData data={getSiteJsonLd()} />
-        <LiquidGlassDefs />
         <SmoothScrollProvider>
           <RouteAwareSiteFrame
             header={content.header}

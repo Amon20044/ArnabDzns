@@ -1,14 +1,10 @@
-"use client";
-
-import { motion } from "framer-motion";
 import type { LucideIcon } from "lucide-react";
 import Link from "next/link";
-import { useState } from "react";
 import { cn } from "@/lib/utils";
 
 type PrimaryButtonSize = "default" | "compact";
 type PrimaryButtonIconVisibility = "always" | "hover";
-type PrimaryButtonTone = "default" | "white" | "whatsapp";
+type PrimaryButtonTone = "default" | "accent" | "white" | "whatsapp";
 
 interface PrimaryButtonProps {
   label: string;
@@ -17,6 +13,10 @@ interface PrimaryButtonProps {
   external?: boolean;
   className?: string;
   size?: PrimaryButtonSize;
+  /**
+   * "hover" places the icon after the label and nudges it on hover (used for
+   * arrows). "always" keeps it in front of the label.
+   */
   iconVisibility?: PrimaryButtonIconVisibility;
   iconOnly?: boolean;
   onClick?: () => void;
@@ -27,19 +27,18 @@ interface PrimaryButtonProps {
   tone?: PrimaryButtonTone;
 }
 
-const ease = [0.22, 1, 0.36, 1] as const;
-const spring = { type: "spring", stiffness: 280, damping: 18, mass: 0.6 } as const;
-const shimmerMotion = {
-  originX: "-42%",
-  originY: "0%",
-  width: "40%",
-  height: "376%",
-  startX: "-24%",
-  startY: "0%",
-  endX: "460%",
-  endY: "40%",
-} as const;
+const toneClassNames: Record<PrimaryButtonTone, string> = {
+  default: "",
+  accent: "press--accent",
+  white: "press--white",
+  whatsapp: "press--whatsapp",
+};
 
+/**
+ * The site's one button: a solid face sitting on a hard offset base that
+ * lifts on hover and sinks on press. All motion is CSS transform, so there is
+ * no per-button React state or animation loop.
+ */
 export const PrimaryButton = ({
   label,
   href,
@@ -56,229 +55,57 @@ export const PrimaryButton = ({
   iconClassName,
   tone = "default",
 }: PrimaryButtonProps) => {
-  const [hovered, setHovered] = useState(false);
   const isCompact = size === "compact";
-  const isWhiteTone = tone === "white";
-  const isWhatsappTone = tone === "whatsapp";
-  const resolvedIconVisibility = iconVisibility ?? (isCompact ? "hover" : "always");
-  const showLeadingIcon =
-    !!Icon && (iconOnly || resolvedIconVisibility === "always" || hovered);
-  const showLabel = !iconOnly;
-  const reserveHoverIconSpace =
-    !!Icon && !iconOnly && resolvedIconVisibility === "hover";
-  const iconSlotWidth = isCompact ? 20 : 24;
-  const iconGap = isCompact ? 8 : 10;
-  const iconStrokeWidth = isCompact ? 2.2 : 2.3;
-  const leadingSlotWidth = Icon && !iconOnly ? iconSlotWidth : 0;
-  const trailingSlotWidth = reserveHoverIconSpace ? iconSlotWidth : 0;
-  const labelColorClass = isWhatsappTone
-    ? "text-green-800"
-    : isWhiteTone
-      ? "text-text-primary"
-      : "text-white";
-  const toneTextClass = isWhatsappTone
-    ? "text-green-800"
-    : isWhiteTone
-      ? "text-text-primary"
-      : "text-white";
-  const enableTilt = !fullWidth && !iconOnly;
+  const iconTrails = !iconOnly && (iconVisibility ?? (isCompact ? "hover" : "always")) === "hover";
   const isMailOrPhoneLink = href?.startsWith("mailto:") || href?.startsWith("tel:");
   const shouldRenderAnchor = !!href && (external || isMailOrPhoneLink);
   const shouldOpenNewTab = external && !isMailOrPhoneLink;
 
-  const iconOnlyContent = Icon && iconOnly ? (
-    <motion.span
-      aria-hidden
-      className={cn(
-        "relative z-10 inline-flex items-center justify-center",
-        labelColorClass,
-        isCompact ? "size-5" : "size-6",
-      )}
-      initial={false}
-      animate={{ scale: hovered ? 1.04 : 1, opacity: 1 }}
-      transition={{ duration: 0.22, ease }}
-    >
-      <Icon
-        className={cn("h-full w-full", iconClassName)}
-        strokeWidth={isCompact ? 2.35 : 2.4}
-      />
-    </motion.span>
-  ) : null;
-
-  const leadingIcon = Icon ? (
-    <motion.span
-      aria-hidden
-      className={cn(
-        "relative z-10 inline-flex items-center justify-center self-center",
-        labelColorClass
-      )}
-      initial={false}
-      animate={{
-        opacity: showLeadingIcon ? 1 : 0,
-        x: showLeadingIcon ? 0 : -4,
-        scale: showLeadingIcon ? 1 : 0.94,
-      }}
-      transition={{ duration: 0.38, ease }}
-    >
-      <Icon
-        className={cn("shrink-0", isCompact ? "size-[18px]" : "size-[18px]", iconClassName)}
-        strokeWidth={iconStrokeWidth}
-      />
-    </motion.span>
-  ) : null;
-
-  const balanceSlot = Icon ? (
-    <span
-      aria-hidden
-      className="pointer-events-none inline-flex items-center justify-center self-center opacity-0"
-    >
-      <span className={cn("block shrink-0", isCompact ? "size-[18px]" : "size-[18px]")} />
-    </span>
-  ) : null;
-
-  const linkClassName = cn(
-    "primary-button group relative inline-flex items-center justify-center gap-0 overflow-hidden rounded-full select-none",
-    (isWhiteTone || isWhatsappTone) && "primary-button--white",
-    "max-md:!shadow-none",
-    "will-change-transform",
+  const pressClassName = cn(
+    "press group select-none",
+    toneClassNames[tone],
+    isCompact && "press--compact",
+    iconOnly && "press--icon",
     fullWidth && "w-full",
-    iconOnly
-      ? isCompact
-        ? "size-16 p-0 text-[13px] font-semibold leading-none"
-        : cn("size-12 p-0 text-[15px] font-semibold", toneTextClass)
-      : isCompact
-        ? "px-[18px] py-[8px] text-[13px] font-semibold leading-none"
-        : cn("px-8 py-[18px] text-[15px] font-semibold", toneTextClass),
   );
 
-  const surfaceOpacity = 1;
-  const isLightTone = isWhiteTone || isWhatsappTone;
-  const glowOpacity = hovered ? (isLightTone ? 0.92 : 0.86) : isLightTone ? 0.72 : 0.46;
-
-  const content = (
-    <>
-      {isWhatsappTone ? (
-        <motion.span
-          aria-hidden
-          className="pointer-events-none absolute inset-0 rounded-full bg-[linear-gradient(120deg,rgba(220,252,231,0.96)_8%,rgba(187,247,208,0.95)_34%,rgba(74,222,128,0.72)_62%,rgba(220,252,231,0.96)_100%)]"
-          initial={false}
-          animate={{ opacity: hovered ? 0.92 : 0.68 }}
-          transition={{ duration: 0.28, ease }}
-        />
-      ) : isWhiteTone ? (
-        <motion.span
-          aria-hidden
-          className="pointer-events-none absolute inset-0 rounded-full bg-[linear-gradient(120deg,rgba(255,255,255,0.96)_8%,rgba(243,232,255,0.95)_34%,rgba(216,180,254,0.72)_62%,rgba(255,255,255,0.96)_100%)]"
-          initial={false}
-          animate={{ opacity: hovered ? 0.92 : 0.68 }}
-          transition={{ duration: 0.28, ease }}
-        />
-      ) : null}
-      <motion.span
-        aria-hidden
-        className={cn(
-          "pointer-events-none absolute rounded-full",
-          isLightTone ? "inset-px glass-capsule" : "inset-0 glass-capsule-primary",
-          "max-md:!shadow-none",
-        )}
-        initial={false}
-        animate={{ opacity: surfaceOpacity }}
-        transition={{ duration: 0.22, ease: "easeOut" }}
-      />
-      <motion.span
-        aria-hidden
-        className={cn(
-          "pointer-events-none absolute inset-px rounded-full",
-          isWhatsappTone
-            ? "bg-[radial-gradient(circle_at_20%_18%,rgba(220,252,231,0.92)_0%,rgba(187,247,208,0.72)_40%,rgba(34,197,94,0.08)_72%,transparent_88%)]"
-            : isWhiteTone
-              ? "bg-[radial-gradient(circle_at_20%_18%,rgba(255,255,255,0.92)_0%,rgba(243,232,255,0.72)_40%,rgba(168,85,247,0.08)_72%,transparent_88%)]"
-              : "bg-[radial-gradient(circle_at_20%_18%,rgba(216,180,254,0.72)_0%,rgba(168,85,247,0.28)_38%,rgba(76,29,149,0.08)_62%,transparent_82%)]",
-        )}
-        initial={false}
-        animate={{ opacity: glowOpacity }}
-        transition={{ duration: 0.3, ease }}
-      />
-      <motion.span
-        aria-hidden
-        className={cn(
-          "pointer-events-none absolute z-[5] block -rotate-[18deg]",
-          isLightTone
-            ? "bg-[linear-gradient(110deg,transparent_0%,rgba(255,255,255,0.18)_20%,rgba(255,255,255,0.94)_50%,rgba(255,255,255,0.22)_80%,transparent_100%)]"
-            : "bg-[linear-gradient(110deg,transparent_0%,rgba(255,255,255,0.06)_20%,rgba(255,255,255,0.62)_50%,rgba(255,255,255,0.08)_80%,transparent_100%)]",
-        )}
-        initial={false}
-        animate={{
-          x: hovered ? shimmerMotion.endX : shimmerMotion.startX,
-          y: hovered ? shimmerMotion.endY : shimmerMotion.startY,
-          opacity: hovered ? 1 : 0,
-        }}
-        style={{
-          left: shimmerMotion.originX,
-          top: shimmerMotion.originY,
-          width: shimmerMotion.width,
-          height: shimmerMotion.height,
-        }}
-        transition={{ duration: 1.05, ease }}
-      />
-      {iconOnly ? (
-        iconOnlyContent
-      ) : (
-        <span
-          className="relative z-10 inline-grid items-center"
-          style={{
-            gridTemplateColumns: `${leadingSlotWidth}px auto ${trailingSlotWidth}px`,
-            columnGap:
-              showLabel && (leadingSlotWidth > 0 || trailingSlotWidth > 0)
-                ? `${iconGap}px`
-                : "0px",
-          }}
-        >
-          {leadingIcon}
-          <span
-            className={cn(
-              "relative z-10 inline-block min-w-0 whitespace-nowrap text-center transition-colors duration-200",
-              labelColorClass,
-            )}
-          >
-            {label}
-          </span>
-          {balanceSlot}
-        </span>
+  const icon = Icon ? (
+    <Icon
+      aria-hidden
+      className={cn(
+        "shrink-0 transition-transform duration-200 ease-out",
+        iconOnly ? "size-5" : "size-[17px]",
+        iconTrails && "group-hover:translate-x-1",
+        iconClassName,
       )}
+      strokeWidth={2.3}
+    />
+  ) : null;
+
+  const content = iconOnly ? (
+    icon
+  ) : (
+    <>
+      {iconTrails ? null : icon}
+      <span>{label}</span>
+      {iconTrails ? icon : null}
     </>
   );
 
   return (
-    <motion.div
-      className={cn(
-        "inline-block origin-center transform-gpu will-change-transform",
-        fullWidth && "w-full",
-        className,
-      )}
-      onHoverStart={() => setHovered(true)}
-      onHoverEnd={() => setHovered(false)}
-      initial={false}
-      animate={{
-        scale: hovered ? (isLightTone ? 1.03 : 1.06) : 1,
-        rotate: hovered && enableTilt && !isLightTone ? -10 : 0,
-        y: hovered ? (isLightTone ? -1 : -1.5) : 0,
-      }}
-      whileTap={{ scale: 0.97 }}
-      transition={spring}
-    >
+    <span className={cn("inline-block", fullWidth && "w-full", className)}>
       {href && shouldRenderAnchor ? (
         <a
           href={href}
           target={shouldOpenNewTab ? "_blank" : undefined}
           rel={shouldOpenNewTab ? "noopener noreferrer" : undefined}
-          className={linkClassName}
+          className={pressClassName}
           aria-label={label}
         >
           {content}
         </a>
       ) : href ? (
-        <Link href={href} className={linkClassName} aria-label={label}>
+        <Link href={href} className={pressClassName} aria-label={label}>
           {content}
         </Link>
       ) : (
@@ -286,12 +113,12 @@ export const PrimaryButton = ({
           type={type}
           onClick={onClick}
           disabled={disabled}
-          className={linkClassName}
+          className={pressClassName}
           aria-label={label}
         >
           {content}
         </button>
       )}
-    </motion.div>
+    </span>
   );
 };
