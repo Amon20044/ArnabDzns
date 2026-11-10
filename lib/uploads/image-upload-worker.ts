@@ -61,12 +61,15 @@ ctx.addEventListener("message", async (event: MessageEvent<ImageWorkerInput>) =>
         if (typeof OffscreenCanvas === "undefined") {
           throw new Error("OffscreenCanvas not supported in this browser.");
         }
-        const canvas = new OffscreenCanvas(bitmap.width, bitmap.height);
+        // Keep uploads sharp at full-screen size without shipping camera-sized originals.
+        const scale = Math.min(1, 2400 / Math.max(bitmap.width, bitmap.height));
+        width = Math.max(1, Math.round(bitmap.width * scale));
+        height = Math.max(1, Math.round(bitmap.height * scale));
+        const canvas = new OffscreenCanvas(width, height);
         const c2d = canvas.getContext("2d");
         if (!c2d) throw new Error("Unable to get OffscreenCanvas 2D context.");
-        c2d.drawImage(bitmap, 0, 0);
-        // quality=1 is the closest browsers get to lossless webp via canvas.
-        outBlob = await canvas.convertToBlob({ type: "image/webp", quality: 1 });
+        c2d.drawImage(bitmap, 0, 0, width, height);
+        outBlob = await canvas.convertToBlob({ type: "image/webp", quality: 0.85 });
         mimeType = "image/webp";
         convertedFlag = true;
       }

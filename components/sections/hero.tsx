@@ -28,6 +28,7 @@ const blurUp: Variants = {
 
 interface HeroProps {
   content: HeroSectionConfig;
+  headingAs?: "h1" | "h2";
   className?: string;
   /**
    * Optional body rendered after the CTA, still inside the centered hero
@@ -62,6 +63,7 @@ const resolveTitleLines = (title: HeroSectionConfig["title"]) => {
 
 export const Hero = ({
   content,
+  headingAs = "h2",
   className,
   children,
   childrenClassName,
@@ -86,7 +88,7 @@ export const Hero = ({
       )}
     >
       {content.eyebrow ? (
-        <motion.div custom={0} initial="hidden" animate="visible" variants={blurUp}>
+        <motion.div custom={0} initial={false} animate="visible" variants={blurUp}>
           <Text
             as="span"
             variant="p3"
@@ -103,7 +105,7 @@ export const Hero = ({
             <motion.div
               key={badge.id ?? `${badge.label}-${index}`}
               custom={eyebrowStep + index}
-              initial="hidden"
+              initial={false}
               animate="visible"
               variants={blurUp}
               className={cn(badge.showInMobile === false && "hidden sm:block")}
@@ -126,12 +128,12 @@ export const Hero = ({
 
       <motion.div
         custom={titleStep}
-        initial="hidden"
+        initial={false}
         animate="visible"
         variants={blurUp}
         className={titleSpacingClassName}
       >
-        <Heading variant="h2">
+        <Heading variant="h2" as={headingAs}>
           {titleLines.map((line, index) => (
             <Fragment key={`${line}-${index}`}>
               {index > 0 ? <br /> : null}
@@ -144,7 +146,7 @@ export const Hero = ({
       {content.description ? (
         <motion.div
           custom={descriptionStep}
-          initial="hidden"
+          initial={false}
           animate="visible"
           variants={blurUp}
           className="mt-5 max-w-md"
@@ -156,7 +158,7 @@ export const Hero = ({
       {ctas.length ? (
         <motion.div
           custom={ctaStep}
-          initial="hidden"
+          initial={false}
           animate="visible"
           variants={blurUp}
           className="mt-10 flex flex-wrap items-center justify-center gap-3"
@@ -179,7 +181,7 @@ export const Hero = ({
       {children ? (
         <motion.div
           custom={childrenStep}
-          initial="hidden"
+          initial={false}
           animate="visible"
           variants={blurUp}
           className={cn("mt-10 w-full", childrenClassName)}

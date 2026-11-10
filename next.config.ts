@@ -7,7 +7,15 @@ const withMDX = createMDX({
 
 const nextConfig: NextConfig = {
   pageExtensions: ["js", "jsx", "md", "mdx", "ts", "tsx"],
+  async headers() {
+    return [{
+      source: "/media/:path*",
+      headers: [{ key: "Cache-Control", value: "public, max-age=31536000, immutable" }],
+    }];
+  },
   images: {
+    deviceSizes: [640, 960, 1280, 1920],
+    imageSizes: [64, 128, 256, 384],
     dangerouslyAllowSVG: true,
     contentDispositionType: "inline",
     minimumCacheTTL: 2_678_400,

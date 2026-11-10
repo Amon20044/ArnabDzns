@@ -1,0 +1,2608 @@
+{
+  "/clients/600px-Battlegrounds_Mobile_International_Cup_2025_lightmode.png": {
+    "base": "/media/dce0a9e35497a662e031",
+    "widths": [
+      64,
+      128,
+      256,
+      384,
+      600
+    ],
+    "avif": true,
+    "full": {
+      "base": "/media/ac89a968f914838c12b8",
+      "widths": [
+        64,
+        128,
+        256,
+        384,
+        600
+      ]
+    }
+  },
+  "/clients/600px-Rooter_x_Nodwin_Champions_Cup_lightmode.png": {
+    "base": "/media/e447381164a4ee6d028a",
+    "widths": [
+      64,
+      128,
+      256,
+      384,
+      600
+    ],
+    "avif": true,
+    "full": {
+      "base": "/media/3e83621918d5401e533c",
+      "widths": [
+        64,
+        128,
+        256,
+        384,
+        600
+      ]
+    }
+  },
+  "/clients/Carnival_Gaming_allmode.png": {
+    "base": "/media/7c58c2ade0fbe54b905c",
+    "widths": [
+      64,
+      128,
+      256,
+      384,
+      437
+    ],
+    "avif": true,
+    "full": {
+      "base": "/media/af599f92d7171983397f",
+      "widths": [
+        64,
+        128,
+        256,
+        384,
+        437
+      ]
+    }
+  },
+  "/clients/Esports_World_Cup_Logo_Acronym_Black_696721635a.webp": {
+    "base": "/media/2eca903e97a8b5e12a60",
+    "widths": [
+      64,
+      128
+    ],
+    "avif": true,
+    "full": {
+      "base": "/media/69f3cc045d57a1407fa0",
+      "widths": [
+        64,
+        128
+      ]
+    }
+  },
+  "/clients/geprofile.png": {
+    "base": "/media/45b6a81f82e5996a013f",
+    "widths": [
+      64,
+      128,
+      256,
+      384,
+      472
+    ],
+    "avif": true,
+    "full": {
+      "base": "/media/bab0e9b0e376736ee512",
+      "widths": [
+        64,
+        128,
+        256,
+        384,
+        472
+      ]
+    }
+  },
+  "/clients/GODLIKE-LOGO.png": {
+    "base": "/media/2d7f6090f0e2fe81ad1b",
+    "widths": [
+      64,
+      128,
+      256,
+      384,
+      640,
+      960
+    ],
+    "avif": true,
+    "full": {
+      "base": "/media/5b4bd7c10b0b82bb8efe",
+      "widths": [
+        64,
+        128,
+        256,
+        384,
+        640,
+        960,
+        1065
+      ]
+    }
+  },
+  "/clients/GR-icon (2).webp": {
+    "base": "/media/42367b9eec60e5db84d8",
+    "widths": [
+      64,
+      128,
+      256,
+      384,
+      640,
+      960
+    ],
+    "avif": true,
+    "full": {
+      "base": "/media/287fb0571a047b3bcf10",
+      "widths": [
+        64,
+        128,
+        256,
+        384,
+        640,
+        960,
+        1280,
+        1530
+      ]
+    }
+  },
+  "/clients/logo (1).png": {
+    "base": "/media/ee3639c8658dbc4ae450",
+    "widths": [
+      64,
+      128,
+      256,
+      279
+    ],
+    "avif": true,
+    "full": {
+      "base": "/media/ddc6fd13f172bac3eb20",
+      "widths": [
+        64,
+        128,
+        256,
+        279
+      ]
+    }
+  },
+  "/clients/logo (1).webp": {
+    "base": "/media/1c065b716f8ab870bfe3",
+    "widths": [
+      64,
+      128,
+      256,
+      384,
+      640,
+      960
+    ],
+    "avif": true,
+    "full": {
+      "base": "/media/0896dad1b608f36ad565",
+      "widths": [
+        64,
+        128,
+        256,
+        384,
+        640,
+        960,
+        1280,
+        1920
+      ]
+    }
+  },
+  "/clients/Untitled-design-8.webp": {
+    "base": "/media/4b5767b04fe2f17f7187",
+    "widths": [
+      64,
+      128,
+      256,
+      384
+    ],
+    "avif": true,
+    "full": {
+      "base": "/media/2145c67152d697ee154d",
+      "widths": [
+        64,
+        128,
+        256,
+        384
+      ]
+    }
+  },
+  "/clients/Vasista_Esports_darkmode.png": {
+    "base": "/media/4b767c94a5d9961c6570",
+    "widths": [
+      64,
+      128,
+      256,
+      373
+    ],
+    "avif": true,
+    "full": {
+      "base": "/media/fc24ca4cb19be2bd644c",
+      "widths": [
+        64,
+        128,
+        256,
+        373
+      ]
+    }
+  },
+  "/demo/marquee-01.jpg": {
+    "base": "/media/571eae6d4c2dda6dfe29",
+    "widths": [
+      64,
+      128,
+      256,
+      384,
+      640,
+      960
+    ],
+    "avif": true,
+    "full": {
+      "base": "/media/793d48146ea3767e9d13",
+      "widths": [
+        64,
+        128,
+        256,
+        384,
+        640,
+        960,
+        1280,
+        1600
+      ]
+    }
+  },
+  "/demo/marquee-02.jpg": {
+    "base": "/media/f4699c9c6381af0f4045",
+    "widths": [
+      64,
+      128,
+      256,
+      384,
+      640,
+      960
+    ],
+    "avif": true,
+    "full": {
+      "base": "/media/3f23515c6add4599cf51",
+      "widths": [
+        64,
+        128,
+        256,
+        384,
+        640,
+        960,
+        1280,
+        1600
+      ]
+    }
+  },
+  "/demo/marquee-03.jpg": {
+    "base": "/media/4724b260b002e320801e",
+    "widths": [
+      64,
+      128,
+      256,
+      384,
+      640,
+      960
+    ],
+    "avif": true,
+    "full": {
+      "base": "/media/d771101b6b4d3fcd4af9",
+      "widths": [
+        64,
+        128,
+        256,
+        384,
+        640,
+        960,
+        1280,
+        1600
+      ]
+    }
+  },
+  "/demo/marquee-04.jpg": {
+    "base": "/media/c14d94b26273f38f9b5f",
+    "widths": [
+      64,
+      128,
+      256,
+      384,
+      640,
+      960
+    ],
+    "avif": true,
+    "full": {
+      "base": "/media/6b64b48024d241521571",
+      "widths": [
+        64,
+        128,
+        256,
+        384,
+        640,
+        960,
+        1280,
+        1600
+      ]
+    }
+  },
+  "/demo/marquee-05.jpg": {
+    "base": "/media/1889bbc9fdb6fe847e67",
+    "widths": [
+      64,
+      128,
+      256,
+      384,
+      640,
+      960
+    ],
+    "avif": true,
+    "full": {
+      "base": "/media/85d2ef83587c12b2f076",
+      "widths": [
+        64,
+        128,
+        256,
+        384,
+        640,
+        960,
+        1280,
+        1600
+      ]
+    }
+  },
+  "/demo/marquee-06.jpg": {
+    "base": "/media/2872597dd7107c226256",
+    "widths": [
+      64,
+      128,
+      256,
+      384,
+      640,
+      960
+    ],
+    "avif": true,
+    "full": {
+      "base": "/media/26cc0d493667ed02fedb",
+      "widths": [
+        64,
+        128,
+        256,
+        384,
+        640,
+        960,
+        1280,
+        1600
+      ]
+    }
+  },
+  "/demo/marquee-07.jpg": {
+    "base": "/media/d204ff5f30406c6d8dcc",
+    "widths": [
+      64,
+      128,
+      256,
+      384,
+      640,
+      960
+    ],
+    "avif": true,
+    "full": {
+      "base": "/media/8e1970eb90a10bd7490a",
+      "widths": [
+        64,
+        128,
+        256,
+        384,
+        640,
+        960,
+        1280,
+        1600
+      ]
+    }
+  },
+  "/demo/marquee-08.jpg": {
+    "base": "/media/1d41bf6af830520c5d54",
+    "widths": [
+      64,
+      128,
+      256,
+      384,
+      640,
+      960
+    ],
+    "avif": true,
+    "full": {
+      "base": "/media/3b1195a45b1e289353b8",
+      "widths": [
+        64,
+        128,
+        256,
+        384,
+        640,
+        960,
+        1280,
+        1600
+      ]
+    }
+  },
+  "/demo/marquee-09.jpg": {
+    "base": "/media/5fe540311f84ed87ad3c",
+    "widths": [
+      64,
+      128,
+      256,
+      384,
+      640,
+      960
+    ],
+    "avif": true,
+    "full": {
+      "base": "/media/969d60f6eaac505718b8",
+      "widths": [
+        64,
+        128,
+        256,
+        384,
+        640,
+        960,
+        1280,
+        1600
+      ]
+    }
+  },
+  "/demo/marquee-10.jpg": {
+    "base": "/media/0a86bdf2ad692ca4334d",
+    "widths": [
+      64,
+      128,
+      256,
+      384,
+      640,
+      960
+    ],
+    "avif": true,
+    "full": {
+      "base": "/media/d80fdb261b4c018b75ac",
+      "widths": [
+        64,
+        128,
+        256,
+        384,
+        640,
+        960,
+        1280,
+        1600
+      ]
+    }
+  },
+  "/demo/marquee-11.jpg": {
+    "base": "/media/0f71eee4aa2718d12e48",
+    "widths": [
+      64,
+      128,
+      256,
+      384,
+      640,
+      960
+    ],
+    "avif": true,
+    "full": {
+      "base": "/media/a2cd485c70dec40718b1",
+      "widths": [
+        64,
+        128,
+        256,
+        384,
+        640,
+        960,
+        1280,
+        1600
+      ]
+    }
+  },
+  "/demo/marquee-12.jpg": {
+    "base": "/media/1125c081e3b6a4375759",
+    "widths": [
+      64,
+      128,
+      256,
+      384,
+      640,
+      960
+    ],
+    "avif": true,
+    "full": {
+      "base": "/media/350fa1045aca20ca487e",
+      "widths": [
+        64,
+        128,
+        256,
+        384,
+        640,
+        960,
+        1280,
+        1600
+      ]
+    }
+  },
+  "/image.png": {
+    "base": "/media/967671a763fc79f20876",
+    "widths": [
+      64,
+      128,
+      180
+    ],
+    "avif": false,
+    "full": {
+      "base": "/media/34d2ab7d8968318b12d6",
+      "widths": [
+        64,
+        128,
+        180
+      ]
+    }
+  },
+  "/shop/image.png": {
+    "base": "/media/46fd7fa34fc0dd9c2a53",
+    "widths": [
+      64,
+      128,
+      256,
+      384,
+      640,
+      960
+    ],
+    "avif": true,
+    "full": {
+      "base": "/media/168aaf435331aed75b2f",
+      "widths": [
+        64,
+        128,
+        256,
+        384,
+        640,
+        960,
+        1280,
+        1920
+      ]
+    }
+  },
+  "/shop/image2.png": {
+    "base": "/media/1ab288b87d9fbc52611a",
+    "widths": [
+      64,
+      128,
+      256,
+      384,
+      640,
+      960
+    ],
+    "avif": true,
+    "full": {
+      "base": "/media/199e26a2a7271385b5e7",
+      "widths": [
+        64,
+        128,
+        256,
+        384,
+        640,
+        960,
+        1200
+      ]
+    }
+  },
+  "/shop/image4.png": {
+    "base": "/media/4b5433b9ef7fff8e3c3e",
+    "widths": [
+      64,
+      128,
+      256,
+      384,
+      640,
+      960
+    ],
+    "avif": true,
+    "full": {
+      "base": "/media/e253120b4205dda1e43f",
+      "widths": [
+        64,
+        128,
+        256,
+        384,
+        640,
+        960,
+        1280,
+        1322
+      ]
+    }
+  },
+  "https://i.ibb.co/0jBg1S92/Oneplus.webp": {
+    "base": "/media/fd036268f0bef7635ed8",
+    "widths": [
+      64,
+      128,
+      256,
+      384,
+      640,
+      960
+    ],
+    "avif": true,
+    "full": {
+      "base": "/media/013e680bf5e7413afbd2",
+      "widths": [
+        64,
+        128,
+        256,
+        384,
+        640,
+        960,
+        1280,
+        1920
+      ]
+    }
+  },
+  "https://i.ibb.co/0psm0LnT/AMPVERSE.webp": {
+    "base": "/media/960b0e24b40126826491",
+    "widths": [
+      64,
+      128,
+      256,
+      384,
+      640,
+      960
+    ],
+    "avif": true,
+    "full": {
+      "base": "/media/d66c47ee0da4f6c42344",
+      "widths": [
+        64,
+        128,
+        256,
+        384,
+        640,
+        960,
+        1280,
+        1920
+      ]
+    }
+  },
+  "https://i.ibb.co/0ydD6DFp/Mizo-Plays-IRL-Vlog-Thumbnail.webp": {
+    "base": "/media/a00bdb1207a4f2014bc7",
+    "widths": [
+      64,
+      128,
+      256,
+      384,
+      640,
+      960
+    ],
+    "avif": true,
+    "full": {
+      "base": "/media/678e0f40041ca6e96a42",
+      "widths": [
+        64,
+        128,
+        256,
+        384,
+        640,
+        960,
+        1280,
+        1920
+      ]
+    }
+  },
+  "https://i.ibb.co/0yrxSgkN/Gods-Rein-Jersey-Reveal-Poster.webp": {
+    "base": "/media/303131d4a17d6c7c5cd3",
+    "widths": [
+      64,
+      128,
+      256,
+      384,
+      640,
+      960
+    ],
+    "avif": true,
+    "full": {
+      "base": "/media/5c27591307e37553bf98",
+      "widths": [
+        64,
+        128,
+        256,
+        384,
+        640,
+        960,
+        1280,
+        1920
+      ]
+    }
+  },
+  "https://i.ibb.co/0yRYw940/nvidia.webp": {
+    "base": "/media/5ae34ae4e8382211431c",
+    "widths": [
+      64,
+      128,
+      256,
+      384,
+      640,
+      960
+    ],
+    "avif": true,
+    "full": {
+      "base": "/media/48994067573a32648cbc",
+      "widths": [
+        64,
+        128,
+        256,
+        384,
+        640,
+        960,
+        1280,
+        1920
+      ]
+    }
+  },
+  "https://i.ibb.co/1GHGQVXQ/zee.webp": {
+    "base": "/media/ed99ed14cce3714205f0",
+    "widths": [
+      64,
+      128,
+      256,
+      384,
+      640,
+      960
+    ],
+    "avif": true,
+    "full": {
+      "base": "/media/213d21d42bfdffd64ec1",
+      "widths": [
+        64,
+        128,
+        256,
+        384,
+        640,
+        960,
+        1280,
+        1650
+      ]
+    }
+  },
+  "https://i.ibb.co/1GYTZbBV/colorful.webp": {
+    "base": "/media/36694a6660ba4f5f46a5",
+    "widths": [
+      64,
+      128,
+      256,
+      384,
+      640,
+      960
+    ],
+    "avif": true,
+    "full": {
+      "base": "/media/73aa0280dbc9f6e805ae",
+      "widths": [
+        64,
+        128,
+        256,
+        384,
+        640,
+        960,
+        1280,
+        1920
+      ]
+    }
+  },
+  "https://i.ibb.co/3mHnGrzz/zupee.webp": {
+    "base": "/media/b627e1d5e9705e7b18d8",
+    "widths": [
+      64,
+      128,
+      256,
+      384,
+      640,
+      960
+    ],
+    "avif": true,
+    "full": {
+      "base": "/media/9c6941ab5a926af4c73a",
+      "widths": [
+        64,
+        128,
+        256,
+        384,
+        640,
+        960,
+        1280,
+        1920
+      ]
+    }
+  },
+  "https://i.ibb.co/6cRLD3sv/Adnan-Shami-Lipstick-Music-Video-Thumbnail.webp": {
+    "base": "/media/ae2adbb721ac9d6c4d42",
+    "widths": [
+      64,
+      128,
+      256,
+      384,
+      640,
+      960
+    ],
+    "avif": true,
+    "full": {
+      "base": "/media/8e1d1cbfa2b8aacbf05e",
+      "widths": [
+        64,
+        128,
+        256,
+        384,
+        640,
+        960,
+        1280,
+        1920
+      ]
+    }
+  },
+  "https://i.ibb.co/6RTqhF2f/green-soul.webp": {
+    "base": "/media/a3857ad8cb2e9cb43c99",
+    "widths": [
+      64,
+      128,
+      256,
+      384,
+      640,
+      960
+    ],
+    "avif": true,
+    "full": {
+      "base": "/media/6b78bd0a29daa7843eaf",
+      "widths": [
+        64,
+        128,
+        256,
+        384,
+        640,
+        960,
+        1280,
+        1920
+      ]
+    }
+  },
+  "https://i.ibb.co/9H5sbwQ9/samsung.webp": {
+    "base": "/media/8fd2734229fc2e4381b9",
+    "widths": [
+      64,
+      128,
+      256,
+      384,
+      640,
+      960
+    ],
+    "avif": true,
+    "full": {
+      "base": "/media/efcbd1b49c711ef9d78f",
+      "widths": [
+        64,
+        128,
+        256,
+        384,
+        640,
+        960,
+        1280,
+        1920
+      ]
+    }
+  },
+  "https://i.ibb.co/B2F6dvwK/Glazer-Last-Zone-Poster.webp": {
+    "base": "/media/c9abdf0229593f6f1c36",
+    "widths": [
+      64,
+      128,
+      256,
+      384,
+      640,
+      960
+    ],
+    "avif": true,
+    "full": {
+      "base": "/media/64008d4c8b8322888aa7",
+      "widths": [
+        64,
+        128,
+        256,
+        384,
+        640,
+        960,
+        1080
+      ]
+    }
+  },
+  "https://i.ibb.co/bgtdHL6k/playstation.webp": {
+    "base": "/media/0a5671e889f4fda49019",
+    "widths": [
+      64,
+      128,
+      256,
+      384,
+      640,
+      960
+    ],
+    "avif": true,
+    "full": {
+      "base": "/media/b4d740c65d0642be75c7",
+      "widths": [
+        64,
+        128,
+        256,
+        384,
+        640,
+        960,
+        1280,
+        1920
+      ]
+    }
+  },
+  "https://i.ibb.co/bjF7CMbS/IQOO-LOGO.webp": {
+    "base": "/media/e1e31080afee10a942f4",
+    "widths": [
+      64,
+      128,
+      256,
+      384,
+      640,
+      960
+    ],
+    "avif": true,
+    "full": {
+      "base": "/media/a535392f2fb006989080",
+      "widths": [
+        64,
+        128,
+        256,
+        384,
+        640,
+        960,
+        1280,
+        1920
+      ]
+    }
+  },
+  "https://i.ibb.co/BXzvPj1/Gods-reign.webp": {
+    "base": "/media/f67d6795a1a4ffeabd8b",
+    "widths": [
+      64,
+      128,
+      256,
+      384,
+      640,
+      960
+    ],
+    "avif": true,
+    "full": {
+      "base": "/media/b23c332df973ebaaebbf",
+      "widths": [
+        64,
+        128,
+        256,
+        384,
+        640,
+        960,
+        1196
+      ]
+    }
+  },
+  "https://i.ibb.co/C5qynJXT/S8-UL-EWC-x-India-Rising-2026-Poster.webp": {
+    "base": "/media/80f7a258c0e867c8bee5",
+    "widths": [
+      64,
+      128,
+      256,
+      384,
+      640,
+      960
+    ],
+    "avif": true,
+    "full": {
+      "base": "/media/258a8b326c5a2ba87a9b",
+      "widths": [
+        64,
+        128,
+        256,
+        384,
+        640,
+        960,
+        1080
+      ]
+    }
+  },
+  "https://i.ibb.co/ccfzWhK0/KONAMI.webp": {
+    "base": "/media/261a66047ed2584bd894",
+    "widths": [
+      64,
+      128,
+      256,
+      384,
+      640,
+      960
+    ],
+    "avif": true,
+    "full": {
+      "base": "/media/e23266cc47b5ff5260d8",
+      "widths": [
+        64,
+        128,
+        256,
+        384,
+        640,
+        960,
+        1280,
+        1920
+      ]
+    }
+  },
+  "https://i.ibb.co/cX8xKrTX/Shoto-Teaser-Thumbnail.webp": {
+    "base": "/media/b17934dd195b57a964bd",
+    "widths": [
+      64,
+      128,
+      256,
+      384,
+      640,
+      960
+    ],
+    "avif": true,
+    "full": {
+      "base": "/media/4c2825682244cd2a8f26",
+      "widths": [
+        64,
+        128,
+        256,
+        384,
+        640,
+        960,
+        1280,
+        1920
+      ]
+    }
+  },
+  "https://i.ibb.co/DDbg8kMK/asus.webp": {
+    "base": "/media/5828c73d3b0fb82ea8e7",
+    "widths": [
+      64,
+      128,
+      256,
+      384,
+      640,
+      960
+    ],
+    "avif": true,
+    "full": {
+      "base": "/media/0e412c755720b15e16ec",
+      "widths": [
+        64,
+        128,
+        256,
+        384,
+        640,
+        960,
+        1280,
+        1920
+      ]
+    }
+  },
+  "https://i.ibb.co/DDMBjhsH/Godlike.webp": {
+    "base": "/media/ab969fa6b63235a7e18d",
+    "widths": [
+      64,
+      128,
+      256,
+      384,
+      640,
+      960
+    ],
+    "avif": true,
+    "full": {
+      "base": "/media/222b5a3d3d780a6637b0",
+      "widths": [
+        64,
+        128,
+        256,
+        384,
+        640,
+        960,
+        1280,
+        1920
+      ]
+    }
+  },
+  "https://i.ibb.co/DDMmC1cF/intel.webp": {
+    "base": "/media/2a1a1f53fa19d3a0e7e6",
+    "widths": [
+      64,
+      128,
+      256,
+      384,
+      640,
+      960
+    ],
+    "avif": true,
+    "full": {
+      "base": "/media/4d8cbbc95f490968e426",
+      "widths": [
+        64,
+        128,
+        256,
+        384,
+        640,
+        960,
+        1280,
+        1920
+      ]
+    }
+  },
+  "https://i.ibb.co/DfvVtrcc/talk-esports.webp": {
+    "base": "/media/1c8472ae26a0abc2e912",
+    "widths": [
+      64,
+      128,
+      256,
+      384,
+      640,
+      759
+    ],
+    "avif": true,
+    "full": {
+      "base": "/media/4fee3c6f5a36780d00a6",
+      "widths": [
+        64,
+        128,
+        256,
+        384,
+        640,
+        759
+      ]
+    }
+  },
+  "https://i.ibb.co/dJxvKxLj/DNA.webp": {
+    "base": "/media/f5c4fa982c503a4e5f31",
+    "widths": [
+      64,
+      128,
+      256,
+      384,
+      640,
+      960
+    ],
+    "avif": true,
+    "full": {
+      "base": "/media/272e8d54a3007836317f",
+      "widths": [
+        64,
+        128,
+        256,
+        384,
+        640,
+        960,
+        1280,
+        1920
+      ]
+    }
+  },
+  "https://i.ibb.co/Fk4SpTJD/GLADIATORS-BGMS-2026-GRAND-FINALS-MATCHDAY.webp": {
+    "base": "/media/15c1e79cbdc85e1e4684",
+    "widths": [
+      64,
+      128,
+      256,
+      384,
+      640,
+      960
+    ],
+    "avif": true,
+    "full": {
+      "base": "/media/afb4bf51a3b2ba7d89fa",
+      "widths": [
+        64,
+        128,
+        256,
+        384,
+        640,
+        960,
+        1080
+      ]
+    }
+  },
+  "https://i.ibb.co/FkqwSM4s/mountain-dew.webp": {
+    "base": "/media/0ddf6f05b212d40c2ccf",
+    "widths": [
+      64,
+      128,
+      256,
+      384,
+      640,
+      960
+    ],
+    "avif": true,
+    "full": {
+      "base": "/media/b438ae27db59a386ff65",
+      "widths": [
+        64,
+        128,
+        256,
+        384,
+        640,
+        960,
+        1280,
+        1920
+      ]
+    }
+  },
+  "https://i.ibb.co/FN1SNRj/gigabyte.webp": {
+    "base": "/media/6b0fc67fee4df49c52db",
+    "widths": [
+      64,
+      128,
+      256,
+      384,
+      640,
+      960
+    ],
+    "avif": true,
+    "full": {
+      "base": "/media/ae7791e3f179bf821982",
+      "widths": [
+        64,
+        128,
+        256,
+        384,
+        640,
+        960,
+        1280,
+        1920
+      ]
+    }
+  },
+  "https://i.ibb.co/GBhLbgq/S8-UL-x-KICK-Announcement-Poster.webp": {
+    "base": "/media/083053c281763200d861",
+    "widths": [
+      64,
+      128,
+      256,
+      384,
+      640,
+      960
+    ],
+    "avif": true,
+    "full": {
+      "base": "/media/2b9e045878dcc2c0c57e",
+      "widths": [
+        64,
+        128,
+        256,
+        384,
+        640,
+        960,
+        1280,
+        1920
+      ]
+    }
+  },
+  "https://i.ibb.co/Hf72yP1c/tvs.webp": {
+    "base": "/media/8e3019976952008206cf",
+    "widths": [
+      64,
+      128,
+      256,
+      384,
+      640,
+      960
+    ],
+    "avif": true,
+    "full": {
+      "base": "/media/289020dc49a7029b5551",
+      "widths": [
+        64,
+        128,
+        256,
+        384,
+        640,
+        960,
+        1280,
+        1920
+      ]
+    }
+  },
+  "https://i.ibb.co/HL0hmmng/infinix.webp": {
+    "base": "/media/84d33eee34be6affdc29",
+    "widths": [
+      64,
+      128,
+      256,
+      384,
+      640,
+      960
+    ],
+    "avif": true,
+    "full": {
+      "base": "/media/86860dec82fe2d12e97b",
+      "widths": [
+        64,
+        128,
+        256,
+        384,
+        640,
+        960,
+        1280,
+        1920
+      ]
+    }
+  },
+  "https://i.ibb.co/hQFh49h/Shoto-Baazigar-main-video-thumbnail.webp": {
+    "base": "/media/be4a2f840896481ad323",
+    "widths": [
+      64,
+      128,
+      256,
+      384,
+      640,
+      960
+    ],
+    "avif": true,
+    "full": {
+      "base": "/media/8af8c691972204343e26",
+      "widths": [
+        64,
+        128,
+        256,
+        384,
+        640,
+        960,
+        1280,
+        1920
+      ]
+    }
+  },
+  "https://i.ibb.co/j9h1TNqc/Thryl-Performance-Marketing-Poster.webp": {
+    "base": "/media/3088286f3b16f05d248b",
+    "widths": [
+      64,
+      128,
+      256,
+      384,
+      640,
+      960
+    ],
+    "avif": true,
+    "full": {
+      "base": "/media/7b68b22a7ee289601bfa",
+      "widths": [
+        64,
+        128,
+        256,
+        384,
+        640,
+        960,
+        1280,
+        1920
+      ]
+    }
+  },
+  "https://i.ibb.co/JjpYkD16/alienware.webp": {
+    "base": "/media/73049cf2c8e1fc499ea1",
+    "widths": [
+      64,
+      128,
+      256,
+      384,
+      640,
+      960
+    ],
+    "avif": true,
+    "full": {
+      "base": "/media/07d69e6fa30be8e0cd42",
+      "widths": [
+        64,
+        128,
+        256,
+        384,
+        640,
+        960,
+        1280,
+        1920
+      ]
+    }
+  },
+  "https://i.ibb.co/jPmPQT1G/ACTIVISION.webp": {
+    "base": "/media/9d9a99cc9a3d45f27457",
+    "widths": [
+      64,
+      128,
+      256,
+      384,
+      640,
+      960
+    ],
+    "avif": true,
+    "full": {
+      "base": "/media/916f9223fd0e8e063029",
+      "widths": [
+        64,
+        128,
+        256,
+        384,
+        640,
+        960,
+        1280,
+        1920
+      ]
+    }
+  },
+  "https://i.ibb.co/JW0CmGWB/genesis.webp": {
+    "base": "/media/8490cab16fccd3c59161",
+    "widths": [
+      64,
+      128,
+      256,
+      384,
+      640,
+      960
+    ],
+    "avif": true,
+    "full": {
+      "base": "/media/fd87903bc1c7d1ccf5fa",
+      "widths": [
+        64,
+        128,
+        256,
+        384,
+        640,
+        960,
+        1280,
+        1920
+      ]
+    }
+  },
+  "https://i.ibb.co/JWqHbwMk/M.webp": {
+    "base": "/media/4119f0f5a5d03cb81a45",
+    "widths": [
+      64,
+      128,
+      256,
+      384,
+      640,
+      960
+    ],
+    "avif": true,
+    "full": {
+      "base": "/media/f7df007b1365d603a099",
+      "widths": [
+        64,
+        128,
+        256,
+        384,
+        640,
+        960,
+        1280,
+        1920
+      ]
+    }
+  },
+  "https://i.ibb.co/kghDdMM8/resseracct.webp": {
+    "base": "/media/64fa322467026f641863",
+    "widths": [
+      64,
+      128,
+      256,
+      384,
+      640,
+      960
+    ],
+    "avif": true,
+    "full": {
+      "base": "/media/200a216bf8e6a1d29756",
+      "widths": [
+        64,
+        128,
+        256,
+        384,
+        640,
+        960,
+        1280,
+        1656
+      ]
+    }
+  },
+  "https://i.ibb.co/Kj2YyCzC/Nodwin-gaming.webp": {
+    "base": "/media/4e28c312146fdc07ab41",
+    "widths": [
+      64,
+      128,
+      256,
+      384,
+      640,
+      960
+    ],
+    "avif": true,
+    "full": {
+      "base": "/media/f02b05f8ec8125ec8992",
+      "widths": [
+        64,
+        128,
+        256,
+        384,
+        640,
+        960,
+        1280,
+        1656
+      ]
+    }
+  },
+  "https://i.ibb.co/kPt2rxp/hero.webp": {
+    "base": "/media/357a510d3fee18d2fa9f",
+    "widths": [
+      64,
+      128,
+      256,
+      384,
+      640,
+      960
+    ],
+    "avif": true,
+    "full": {
+      "base": "/media/12fc10ba14ebde9f224d",
+      "widths": [
+        64,
+        128,
+        256,
+        384,
+        640,
+        960,
+        1280,
+        1920
+      ]
+    }
+  },
+  "https://i.ibb.co/kVZFqDLV/S8-UL-EWC-2026-Gaming-House-Watch-Party-Poster.webp": {
+    "base": "/media/4d15e849d2266693015f",
+    "widths": [
+      64,
+      128,
+      256,
+      384,
+      640,
+      960
+    ],
+    "avif": true,
+    "full": {
+      "base": "/media/c4d930df01b2cce15c07",
+      "widths": [
+        64,
+        128,
+        256,
+        384,
+        640,
+        960,
+        1280,
+        1920
+      ]
+    }
+  },
+  "https://i.ibb.co/LhzGFDZn/REDBULL.webp": {
+    "base": "/media/7aff70efae3097ae10dd",
+    "widths": [
+      64,
+      128,
+      256,
+      384,
+      640,
+      960
+    ],
+    "avif": true,
+    "full": {
+      "base": "/media/7414571eecf12f0ef955",
+      "widths": [
+        64,
+        128,
+        256,
+        384,
+        640,
+        960,
+        1280,
+        1920
+      ]
+    }
+  },
+  "https://i.ibb.co/MDWNfCkw/S8-UL-2026-EWC-Tickets-Post.webp": {
+    "base": "/media/154bf3152e68fb73e2f1",
+    "widths": [
+      64,
+      128,
+      256,
+      384,
+      640,
+      960
+    ],
+    "avif": true,
+    "full": {
+      "base": "/media/801abd8eea55874ee1d6",
+      "widths": [
+        64,
+        128,
+        256,
+        384,
+        640,
+        960,
+        1280,
+        1920
+      ]
+    }
+  },
+  "https://i.ibb.co/mFg2qqzq/s8ul.webp": {
+    "base": "/media/5adc3ad5dec1d0f3b172",
+    "widths": [
+      64,
+      128,
+      256,
+      384,
+      640,
+      960
+    ],
+    "avif": true,
+    "full": {
+      "base": "/media/3fe72cef635d9aafed91",
+      "widths": [
+        64,
+        128,
+        256,
+        384,
+        640,
+        960,
+        1280,
+        1920
+      ]
+    }
+  },
+  "https://i.ibb.co/nNJR73rW/nissan.webp": {
+    "base": "/media/70307d53cbf4105cddf5",
+    "widths": [
+      64,
+      128,
+      256,
+      384,
+      640,
+      960
+    ],
+    "avif": true,
+    "full": {
+      "base": "/media/e2461e44b6a7e16721a2",
+      "widths": [
+        64,
+        128,
+        256,
+        384,
+        640,
+        960,
+        1280,
+        1920
+      ]
+    }
+  },
+  "https://i.ibb.co/pBv0NxFf/Gladiators-Into-the-Finals-BGMS-2026-Poster.webp": {
+    "base": "/media/2ddcc30f70e59c93aea9",
+    "widths": [
+      64,
+      128,
+      256,
+      384,
+      640,
+      960
+    ],
+    "avif": true,
+    "full": {
+      "base": "/media/dd480a304c09ab8bda19",
+      "widths": [
+        64,
+        128,
+        256,
+        384,
+        640,
+        960,
+        1280,
+        1920
+      ]
+    }
+  },
+  "https://i.ibb.co/PGXvTk7y/S8-UL-Free-Fire-i-QOO-Champions-Poster.webp": {
+    "base": "/media/ae46aa464f63989ac1d2",
+    "widths": [
+      64,
+      128,
+      256,
+      384,
+      640,
+      960
+    ],
+    "avif": true,
+    "full": {
+      "base": "/media/7c263b0400794f6261e5",
+      "widths": [
+        64,
+        128,
+        256,
+        384,
+        640,
+        960,
+        1280,
+        1920
+      ]
+    }
+  },
+  "https://i.ibb.co/pjVm0qyn/ROYAL-STAG.webp": {
+    "base": "/media/4c3651b3f1cac458d0fe",
+    "widths": [
+      64,
+      128,
+      256,
+      384,
+      640,
+      960
+    ],
+    "avif": true,
+    "full": {
+      "base": "/media/05ea978669d8eaef714a",
+      "widths": [
+        64,
+        128,
+        256,
+        384,
+        640,
+        960,
+        1280,
+        1920
+      ]
+    }
+  },
+  "https://i.ibb.co/pjy5MDP7/lenovo.webp": {
+    "base": "/media/5cfac7fd8ccc97d6495d",
+    "widths": [
+      64,
+      128,
+      256,
+      384,
+      640,
+      960
+    ],
+    "avif": true,
+    "full": {
+      "base": "/media/84ccd071e22ee97c35c0",
+      "widths": [
+        64,
+        128,
+        256,
+        384,
+        640,
+        960,
+        1280,
+        1920
+      ]
+    }
+  },
+  "https://i.ibb.co/pvgKSptT/lenskart.webp": {
+    "base": "/media/fadcdcd7544a3859fe83",
+    "widths": [
+      64,
+      128,
+      256,
+      384,
+      640,
+      960
+    ],
+    "avif": true,
+    "full": {
+      "base": "/media/f202fc030162daa8e505",
+      "widths": [
+        64,
+        128,
+        256,
+        384,
+        640,
+        960,
+        1280,
+        1920
+      ]
+    }
+  },
+  "https://i.ibb.co/q3P4QrYf/tec.webp": {
+    "base": "/media/07baeee4bbf845b43e74",
+    "widths": [
+      64,
+      128,
+      256,
+      384,
+      640,
+      960
+    ],
+    "avif": true,
+    "full": {
+      "base": "/media/2e2090384af1442bee00",
+      "widths": [
+        64,
+        128,
+        256,
+        384,
+        640,
+        960,
+        1280,
+        1472
+      ]
+    }
+  },
+  "https://i.ibb.co/q3SQmC6T/rog.webp": {
+    "base": "/media/4174a5e85df4b4c35e23",
+    "widths": [
+      64,
+      128,
+      256,
+      384,
+      640,
+      960
+    ],
+    "avif": true,
+    "full": {
+      "base": "/media/811c33bb3baf630971fc",
+      "widths": [
+        64,
+        128,
+        256,
+        384,
+        640,
+        960,
+        1280,
+        1920
+      ]
+    }
+  },
+  "https://i.ibb.co/Rkc7htXY/Glazer-Onam-Story.webp": {
+    "base": "/media/cbb6facbd4c031d62b5e",
+    "widths": [
+      64,
+      128,
+      256,
+      384,
+      640,
+      960
+    ],
+    "avif": true,
+    "full": {
+      "base": "/media/08688c591fd17251f3f5",
+      "widths": [
+        64,
+        128,
+        256,
+        384,
+        640,
+        960,
+        1080
+      ]
+    }
+  },
+  "https://i.ibb.co/Rpcdhsz2/welt.webp": {
+    "base": "/media/867008cd7310d99a6fbb",
+    "widths": [
+      64,
+      128,
+      256,
+      384,
+      640,
+      960
+    ],
+    "avif": true,
+    "full": {
+      "base": "/media/d324058e17cb8289e815",
+      "widths": [
+        64,
+        128,
+        256,
+        384,
+        640,
+        960,
+        1280,
+        1656
+      ]
+    }
+  },
+  "https://i.ibb.co/rR1kdmdg/realme.webp": {
+    "base": "/media/2fb77444f448f9fbf8e6",
+    "widths": [
+      64,
+      128,
+      256,
+      384,
+      640,
+      960
+    ],
+    "avif": true,
+    "full": {
+      "base": "/media/3007afd6979b0d49aa13",
+      "widths": [
+        64,
+        128,
+        256,
+        384,
+        640,
+        960,
+        1280,
+        1920
+      ]
+    }
+  },
+  "https://i.ibb.co/rRdpkfx1/S8-UL-Free-Fire-Enroute-Paris-Poster.webp": {
+    "base": "/media/d030472a09a3e1b3dfd6",
+    "widths": [
+      64,
+      128,
+      256,
+      384,
+      640,
+      960
+    ],
+    "avif": true,
+    "full": {
+      "base": "/media/cd9cae27ff27cf2019e7",
+      "widths": [
+        64,
+        128,
+        256,
+        384,
+        640,
+        960,
+        1280,
+        1920
+      ]
+    }
+  },
+  "https://i.ibb.co/rRZj3hx1/Godlike.webp": {
+    "base": "/media/0e532aa5801efcb800f5",
+    "widths": [
+      64,
+      128,
+      256,
+      384,
+      640,
+      960
+    ],
+    "avif": true,
+    "full": {
+      "base": "/media/1d36d2240285ce3acf14",
+      "widths": [
+        64,
+        128,
+        256,
+        384,
+        640,
+        960,
+        1280,
+        1534
+      ]
+    }
+  },
+  "https://i.ibb.co/s9hdQFTQ/true-rppers.webp": {
+    "base": "/media/7663be26862ff6a5f5ad",
+    "widths": [
+      64,
+      128,
+      256,
+      384,
+      593
+    ],
+    "avif": true,
+    "full": {
+      "base": "/media/d36071790e0ceca5514f",
+      "widths": [
+        64,
+        128,
+        256,
+        384,
+        593
+      ]
+    }
+  },
+  "https://i.ibb.co/TBgwQMcZ/FOUMA-LCQ-EWC-S8-UL-POSTER.webp": {
+    "base": "/media/944e1c6b71c9171e46e4",
+    "widths": [
+      64,
+      128,
+      256,
+      384,
+      640,
+      960
+    ],
+    "avif": true,
+    "full": {
+      "base": "/media/6308f6cecde96a9614cd",
+      "widths": [
+        64,
+        128,
+        256,
+        384,
+        640,
+        960,
+        1280,
+        1920
+      ]
+    }
+  },
+  "https://i.ibb.co/twt3TkgG/monster.webp": {
+    "base": "/media/d547b6ab20758c29658c",
+    "widths": [
+      64,
+      128,
+      256,
+      384,
+      640,
+      960
+    ],
+    "avif": true,
+    "full": {
+      "base": "/media/5dc0ad606ddacf833a62",
+      "widths": [
+        64,
+        128,
+        256,
+        384,
+        640,
+        960,
+        1280,
+        1920
+      ]
+    }
+  },
+  "https://i.ibb.co/V0mX8CQ7/S8-UL-EWC-2026-Road-to-Paris-Poster.webp": {
+    "base": "/media/8a688e8c9e64c4db33c7",
+    "widths": [
+      64,
+      128,
+      256,
+      384,
+      640,
+      960
+    ],
+    "avif": true,
+    "full": {
+      "base": "/media/b2fef3e9467297c33fcc",
+      "widths": [
+        64,
+        128,
+        256,
+        384,
+        640,
+        960,
+        1280,
+        1920
+      ]
+    }
+  },
+  "https://i.ibb.co/v41NT7Tq/sony-logo-png.webp": {
+    "base": "/media/14767db47bbd3d22a766",
+    "widths": [
+      64,
+      128,
+      256,
+      384,
+      640,
+      960
+    ],
+    "avif": true,
+    "full": {
+      "base": "/media/b7da3dc3e9e2f35a6959",
+      "widths": [
+        64,
+        128,
+        256,
+        384,
+        640,
+        960,
+        1280,
+        1920
+      ]
+    }
+  },
+  "https://i.ibb.co/v6m2Lknh/winzo.webp": {
+    "base": "/media/ecb280b05b324d316072",
+    "widths": [
+      64,
+      128,
+      256,
+      384,
+      640,
+      960
+    ],
+    "avif": true,
+    "full": {
+      "base": "/media/e85fcdce8f2d85bc0b62",
+      "widths": [
+        64,
+        128,
+        256,
+        384,
+        640,
+        960,
+        1280,
+        1920
+      ]
+    }
+  },
+  "https://i.ibb.co/Vc4Dd85c/8bit-Beg4-Mercy-Fifa-Thumbnail.webp": {
+    "base": "/media/9383d50f373030bb8e4d",
+    "widths": [
+      64,
+      128,
+      256,
+      384,
+      640,
+      960
+    ],
+    "avif": true,
+    "full": {
+      "base": "/media/82c409c7743b7949b78d",
+      "widths": [
+        64,
+        128,
+        256,
+        384,
+        640,
+        960,
+        1280,
+        1920
+      ]
+    }
+  },
+  "https://i.ibb.co/VpknzRJH/Orangutan-Esports-BMPS-2026-Matchday-creatives.webp": {
+    "base": "/media/cd9aff13fb86d4f7e9ed",
+    "widths": [
+      64,
+      128,
+      256,
+      384,
+      640,
+      960
+    ],
+    "avif": true,
+    "full": {
+      "base": "/media/cfb0cc8ac2f0e60262b5",
+      "widths": [
+        64,
+        128,
+        256,
+        384,
+        640,
+        960,
+        1080
+      ]
+    }
+  },
+  "https://i.ibb.co/vxxdG9j8/S8UL.webp": {
+    "base": "/media/7a1d826f50264fa11a39",
+    "widths": [
+      64,
+      128,
+      256,
+      384,
+      640,
+      960
+    ],
+    "avif": true,
+    "full": {
+      "base": "/media/e9a1ee6a49bbfa2084d0",
+      "widths": [
+        64,
+        128,
+        256,
+        384,
+        640,
+        960,
+        1280,
+        1492
+      ]
+    }
+  },
+  "https://i.ibb.co/W4D3jCsn/amd.webp": {
+    "base": "/media/75d6bc798966624b3aa0",
+    "widths": [
+      64,
+      128,
+      256,
+      384,
+      640,
+      960
+    ],
+    "avif": true,
+    "full": {
+      "base": "/media/8ae8e04dba4eacab000e",
+      "widths": [
+        64,
+        128,
+        256,
+        384,
+        640,
+        960,
+        1280,
+        1920
+      ]
+    }
+  },
+  "https://i.ibb.co/Wb0Q5Vn/S8-UL-VCSA-2026-Split-2-Playoffs-Matchday.webp": {
+    "base": "/media/290d76aa1158c46d3613",
+    "widths": [
+      64,
+      128,
+      256,
+      384,
+      640,
+      960
+    ],
+    "avif": true,
+    "full": {
+      "base": "/media/c900a22e0bc7f7103aa7",
+      "widths": [
+        64,
+        128,
+        256,
+        384,
+        640,
+        960,
+        1080
+      ]
+    }
+  },
+  "https://i.ibb.co/WvFLvrqB/Aquanox-Lan-Demon-Octopus-Poster.webp": {
+    "base": "/media/b098922e4ee4514340f3",
+    "widths": [
+      64,
+      128,
+      256,
+      384,
+      640,
+      960
+    ],
+    "avif": true,
+    "full": {
+      "base": "/media/4c271308b3f1346bc90e",
+      "widths": [
+        64,
+        128,
+        256,
+        384,
+        640,
+        960,
+        1080
+      ]
+    }
+  },
+  "https://i.ibb.co/WWzzgWGs/HP.webp": {
+    "base": "/media/41b33b8db336559fd101",
+    "widths": [
+      64,
+      128,
+      256,
+      384,
+      640,
+      960
+    ],
+    "avif": true,
+    "full": {
+      "base": "/media/c9c5e9734d7435793c28",
+      "widths": [
+        64,
+        128,
+        256,
+        384,
+        640,
+        960,
+        1280,
+        1920
+      ]
+    }
+  },
+  "https://i.ibb.co/XfvtkRdr/S8-UL-Beelzeboy-Pokemon-Go-Championship-2026-Poster.webp": {
+    "base": "/media/0d26ded55eaead6e06eb",
+    "widths": [
+      64,
+      128,
+      256,
+      384,
+      640,
+      960
+    ],
+    "avif": true,
+    "full": {
+      "base": "/media/c120910710e01f66e909",
+      "widths": [
+        64,
+        128,
+        256,
+        384,
+        640,
+        960,
+        1280,
+        1920
+      ]
+    }
+  },
+  "https://i.ibb.co/xKhF8P3J/Unipin.webp": {
+    "base": "/media/ed13c4032a922ef3cbb2",
+    "widths": [
+      64,
+      128,
+      256,
+      384,
+      640,
+      960
+    ],
+    "avif": true,
+    "full": {
+      "base": "/media/798de309ccaab3dc6d0e",
+      "widths": [
+        64,
+        128,
+        256,
+        384,
+        640,
+        960,
+        1280,
+        1920
+      ]
+    }
+  },
+  "https://i.ibb.co/XZVdrcr0/philips.webp": {
+    "base": "/media/755737db325aff006e87",
+    "widths": [
+      64,
+      128,
+      256,
+      384,
+      640,
+      960
+    ],
+    "avif": true,
+    "full": {
+      "base": "/media/816774463a04b6d4355b",
+      "widths": [
+        64,
+        128,
+        256,
+        384,
+        640,
+        960,
+        1280,
+        1920
+      ]
+    }
+  },
+  "https://i.ibb.co/Y7jzmhbv/orangutan.webp": {
+    "base": "/media/fbd8c8f2f4b3df267576",
+    "widths": [
+      64,
+      128,
+      256,
+      384,
+      640,
+      960
+    ],
+    "avif": true,
+    "full": {
+      "base": "/media/9afe6d1ec30df3eb02c3",
+      "widths": [
+        64,
+        128,
+        256,
+        384,
+        640,
+        960,
+        1196
+      ]
+    }
+  },
+  "https://i.ibb.co/YBkHLHs4/logitech.webp": {
+    "base": "/media/72c1beed0dea403b4f7e",
+    "widths": [
+      64,
+      128,
+      256,
+      384,
+      640,
+      960
+    ],
+    "avif": true,
+    "full": {
+      "base": "/media/b6ab31888841bdd05c65",
+      "widths": [
+        64,
+        128,
+        256,
+        384,
+        640,
+        960,
+        1280,
+        1920
+      ]
+    }
+  },
+  "https://i.ibb.co/yc3G3BLW/aoc.webp": {
+    "base": "/media/b09ca293655468a039c9",
+    "widths": [
+      64,
+      128,
+      256,
+      384,
+      640,
+      960
+    ],
+    "avif": true,
+    "full": {
+      "base": "/media/9c902730a891fd9f9a75",
+      "widths": [
+        64,
+        128,
+        256,
+        384,
+        640,
+        960,
+        1280,
+        1920
+      ]
+    }
+  },
+  "https://i.ibb.co/yF4K23bn/KRAFTON.webp": {
+    "base": "/media/da79c19dc721a976dac6",
+    "widths": [
+      64,
+      128,
+      256,
+      384,
+      640,
+      960
+    ],
+    "avif": true,
+    "full": {
+      "base": "/media/f95946d1d7c669c34b13",
+      "widths": [
+        64,
+        128,
+        256,
+        384,
+        640,
+        960,
+        1280,
+        1920
+      ]
+    }
+  },
+  "https://i.ibb.co/yFb0KW0K/benq.webp": {
+    "base": "/media/3357d5e058f281bba3e0",
+    "widths": [
+      64,
+      128,
+      256,
+      384,
+      640,
+      960
+    ],
+    "avif": true,
+    "full": {
+      "base": "/media/20fe6560eb526b96d7a4",
+      "widths": [
+        64,
+        128,
+        256,
+        384,
+        640,
+        960,
+        1280,
+        1920
+      ]
+    }
+  },
+  "https://i.ibb.co/Z6hg5SkQ/acer.webp": {
+    "base": "/media/418e03260b53364c941b",
+    "widths": [
+      64,
+      128,
+      256,
+      384,
+      640,
+      960
+    ],
+    "avif": true,
+    "full": {
+      "base": "/media/92fbdf3ad124b367c739",
+      "widths": [
+        64,
+        128,
+        256,
+        384,
+        640,
+        960,
+        1280,
+        1920
+      ]
+    }
+  },
+  "https://i.ibb.co/zhPqvwjp/GENESIS.webp": {
+    "base": "/media/bfb9da0b80132212c411",
+    "widths": [
+      64,
+      128,
+      256,
+      384,
+      640,
+      960
+    ],
+    "avif": true,
+    "full": {
+      "base": "/media/a16745524e7612dd9662",
+      "widths": [
+        64,
+        128,
+        256,
+        384,
+        640,
+        960,
+        1280,
+        1584
+      ]
+    }
+  },
+  "https://i.ibb.co/ZpJcmTQ0/GDR-Documentry-Thumbnail-Episode-1.webp": {
+    "base": "/media/280c72121b2b6cd35944",
+    "widths": [
+      64,
+      128,
+      256,
+      384,
+      640,
+      960
+    ],
+    "avif": true,
+    "full": {
+      "base": "/media/7236f9f12c3b8ff6d726",
+      "widths": [
+        64,
+        128,
+        256,
+        384,
+        640,
+        960,
+        1280,
+        1920
+      ]
+    }
+  },
+  "https://i.ibb.co/ZRtVw2LN/aftermath.webp": {
+    "base": "/media/4ec092ce45d87307e6c7",
+    "widths": [
+      64,
+      128,
+      256,
+      384,
+      640,
+      960
+    ],
+    "avif": true,
+    "full": {
+      "base": "/media/1a060a9f590e02b2a2e7",
+      "widths": [
+        64,
+        128,
+        256,
+        384,
+        640,
+        960,
+        1280,
+        1656
+      ]
+    }
+  }
+}

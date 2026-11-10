@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import Image from "@/components/ui/site-image";
 import { AnimatePresence, motion, type PanInfo } from "framer-motion";
 import { Quote, Star } from "lucide-react";
 import { Hero } from "@/components/sections/hero";
@@ -100,11 +101,13 @@ function Avatar({
       )}
       style={{ width: size, height: size }}
     >
-      <img
+      <Image
         src={avatar.src}
         alt={avatar.alt}
+        width={size}
+        height={size}
         className="h-full w-full object-cover"
-        loading="eager"
+        loading="lazy"
         decoding="async"
         onError={() => setErroredSrc(avatar.src)}
       />

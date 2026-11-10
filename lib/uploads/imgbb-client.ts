@@ -158,8 +158,7 @@ export async function convertImageFileToWebP(file: File) {
       blob,
       filename: toWebPFilename(file.name),
       mimeType: WEBP_MIME_TYPE,
-      width: bitmap.width,
-      height: bitmap.height,
+      ...getUploadDimensions(bitmap),
     };
   } finally {
     bitmap.close();
@@ -177,21 +176,23 @@ export function toWebPFilename(filename: string) {
 }
 
 async function convertWithOffscreenCanvas(bitmap: ImageBitmap) {
-  const canvas = new OffscreenCanvas(bitmap.width, bitmap.height);
+  const { width, height } = getUploadDimensions(bitmap);
+  const canvas = new OffscreenCanvas(width, height);
   const context = canvas.getContext("2d");
 
   if (!context) {
     throw new Error("Unable to create a browser image conversion context.");
   }
 
-  context.drawImage(bitmap, 0, 0);
-  return canvas.convertToBlob({ type: WEBP_MIME_TYPE, quality: 1 });
+  context.drawImage(bitmap, 0, 0, width, height);
+  return canvas.convertToBlob({ type: WEBP_MIME_TYPE, quality: 0.85 });
 }
 
 async function convertWithHtmlCanvas(bitmap: ImageBitmap) {
   const canvas = document.createElement("canvas");
-  canvas.width = bitmap.width;
-  canvas.height = bitmap.height;
+  const { width, height } = getUploadDimensions(bitmap);
+  canvas.width = width;
+  canvas.height = height;
 
   const context = canvas.getContext("2d");
 
@@ -199,7 +200,7 @@ async function convertWithHtmlCanvas(bitmap: ImageBitmap) {
     throw new Error("Unable to create a browser image conversion context.");
   }
 
-  context.drawImage(bitmap, 0, 0);
+  context.drawImage(bitmap, 0, 0, width, height);
 
   return new Promise<Blob>((resolve, reject) => {
     canvas.toBlob(
@@ -211,9 +212,17 @@ async function convertWithHtmlCanvas(bitmap: ImageBitmap) {
         }
       },
       WEBP_MIME_TYPE,
-      1,
+      0.85,
     );
   });
+}
+
+function getUploadDimensions(bitmap: ImageBitmap) {
+  const scale = Math.min(1, 2400 / Math.max(bitmap.width, bitmap.height));
+  return {
+    width: Math.max(1, Math.round(bitmap.width * scale)),
+    height: Math.max(1, Math.round(bitmap.height * scale)),
+  };
 }
 
 function readPositiveNumber(value: string | number | undefined) {

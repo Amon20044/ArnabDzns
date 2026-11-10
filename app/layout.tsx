@@ -48,13 +48,6 @@ export default async function RootLayout({
             {children}
           </RouteAwareSiteFrame>
         </SmoothScrollProvider>
-        <div className="site-boot-loader" aria-label="Loading site" role="status">
-          <div className="site-loader-card">
-            <span className="site-loader-mark" />
-            <span className="site-loader-line site-loader-line-wide" />
-            <span className="site-loader-line site-loader-line-short" />
-          </div>
-        </div>
       </body>
     </html>
   );

@@ -1,4 +1,4 @@
-import Image from "next/image";
+import Image from "@/components/ui/site-image";
 import { Download, Layers3, Sparkles } from "lucide-react";
 import { ShopHero } from "@/components/shop/shop-hero";
 import { StructuredData } from "@/components/site/structured-data";

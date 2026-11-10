@@ -1,6 +1,6 @@
 "use client";
 
-import Image from "next/image";
+import Image from "@/components/ui/site-image";
 import { useRouter } from "next/navigation";
 import {
   useCallback,

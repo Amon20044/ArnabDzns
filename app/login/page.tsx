@@ -1,4 +1,10 @@
 import { LoginForm } from "@/components/login-form";
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Admin login",
+  robots: { index: false, follow: false },
+};
 
 type LoginPageProps = {
   searchParams: Promise<{

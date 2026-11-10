@@ -5,9 +5,9 @@ export const sitePages: SitePagesConfig = {
     path: "/",
     seo: {
       title:
-        "Arnab Designs — Best Graphic & UI/UX Designer in Bangalore & West Bengal | Arnab Shaw (arnabdzns)",
+        "Arnab Shaw | Graphic & UI/UX Designer in Bangalore",
       description:
-        "Arnab Shaw (arnabdzns) is a budget-friendly senior graphic, brand, and UI/UX designer based in Bengaluru with West Bengal roots. Premium brand identity, posters, esports/livestream visuals, portfolio sites, launch pages, and Next.js frontend builds. Site by Amon Sharma.",
+        "Explore Arnab Shaw’s graphic design, brand identity, UI/UX, and esports portfolio. Based in Bangalore, working with creators and brands worldwide.",
       keywords: [
         "Arnab Designs",
         "Arnab Shaw",
@@ -37,9 +37,9 @@ export const sitePages: SitePagesConfig = {
     navLabel: "About",
     seo: {
       title:
-        "About Arnab Shaw — Graphic & UI/UX Designer in Bangalore (arnabdzns)",
+        "About Arnab Shaw — Graphic & UI/UX Designer",
       description:
-        "Learn how Arnab Shaw (arnabdzns) approaches graphic design, brand identity, UI/UX, and esports/livestream visuals from Bengaluru. Work history with creators, founders, tournament organizers, and growing teams across India and worldwide.",
+        "Meet Arnab Shaw, a Bangalore-based graphic and UI/UX designer creating brand identities, esports visuals, and digital experiences for clients worldwide.",
       keywords: [
         "about Arnab Shaw",
         "Arnab Shaw biography",
@@ -63,9 +63,9 @@ export const sitePages: SitePagesConfig = {
     navLabel: "Contact",
     seo: {
       title:
-        "Hire Arnab Shaw — Budget-Friendly Graphic & UI/UX Designer (Bangalore · West Bengal)",
+        "Hire Arnab Shaw — Graphic & UI/UX Design",
       description:
-        "Hire Arnab Shaw (arnabdzns) for brand identity, posters, social creatives, UI/UX, esports & livestream visuals, portfolio sites, and Next.js frontend builds. Reach out via the contact form, email, or WhatsApp +91 6289 135 345.",
+        "Have a design project? Contact Arnab Shaw for brand identity, graphic design, UI/UX, and esports visuals. Share your brief by email, WhatsApp, or the contact form.",
       keywords: [
         "hire Arnab Shaw",
         "contact arnabdzns",
@@ -89,7 +89,7 @@ export const sitePages: SitePagesConfig = {
     navLabel: "Shop",
     seo: {
       title:
-        "Shop — Premium Graphic & Brand Templates by Arnab Designs (Coming Soon)",
+        "Design Templates — Coming Soon",
       description:
         "A coming-soon storefront for premium ecommerce graphics, launch page templates, esports/livestream packs, and creator-ready digital design templates by Arnab Shaw (arnabdzns).",
       keywords: [

@@ -9,7 +9,7 @@ import {
   type PointerEvent as ReactPointerEvent,
 } from "react";
 import { createPortal } from "react-dom";
-import Image from "next/image";
+import Image from "@/components/ui/site-image";
 import { ChevronLeftIcon, ChevronRightIcon, XIcon } from "lucide-react";
 import type { IconType } from "react-icons";
 import {
@@ -159,7 +159,7 @@ function resolveAspectRatio(image: ImageMarqueeItem) {
 }
 
 function getMarqueeImageKey(image: ImageMarqueeItem) {
-  return image.id ?? image.src ?? image.title ?? image.alt ?? "";
+  return image.id || image.src || image.title || image.alt || "";
 }
 
 function buildGridSlots(images: ImageMarqueeItem[]): GridSlot[] {
@@ -220,6 +220,7 @@ interface GalleryTileProps {
   image: ImageMarqueeItem;
   height: string;
   width?: string;
+  sizes?: string;
   aspectRatio: number;
   priority: boolean;
   itemClassName?: string;
@@ -230,6 +231,7 @@ function GalleryTile({
   image,
   height,
   width,
+  sizes,
   aspectRatio,
   priority,
   itemClassName,
@@ -264,11 +266,11 @@ function GalleryTile({
       <div className="absolute inset-0">
         <Image
           src={imageSrc}
-          alt={image.alt ?? ""}
+          alt={image.alt || image.title || "Portfolio artwork by Arnab Shaw"}
           fill
-          sizes="(max-width: 640px) 82vw, (max-width: 1200px) 42vw, 34vw"
+          sizes={sizes ?? `calc(${height} * ${aspectRatio})`}
           quality={75}
-          loading="eager"
+          loading={priority ? "eager" : "lazy"}
           decoding="async"
           fetchPriority={priority ? "high" : "auto"}
           draggable={false}
@@ -344,6 +346,7 @@ function MarqueeRow({
 
     const mediaQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
     let previousTime = 0;
+    let inViewport = false;
 
     const applyTransform = () => {
       if (!widthRef.current) {
@@ -426,6 +429,7 @@ function MarqueeRow({
     const startAnimation = () => {
       if (
         frameRef.current === null &&
+        inViewport &&
         !document.hidden &&
         !mediaQuery.matches
       ) {
@@ -460,12 +464,20 @@ function MarqueeRow({
     resizeObserver.observe(segment);
     updateMetrics();
 
+    const intersectionObserver = new IntersectionObserver(([entry]) => {
+      inViewport = entry.isIntersecting;
+      if (inViewport) startAnimation();
+      else stopAnimation();
+    }, { rootMargin: "100px" });
+    intersectionObserver.observe(container);
+
     mediaQuery.addEventListener("change", handleMotionChange);
     document.addEventListener("visibilitychange", handleVisibilityChange);
     startAnimation();
 
     return () => {
       resizeObserver.disconnect();
+      intersectionObserver.disconnect();
       mediaQuery.removeEventListener("change", handleMotionChange);
       document.removeEventListener("visibilitychange", handleVisibilityChange);
       stopAnimation();
@@ -482,8 +494,6 @@ function MarqueeRow({
     (event: ReactPointerEvent<HTMLDivElement>) => {
       if (!draggable) return;
       if (event.pointerType === "mouse" && event.button !== 0) return;
-      const target = event.currentTarget;
-      target.setPointerCapture(event.pointerId);
       dragRef.current = {
         pointerId: event.pointerId,
         active: true,
@@ -505,6 +515,9 @@ function MarqueeRow({
       const deltaRaw = event.clientX - state.startX;
       if (!state.moved && Math.abs(deltaRaw) > DRAG_THRESHOLD_PX) {
         state.moved = true;
+        // Capturing on pointer-down retargets ordinary clicks to the row,
+        // preventing the clicked tile from opening its lightbox.
+        event.currentTarget.setPointerCapture(event.pointerId);
       }
 
       const directionSign = direction === "left" ? 1 : -1;
@@ -559,6 +572,9 @@ function MarqueeRow({
       onPointerMove={onPointerMove}
       onPointerUp={releasePointer}
       onPointerCancel={releasePointer}
+      onPointerLeave={(event) => {
+        if (!dragRef.current.moved) releasePointer(event);
+      }}
       onClickCapture={onClickCapture}
     >
       <div ref={trackRef} className="flex w-max will-change-transform">
@@ -618,10 +634,10 @@ function MarqueeRow({
                           fill
                           sizes="(max-width: 640px) 120px, 180px"
                           quality={75}
-                          loading="eager"
+                          loading={isPriorityIndex ? "eager" : "lazy"}
                           decoding="async"
                           fetchPriority={
-                            image.priority ?? isPriorityIndex ? "high" : "auto"
+                            isPriorityIndex ? "high" : "auto"
                           }
                           draggable={false}
                           referrerPolicy="no-referrer-when-downgrade"
@@ -690,6 +706,7 @@ function MarqueeRow({
                       image={topImage}
                       height={stackedTileHeight}
                       width="100%"
+                      sizes={stackedWidth}
                       aspectRatio={resolveAspectRatio(topImage)}
                       priority={isPriorityIndex}
                       itemClassName={itemClassName}
@@ -699,6 +716,7 @@ function MarqueeRow({
                       image={bottomImage}
                       height={stackedTileHeight}
                       width="100%"
+                      sizes={stackedWidth}
                       aspectRatio={resolveAspectRatio(bottomImage)}
                       priority={isPriorityIndex}
                       itemClassName={itemClassName}
@@ -730,7 +748,7 @@ function MarqueeRow({
                     image={image}
                     height={height}
                     aspectRatio={aspectRatio}
-                    priority={image.priority ?? isPriorityIndex}
+                    priority={isPriorityIndex}
                     itemClassName={itemClassName}
                     onTileClick={onTileClick}
                   />
@@ -810,19 +828,6 @@ function GalleryOverlay({
     };
   }, [goNext, goPrev, onClose]);
 
-  useEffect(() => {
-    if (total < 2) return;
-    const adjacent = [
-      state.images[(safeIndex + 1) % total],
-      state.images[(safeIndex - 1 + total) % total],
-    ];
-    adjacent.forEach((adj) => {
-      if (!adj?.src) return;
-      const preload = new window.Image();
-      preload.src = adj.src;
-    });
-  }, [safeIndex, state.images, total]);
-
   if (!image?.src || typeof document === "undefined") {
     return null;
   }
@@ -897,7 +902,7 @@ function GalleryOverlay({
           <Image
             key={image.src}
             src={image.src}
-            alt={image.alt ?? ""}
+            alt={image.alt || image.title || "Portfolio artwork by Arnab Shaw"}
             fill
             sizes="100vw"
             quality={90}

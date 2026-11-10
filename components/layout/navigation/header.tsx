@@ -1,6 +1,6 @@
 "use client";
 
-import Image from "next/image";
+import Image from "@/components/ui/site-image";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { ShoppingBag } from "lucide-react";
@@ -79,7 +79,7 @@ export const Header = ({ content = headerConfig }: HeaderProps) => {
   return (
     <motion.header
       className="fixed inset-x-0 top-0 z-40 overflow-hidden border-b border-white/35 bg-transparent"
-      initial={{ opacity: 0, y: -16 }}
+      initial={false}
       animate={{
         opacity: isVisible ? 1 : 0,
         y: isVisible ? 0 : -96,

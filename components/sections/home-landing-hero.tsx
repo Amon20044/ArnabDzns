@@ -108,7 +108,7 @@ export function HomeLandingHero({
             <motion.div
               key={badge.id ?? `${badge.label}-${index}`}
               custom={index}
-              initial="hidden"
+              initial={false}
               animate="visible"
               variants={blurUp}
               className={cn(badge.showInMobile === false && "hidden sm:block")}
@@ -143,7 +143,7 @@ export function HomeLandingHero({
             <motion.span
               key={`${line}-${index}`}
               custom={titleStartStep + index}
-              initial="hidden"
+              initial={false}
               animate="visible"
               variants={blurUp}
               className="block leading-[1.05]"
@@ -168,7 +168,7 @@ export function HomeLandingHero({
       {content.description ? (
         <motion.div
           custom={descriptionStep}
-          initial="hidden"
+          initial={false}
           animate="visible"
           variants={blurUp}
           className="mt-6 max-w-2xl"
@@ -182,7 +182,7 @@ export function HomeLandingHero({
       {ctas.length ? (
         <motion.div
           custom={ctaStep}
-          initial="hidden"
+          initial={false}
           animate="visible"
           variants={blurUp}
           className="mt-8 flex flex-nowrap items-center justify-center gap-3 sm:mt-10"

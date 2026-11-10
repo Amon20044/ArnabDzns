@@ -1,6 +1,6 @@
 "use client";
 
-import Image from "next/image";
+import Image from "@/components/ui/site-image";
 import type { CSSProperties } from "react";
 import { cn } from "@/lib/utils";
 

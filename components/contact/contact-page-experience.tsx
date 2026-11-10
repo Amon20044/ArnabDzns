@@ -31,6 +31,7 @@ export function ContactPageExperience({
 
           <Hero
             content={content.hero}
+            headingAs="h1"
             className="min-h-0 py-2 sm:py-4"
             childrenClassName="mt-12"
           >

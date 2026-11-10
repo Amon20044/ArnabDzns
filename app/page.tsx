@@ -44,7 +44,7 @@ export default async function Home() {
           />
         </section>
 
-        <section className="page-reveal" style={homeHeroToClientsGapStyle}>
+        <section id="portfolio" data-nav-section="portfolio" className="page-reveal scroll-target" style={homeHeroToClientsGapStyle}>
           <ImageMarquee
             rows={content.showcaseMarquee}
             height="clamp(24.5rem, 43.94vw, 33.8rem)"

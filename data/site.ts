@@ -5,7 +5,7 @@ const whatsappNumber = "916289135345";
 const whatsappDisplay = "+91 6289 135 345";
 
 const siteUrl = normalizeUrl(
-  process.env.NEXT_PUBLIC_SITE_URL || "https://arnabdzns.com",
+  process.env.NEXT_PUBLIC_SITE_URL || "https://arnab-dzns.vercel.app",
 );
 
 type WhatsAppPrefillInput = {
@@ -89,8 +89,8 @@ export const siteConfig: SiteConfig = {
   contact: {
     inquiryPath: "/contact",
     bookingPath: "/contact",
-    bookingUrl: "https://www.arnabdzns.com/contact",
-    bookingDisplay: "arnabdzns.com/contact",
+    bookingUrl: `${siteUrl}/contact`,
+    bookingDisplay: `${new URL(siteUrl).host}/contact`,
     primaryCtaLabel: "Contact",
     emailAddress: "arnabdzns@gmail.com",
     callLabel: `WhatsApp ${whatsappDisplay}`,

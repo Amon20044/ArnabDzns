@@ -24,9 +24,8 @@ export function RouteAwareSiteFrame({
 
   return (
     <>
-      {/* Fixed chrome stays outside the brief startup content fade. */}
       {hideChrome ? null : <Header content={header} />}
-      <div className="site-boot-content flex flex-1 flex-col">
+      <div className="flex flex-1 flex-col">
         <div className={cn("flex flex-1 flex-col", hideChrome ? "" : "pt-24")}>
           <PageTransitionShell>{children}</PageTransitionShell>
         </div>

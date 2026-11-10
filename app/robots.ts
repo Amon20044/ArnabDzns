@@ -52,10 +52,7 @@ export default function robots(): MetadataRoute.Robots {
         disallow: DISALLOWED_PATHS,
       },
     ],
-    sitemap: [
-      `${siteConfig.url}/sitemap.xml`,
-      `${siteConfig.url}/llms.txt`,
-    ],
+    sitemap: `${siteConfig.url}/sitemap.xml`,
     host: siteConfig.url,
   };
 }

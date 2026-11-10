@@ -1,7 +1,7 @@
 "use client";
 
 import type { CSSProperties } from "react";
-import Image from "next/image";
+import Image from "@/components/ui/site-image";
 import { CalendarDays, Mail } from "lucide-react";
 import { Hero } from "@/components/sections/hero";
 import { PrimaryButton } from "@/components/ui/primary-button";
@@ -250,7 +250,7 @@ export function AboutPage({
               <div className="pointer-events-none absolute inset-0 max-md:hidden bg-[radial-gradient(circle_at_top_left,rgba(255,255,255,0.65),transparent_28%),radial-gradient(circle_at_bottom_right,rgba(216,180,254,0.18),transparent_32%)]" />
 
               <div className="relative z-[1]">
-                <h2
+                <h1
                   className={cn(
                     "text-[clamp(2.1rem,5.6vw,4.2rem)] font-bold leading-[0.98] tracking-[-0.035em] text-text-primary",
                   )}
@@ -284,7 +284,7 @@ export function AboutPage({
                   >
                     decoration.
                   </span>
-                </h2>
+                </h1>
 
                 <div className="mt-8 space-y-5">
                   {content.intro.paragraphs.map((paragraph) => (

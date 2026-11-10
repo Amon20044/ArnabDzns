@@ -1,6 +1,12 @@
 import Link from "next/link";
+import type { Metadata } from "next";
 import { DatabaseIcon, KeyRoundIcon, LayoutDashboardIcon } from "lucide-react";
 import { LogoutButton } from "@/components/admin/logout-button";
+
+export const metadata: Metadata = {
+  title: "Admin dashboard",
+  robots: { index: false, follow: false },
+};
 
 export default function DashboardLayout({
   children,
