@@ -85,7 +85,9 @@ export function HeroOrbitField({ className }: { className?: string }) {
     <div
       aria-hidden
       className={cn(
-        "pointer-events-none absolute -top-28 bottom-0 left-1/2 -z-10 w-screen -translate-x-1/2 overflow-hidden",
+        // The mask fades the rings out toward the hero's bottom edge, so they
+        // dissolve into the page instead of being cut off in a straight line.
+        "pointer-events-none absolute -top-28 bottom-0 left-1/2 -z-10 w-screen -translate-x-1/2 overflow-hidden [mask-image:linear-gradient(to_bottom,#000_calc(100%-15rem),transparent_calc(100%-1rem))]",
         className,
       )}
     >

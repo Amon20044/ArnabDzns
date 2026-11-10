@@ -608,7 +608,43 @@ body > :is(div, main) {
     }
   }
 
-  @keyframes sticker-bob {
+  @keyframes art-float-up {
+  0% {
+    translate: 0 0;
+    opacity: 0;
+  }
+  15% {
+    opacity: 1;
+  }
+  100% {
+    translate: 0 -34px;
+    opacity: 0;
+  }
+}
+
+@keyframes art-playhead {
+  0%,
+  100% {
+    translate: 0 0;
+  }
+  50% {
+    translate: 168px 0;
+  }
+}
+
+@keyframes drift {
+  0%,
+  100% {
+    translate: 0 0;
+    rotate: var(--drift-from, -6deg);
+  }
+  50% {
+    translate: 0 -14px;
+    rotate: var(--drift-to, 6deg);
+  }
+}
+
+@keyframes sticker-bob {
     0%,
     100% {
       translate: 0 0;
@@ -1082,8 +1118,9 @@ body > :is(div, main) {
 
   .orbit-carrier,
   .orbit-upright,
-  .marker-sweep {
-    animation: none;
+  .marker-sweep,
+  .art-loop {
+    animation: none !important;
   }
 
   .press {
