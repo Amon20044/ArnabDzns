@@ -216,6 +216,61 @@ function expandSlots<T>(items: T[], minimumItems: number): T[] {
   return expanded;
 }
 
+/* --------------------------------------------------------------------------
+   Page-scroll velocity, shared by every marquee row.
+
+   One passive scroll listener keeps a smoothed px/s reading. Rows read it in
+   their own animation frame and let it decay by elapsed time, so nothing has
+   to "reset" it when scrolling stops.
+   -------------------------------------------------------------------------- */
+const scrollVelocity = { value: 0, lastY: 0, lastTime: 0, subscribers: 0 };
+
+function handleScrollVelocity() {
+  const now = performance.now();
+  const y = window.scrollY;
+  const elapsed = now - scrollVelocity.lastTime;
+
+  if (elapsed > 0 && elapsed < 250) {
+    const instant = ((y - scrollVelocity.lastY) / elapsed) * 1000;
+    scrollVelocity.value = scrollVelocity.value * 0.55 + instant * 0.45;
+  }
+
+  scrollVelocity.lastY = y;
+  scrollVelocity.lastTime = now;
+}
+
+function subscribeScrollVelocity() {
+  if (scrollVelocity.subscribers === 0) {
+    scrollVelocity.lastY = window.scrollY;
+    scrollVelocity.lastTime = performance.now();
+    window.addEventListener("scroll", handleScrollVelocity, { passive: true });
+  }
+
+  scrollVelocity.subscribers += 1;
+
+  return () => {
+    scrollVelocity.subscribers -= 1;
+
+    if (scrollVelocity.subscribers === 0) {
+      window.removeEventListener("scroll", handleScrollVelocity);
+    }
+  };
+}
+
+/** Current scroll speed in px/s, fading out ~0.2s after the last scroll event. */
+function readScrollSpeed(now: number) {
+  const sinceLastEvent = now - scrollVelocity.lastTime;
+
+  return Math.abs(scrollVelocity.value) * Math.exp(-sinceLastEvent / 160);
+}
+
+/** How strongly page scrolling speeds a row up: 600px/s of scroll adds 1x. */
+const SCROLL_BOOST_PER_PX = 1 / 600;
+const SCROLL_BOOST_MAX = 5;
+/** Glide after a drag: fraction of speed kept per second (lower = stops sooner). */
+const INERTIA_DECAY_PER_SECOND = 1.7;
+const INERTIA_MAX = 5200;
+
 interface GalleryTileProps {
   image: ImageMarqueeItem;
   height: string;
@@ -305,6 +360,8 @@ function MarqueeRow({
   const offsetRef = useRef(0);
   const widthRef = useRef(0);
   const speedScaleRef = useRef(1);
+  const scrollBoostRef = useRef(0);
+  const inertiaRef = useRef(0);
   const frameRef = useRef<number | null>(null);
   const dragRef = useRef({
     pointerId: -1,
@@ -312,6 +369,9 @@ function MarqueeRow({
     moved: false,
     startX: 0,
     startOffset: 0,
+    lastX: 0,
+    lastTime: 0,
+    velocity: 0,
   });
   const applyTransformRef = useRef<() => void>(() => {});
   const [segmentKeys, setSegmentKeys] = useState([0, 1]);
@@ -404,15 +464,31 @@ function MarqueeRow({
       } else if (dragRef.current.active) {
         // While dragging, leave offset untouched; pointer handlers apply transform directly.
       } else {
+        // Base drift, eased toward the hover slowdown.
         const targetScale = hoverRef.current ? hoverSlowdownFactor : 1;
         const smoothing = 1 - Math.exp(-8 * deltaSeconds);
         speedScaleRef.current +=
           (targetScale - speedScaleRef.current) * smoothing;
-        offsetRef.current += speed * speedScaleRef.current * deltaSeconds;
 
-        if (offsetRef.current >= widthRef.current) {
-          offsetRef.current %= widthRef.current;
-        }
+        // Scrolling the page pushes the row along; it eases back when you stop.
+        const boostTarget = Math.min(
+          readScrollSpeed(time) * SCROLL_BOOST_PER_PX,
+          SCROLL_BOOST_MAX,
+        );
+        scrollBoostRef.current +=
+          (boostTarget - scrollBoostRef.current) * (1 - Math.exp(-5 * deltaSeconds));
+
+        // After a drag the row keeps the throw and loses it gradually, so it
+        // settles back into the normal drift instead of snapping to it.
+        const inertia = inertiaRef.current;
+        inertiaRef.current =
+          Math.abs(inertia) < 2 ? 0 : inertia * Math.exp(-INERTIA_DECAY_PER_SECOND * deltaSeconds);
+
+        const velocity =
+          speed * (speedScaleRef.current + scrollBoostRef.current) + inertia;
+        const next = offsetRef.current + velocity * deltaSeconds;
+
+        offsetRef.current = ((next % widthRef.current) + widthRef.current) % widthRef.current;
 
         applyTransform();
       }
@@ -442,6 +518,8 @@ function MarqueeRow({
     const handleMotionChange = () => {
       previousTime = 0;
       speedScaleRef.current = 1;
+      scrollBoostRef.current = 0;
+      inertiaRef.current = 0;
 
       if (mediaQuery.matches) {
         offsetRef.current = 0;
@@ -475,9 +553,11 @@ function MarqueeRow({
 
     mediaQuery.addEventListener("change", handleMotionChange);
     document.addEventListener("visibilitychange", handleVisibilityChange);
+    const unsubscribeScroll = subscribeScrollVelocity();
     startAnimation();
 
     return () => {
+      unsubscribeScroll();
       resizeObserver.disconnect();
       intersectionObserver.disconnect();
       mediaQuery.removeEventListener("change", handleMotionChange);
@@ -502,7 +582,11 @@ function MarqueeRow({
         moved: false,
         startX: event.clientX,
         startOffset: offsetRef.current,
+        lastX: event.clientX,
+        lastTime: performance.now(),
+        velocity: 0,
       };
+      inertiaRef.current = 0;
       hoverRef.current = true;
     },
     [draggable],
@@ -520,6 +604,16 @@ function MarqueeRow({
         // Capturing on pointer-down retargets ordinary clicks to the row,
         // preventing the clicked tile from opening its lightbox.
         event.currentTarget.setPointerCapture(event.pointerId);
+      }
+
+      const now = performance.now();
+      const elapsed = now - state.lastTime;
+
+      if (elapsed > 0) {
+        const instant = ((event.clientX - state.lastX) / elapsed) * 1000;
+        state.velocity = state.velocity * 0.6 + instant * 0.4;
+        state.lastX = event.clientX;
+        state.lastTime = now;
       }
 
       const directionSign = direction === "left" ? 1 : -1;
@@ -540,8 +634,18 @@ function MarqueeRow({
       }
       state.active = false;
       hoverRef.current = false;
+
+      // A pointer that sat still before release should not fling the row.
+      const restedFor = performance.now() - state.lastTime;
+
+      if (state.moved && restedFor < 90) {
+        const directionSign = direction === "left" ? 1 : -1;
+        const thrown = -state.velocity * directionSign;
+
+        inertiaRef.current = Math.max(-INERTIA_MAX, Math.min(INERTIA_MAX, thrown));
+      }
     },
-    [],
+    [direction],
   );
 
   const onClickCapture = useCallback(

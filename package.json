@@ -8,6 +8,7 @@
     "start": "cross-env UV_THREADPOOL_SIZE=8 MALLOC_ARENA_MAX=2 next start",
     "lint": "eslint",
     "images:sync": "node scripts/sync-image-assets.mjs",
+    "icons:generate": "tsx scripts/generate-icons.tsx",
     "db:seed": "tsx scripts/seed-mongo-content.ts",
     "db:seed:missing": "tsx scripts/seed-mongo-content.ts --no-overwrite",
     "auth:seed": "tsx scripts/seed-admin-user.ts"

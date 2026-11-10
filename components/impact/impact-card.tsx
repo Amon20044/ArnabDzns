@@ -229,7 +229,7 @@ function FeaturedBody({ card, inView }: { card: ImpactCardConfig; inView: boolea
   return (
     <div className="relative flex h-full flex-col justify-between gap-4">
       {card.chart?.kind === "area" || card.chart?.kind === "sparkline" ? (
-        <div className="pointer-events-none absolute -bottom-5 -left-5 -right-5 h-44 opacity-80 sm:-bottom-6 sm:-left-6 sm:-right-6">
+        <div className="pointer-events-none absolute -bottom-5 -left-5 -right-5 h-[52%] sm:-bottom-6 sm:-left-6 sm:-right-6">
           <Sparkline
             points={card.chart.points}
             accent={card.accent}

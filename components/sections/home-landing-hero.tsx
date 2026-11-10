@@ -39,6 +39,17 @@ function resolveTitleLines(title: HeroSectionConfig["title"]) {
 }
 
 /**
+ * Body copy is written in sentence case. If the stored content shouts a
+ * phrase ("CREATIVE DECISION"), lower it here. Short all-caps tokens are left
+ * alone because they are usually acronyms (UI, UX, CTR).
+ */
+function toSentenceCase(text: string) {
+  return text
+    .replace(/\b[A-Z][A-Z'’]{3,}\b/g, (word) => word.toLowerCase())
+    .replace(/\s+([!?.,])/g, "$1");
+}
+
+/**
  * Split "20000+ Projects Delivered" into a number and a caption so content
  * badges can be drawn as stamps. Labels without a leading number are skipped.
  */
@@ -125,7 +136,7 @@ export function HomeLandingHero({ content, work, className }: HomeLandingHeroPro
             className="mt-6 max-w-[34rem]"
           >
             <Text variant="p1" className="text-pretty">
-              {content.description}
+              {toSentenceCase(content.description)}
             </Text>
           </motion.div>
         ) : null}

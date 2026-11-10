@@ -78,6 +78,9 @@ interface SparklineProps {
   height?: number;
 }
 
+/** Where the measured data ends; the rest of the width is the projection. */
+const DATA_END_X = 86;
+
 export function Sparkline({
   points,
   accent,
@@ -92,73 +95,145 @@ export function Sparkline({
 
   const geometry = useMemo(() => {
     if (points.length === 0) {
-      return { path: "", area: "", width: 100 };
+      return { line: "", projection: "", area: "", end: null as null | { x: number; y: number } };
     }
-    const width = 100;
+
     const max = Math.max(...points.map((p) => p.value));
     const min = Math.min(...points.map((p) => p.value));
     const range = max - min || 1;
-    const step = width / Math.max(1, points.length - 1);
+    const step = DATA_END_X / Math.max(1, points.length - 1);
 
-    // Leave a touch of vertical breathing room so the peak/trough never clip.
-    const top = strokeWidth + 1;
-    const usable = height - top - strokeWidth;
+    // Headroom so the peak and the end marker never touch the top edge.
+    const top = height * 0.16;
+    const usable = height * 0.72;
 
-    const coords = points.map((point, index) => {
-      const x = index * step;
-      const y = top + (1 - (point.value - min) / range) * usable;
-      return [x, y] as const;
-    });
+    const coords = points.map((point, index) => ({
+      x: index * step,
+      y: top + (1 - (point.value - min) / range) * usable,
+    }));
 
-    // Straight connected segments — one continuous, unbroken line.
-    const path = coords
-      .map(([x, y], index) => (index === 0 ? `M${x},${y}` : `L${x},${y}`))
-      .join(" ");
+    // Smooth curve through the points. Control points are clamped between
+    // their neighbours so the line never overshoots the data.
+    let line = `M${coords[0].x},${coords[0].y}`;
 
-    // Carry the fill all the way to the bottom edge so it bleeds continuously.
-    const area = `${path} L${width},${height} L0,${height} Z`;
+    for (let index = 0; index < coords.length - 1; index += 1) {
+      const previous = coords[index - 1] ?? coords[index];
+      const current = coords[index];
+      const next = coords[index + 1];
+      const afterNext = coords[index + 2] ?? next;
+      const low = Math.min(current.y, next.y);
+      const high = Math.max(current.y, next.y);
+      const clampY = (value: number) => Math.min(high, Math.max(low, value));
 
-    return { path, area, width };
-  }, [height, points, strokeWidth]);
+      const c1x = current.x + (next.x - previous.x) / 6;
+      const c1y = clampY(current.y + (next.y - previous.y) / 6);
+      const c2x = next.x - (afterNext.x - current.x) / 6;
+      const c2y = clampY(next.y - (afterNext.y - current.y) / 6);
+
+      line += ` C${c1x},${c1y} ${c2x},${c2y} ${next.x},${next.y}`;
+    }
+
+    // Projection: carry the closing trend on to the right edge, flattened a
+    // little, so the chart can bleed off the card without a hard stop.
+    const end = coords[coords.length - 1];
+    const beforeEnd = coords[coords.length - 2] ?? end;
+    const slope = step > 0 ? (end.y - beforeEnd.y) / step : 0;
+    const projectedY = Math.min(
+      height - 2,
+      Math.max(height * 0.06, end.y + slope * (100 - end.x) * 0.55),
+    );
+    const bend = `Q${(end.x + 100) / 2},${(end.y + projectedY) / 2 - 0.5} 100,${projectedY}`;
+    const projection = `M${end.x},${end.y} ${bend}`;
+    const area = `${line} ${bend} L100,${height} L0,${height} Z`;
+
+    return { line, projection, area, end };
+  }, [height, points]);
 
   return (
-    <svg
-      viewBox={`0 0 ${geometry.width} ${height}`}
-      preserveAspectRatio="none"
-      className={cn("h-full w-full", className)}
-      aria-hidden
-    >
-      <defs>
-        <linearGradient id={gradientId} x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stopColor={tokens.solid} stopOpacity="0.55" />
-          <stop offset="45%" stopColor={tokens.solid} stopOpacity="0.22" />
-          <stop offset="100%" stopColor={tokens.solid} stopOpacity="0" />
-        </linearGradient>
-      </defs>
+    <div className={cn("relative h-full w-full", className)} aria-hidden>
+      <motion.div
+        className="absolute inset-0"
+        initial={false}
+        animate={{ clipPath: isActive ? "inset(0% 0% 0% 0%)" : "inset(0% 100% 0% 0%)" }}
+        transition={{ duration: 1.2, ease, delay: 0.1 }}
+      >
+        <svg
+          viewBox={`0 0 100 ${height}`}
+          preserveAspectRatio="none"
+          className="h-full w-full overflow-visible"
+        >
+          <defs>
+            <linearGradient id={gradientId} x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stopColor={tokens.solid} stopOpacity="0.3" />
+              <stop offset="60%" stopColor={tokens.solid} stopOpacity="0.08" />
+              <stop offset="100%" stopColor={tokens.solid} stopOpacity="0" />
+            </linearGradient>
+          </defs>
 
-      {fill ? (
-        <motion.path
-          d={geometry.area}
-          fill={`url(#${gradientId})`}
-          initial={{ opacity: 0 }}
-          animate={{ opacity: isActive ? 1 : 0 }}
-          transition={{ duration: 0.9, ease, delay: 0.3 }}
-        />
+          {/* guide lines */}
+          {[0.3, 0.55, 0.8].map((ratio) => (
+            <line
+              key={ratio}
+              x1="0"
+              x2="100"
+              y1={height * ratio}
+              y2={height * ratio}
+              stroke="rgb(44 30 72)"
+              strokeOpacity="0.09"
+              strokeWidth="1"
+              strokeDasharray="2 5"
+              vectorEffect="non-scaling-stroke"
+            />
+          ))}
+
+          {fill ? <path d={geometry.area} fill={`url(#${gradientId})`} /> : null}
+
+          {/* The stroke stays a true hairline even though the chart stretches. */}
+          <path
+            d={geometry.projection}
+            fill="none"
+            stroke={tokens.solid}
+            strokeOpacity="0.55"
+            strokeWidth={strokeWidth}
+            strokeLinecap="round"
+            strokeDasharray="1 6"
+            vectorEffect="non-scaling-stroke"
+          />
+          <path
+            d={geometry.line}
+            fill="none"
+            stroke={tokens.solid}
+            strokeWidth={strokeWidth}
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            vectorEffect="non-scaling-stroke"
+          />
+        </svg>
+      </motion.div>
+
+      {/* End marker: an HTML dot, so it stays round on a stretched chart. */}
+      {geometry.end ? (
+        <motion.span
+          className="absolute size-3 -translate-x-1/2 -translate-y-1/2"
+          style={{
+            left: `${geometry.end.x}%`,
+            top: `${(geometry.end.y / height) * 100}%`,
+          }}
+          initial={false}
+          animate={{ opacity: isActive ? 1 : 0, scale: isActive ? 1 : 0.4 }}
+          transition={{ type: "spring", stiffness: 380, damping: 20, delay: isActive ? 1.05 : 0 }}
+        >
+          <span
+            className="absolute inset-0 animate-ping rounded-full opacity-60"
+            style={{ backgroundColor: tokens.solid }}
+          />
+          <span
+            className="absolute inset-0 rounded-full shadow-[0_0_0_3px_#fff]"
+            style={{ backgroundColor: tokens.solid }}
+          />
+        </motion.span>
       ) : null}
-
-      <motion.path
-        d={geometry.path}
-        fill="none"
-        stroke={tokens.foreground}
-        strokeWidth={strokeWidth}
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        initial={{ pathLength: 0 }}
-        animate={{ pathLength: isActive ? 1 : 0 }}
-        transition={{ duration: 1.1, ease, delay: 0.15 }}
-        style={{ filter: `drop-shadow(0 0 6px ${tokens.soft})` }}
-      />
-    </svg>
+    </div>
   );
 }
 
